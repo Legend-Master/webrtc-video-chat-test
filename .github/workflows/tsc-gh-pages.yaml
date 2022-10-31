@@ -30,10 +30,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-      - uses: actions/upload-pages-artifact@v1
 
       - run: npm install typescript
       - run: tsc
+
+      - uses: actions/configure-pages@v2
+      - uses: actions/upload-pages-artifact@v1
 
   deploy:
     # Add a dependency to the build job
