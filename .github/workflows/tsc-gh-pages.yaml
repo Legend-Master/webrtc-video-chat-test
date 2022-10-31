@@ -34,8 +34,13 @@ jobs:
       - run: npm install typescript
       - run: tsc
 
-      - uses: actions/configure-pages@v2
-      - uses: actions/upload-pages-artifact@v1
+      - name: Setup Pages
+        uses: actions/configure-pages@v2
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload entire repository
+          path: '.'
 
   deploy:
     # Add a dependency to the build job
