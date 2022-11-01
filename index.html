@@ -4,15 +4,33 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Test</title>
-		<script type="module" src="./out/index.js"></script>
-		<link rel="stylesheet" href="./style.css" />
+		<script type="module" src="out/index.js"></script>
+		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
 		<div>
-			<button id="offer-button">Offer</button>
-			<textarea id="answer-textarea"></textarea>
-			<button id="answer-button">Answer</button>
-			<div>
+			<div id="pc-config-div">
+				<h2 id="current-stun"></h2>
+				<div id="stun-setting-div">
+					<div>
+						<label for="stun-url">Url</label>
+						<input id="stun-url"></input>
+						<label for="stun-username">Username</label>
+						<input id="stun-username"></input>
+						<label for="stun-password">Password</label>
+						<input id="stun-password"></input>
+					</div>
+					<div>
+						<button id="stun-button">Set STUN/TURN Server</button>
+					</div>
+				</div>
+			</div>
+			<div id="pc-control-div">
+				<button id="offer-button">Offer</button>
+				<textarea id="answer-textarea"></textarea>
+				<button id="answer-button">Answer</button>
+			</div>
+			<div id="pc-info-div" hidden>
 				<button id="copy-button">Copy</button>
 				<h2>Ice Candidates<span id="ice-gather-state"></span></h2>
 				<div class="code-block">

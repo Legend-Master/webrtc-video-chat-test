@@ -1,7 +1,17 @@
 const video = document.getElementById('remote-video') as HTMLVideoElement
+
+const stunSettingDiv = document.getElementById('stun-setting-div') as HTMLDivElement
+const currentStun = document.getElementById('current-stun') as HTMLHeadingElement
+const stunUrl = document.getElementById('stun-url') as HTMLInputElement
+const stunUsername = document.getElementById('stun-username') as HTMLInputElement
+const stunPassword = document.getElementById('stun-password') as HTMLInputElement
+const stunBtn = document.getElementById('stun-button') as HTMLButtonElement
+
 const offerBtn = document.getElementById('offer-button') as HTMLButtonElement
 const answerBtn = document.getElementById('answer-button') as HTMLButtonElement
 const answerTextarea = document.getElementById('answer-textarea') as HTMLTextAreaElement
+
+const pcInfoDiv = document.getElementById('pc-info-div') as HTMLDivElement
 const copyBtn = document.getElementById('copy-button') as HTMLButtonElement
 const iceGatherState = document.getElementById('ice-gather-state') as HTMLSpanElement
 const iceOutEl = document.getElementById('ice-out') as HTMLDivElement
@@ -12,9 +22,11 @@ type MixedData = {
 	desc: RTCSessionDescriptionInit
 }
 
-const config: RTCConfiguration = {
-	iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }],
+const defaultIceServerUrl = 'stun:stun.l.google.com:19302'
+let iceServerConfig: RTCIceServer = {
+	urls: defaultIceServerUrl,
 }
+currentStun.innerText = defaultIceServerUrl
 
 let pc: RTCPeerConnection
 let peerType: 'offer' | 'answer' = 'answer'
@@ -23,10 +35,25 @@ const icecandidateData: RTCIceCandidateInit[] = []
 let offerDesc: RTCSessionDescriptionInit
 let answerDesc: RTCSessionDescriptionInit
 
+stunBtn.addEventListener('click', async (ev) => {
+	if (!stunUrl.value) {
+		return
+	}
+	iceServerConfig = {
+		urls: stunUrl.value.trim(),
+		username: stunUsername.value.trim(),
+		credential: stunPassword.value.trim(),
+	}
+	currentStun.innerText = iceServerConfig.username
+		? `${iceServerConfig.urls} ${iceServerConfig.username} ${iceServerConfig.credential}`
+		: `${iceServerConfig.urls}`
+})
 offerBtn.addEventListener('click', async (ev) => {
 	offerBtn.hidden = true
 	peerType = 'offer'
 	await createOfferPeer()
+	stunSettingDiv.hidden = true
+	pcInfoDiv.hidden = false
 })
 answerBtn.addEventListener('click', async (ev) => {
 	const userInput = answerTextarea.value
@@ -46,6 +73,8 @@ answerBtn.addEventListener('click', async (ev) => {
 	for (const candidate of data.ice) {
 		await pc.addIceCandidate(candidate)
 	}
+	stunSettingDiv.hidden = true
+	pcInfoDiv.hidden = false
 })
 copyBtn.addEventListener('click', (ev) => {
 	const data: MixedData = {
@@ -80,7 +109,7 @@ function registerTrackChange() {
 }
 
 async function createOfferPeer() {
-	pc = new RTCPeerConnection(config)
+	pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
 	registerIceChange()
 	registerTrackChange()
 	await addMedia()
@@ -90,7 +119,7 @@ async function createOfferPeer() {
 }
 
 async function createAnswerPeer() {
-	pc = new RTCPeerConnection(config)
+	pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
 	registerIceChange()
 	registerTrackChange()
 	await addMedia()

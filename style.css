@@ -1,23 +1,52 @@
 :root {
-    text-align: center;
+	text-align: center;
+}
+
+[hidden] {
+	display: none !important;
 }
 
 video {
-    width: 100%;
-    height: 100%;
+	width: 100%;
+	height: 100%;
 }
 
 code {
-    font-family: Consolas;
+	font-family: Consolas;
+}
+
+button {
+	padding: 0.3em 0.5em;
+}
+
+#pc-config-div {
+	flex-direction: column;
+}
+
+#pc-config-div,
+#pc-control-div {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	margin: 4px;
+}
+
+#pc-config-div *,
+#pc-control-div * {
+	margin: 4px;
+}
+
+#pc-info-div {
+	margin: 1.5em 0;
 }
 
 #ice-gather-state {
-    font-size: 0.5em;
+	font-size: 0.5em;
 }
 
 .code-block {
-    border: solid 1px;
-    padding: 2px;
-    margin: 4px;
-    min-height: 20px;
+	border: solid 1px;
+	padding: 2px;
+	margin: 4px;
+	min-height: 20px;
 }
