@@ -1,4 +1,4 @@
-import { ref, set, get, onValue, push, onChildAdded } from 'firebase/database'
+import { ref, set, get, onValue, push, onChildAdded, remove } from 'firebase/database'
 import { db } from './firebaseInit'
 
 const video = document.getElementById('remote-video') as HTMLVideoElement
@@ -20,8 +20,6 @@ type PeerType = 'offer' | 'answer'
 const serverSaveKey = 'ice-server-data'
 let iceServerConfig: RTCIceServer
 setServerData(readServerData() || getDefaultServerData())
-
-let pc: RTCPeerConnection
 
 const searchParams = new URLSearchParams(location.search)
 let room = searchParams.get('room')
@@ -59,24 +57,20 @@ answerBtn.addEventListener('click', async (ev) => {
 	await createAnswerPeer()
 })
 
-function registerIceChange(peerType: PeerType) {
+function registerIceChange(pc: RTCPeerConnection, peerType: PeerType) {
 	// const icecandidateData: RTCIceCandidateInit[] = []
+	const iceRef = ref(db, `${room}/${peerType}/ice`)
 	pc.addEventListener('icecandidate', async (ev) => {
 		if (ev.candidate) {
-			// console.log(ev.candidate.candidate)
-			// icecandidateData.push(ev.candidate.toJSON())
-			await set(push(ref(db, `${room}/${peerType}/ice`)), ev.candidate.toJSON())
+			await set(push(iceRef), ev.candidate.toJSON())
 		}
 	})
-	// pc.addEventListener('icegatheringstatechange', (ev) => {
-	// 	if (pc.iceGatheringState === 'complete') {
-	// 		iceOutEl.innerText = JSON.stringify(icecandidateData)
-	// 	}
-	// 	iceGatherState.innerText = ` (${pc.iceGatheringState})`
+	// pc.addEventListener('icegatheringstatechange', async (ev) => {
+	// 	await set(push(iceRef), DONE_SIGNAL)
 	// })
 }
 
-function registerTrackChange() {
+function registerTrackChange(pc: RTCPeerConnection) {
 	pc.addEventListener('track', (ev) => {
 		if (ev.streams[0]) {
 			video.srcObject = ev.streams[0]
@@ -85,43 +79,51 @@ function registerTrackChange() {
 }
 
 async function createOfferPeer() {
-	pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
-	registerIceChange('offer')
-	registerTrackChange()
-	await addMedia()
+	const pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
+	registerIceChange(pc, 'offer')
+	registerTrackChange(pc)
+	await addMedia(pc)
+
 	const offerDesc = await pc.createOffer()
 	await pc.setLocalDescription(offerDesc)
+
 	await set(ref(db, `${room}/offer/desc`), JSON.stringify(offerDesc))
-	onChildAdded(ref(db, `${room}/answer/ice`), async (snapshot) => {
-		if (snapshot.exists()) {
-			await pc.addIceCandidate(snapshot.val())
-		}
-	})
-	onValue(ref(db, `${room}/answer/desc`), async (snapshot) => {
+	const answerDescRef = ref(db, `${room}/answer/desc`)
+	onValue(answerDescRef, async (snapshot) => {
 		if (snapshot.exists()) {
 			await pc.setRemoteDescription(JSON.parse(snapshot.val()))
+			await remove(answerDescRef)
+			const iceRef = ref(db, `${room}/answer/ice`)
+			onChildAdded(iceRef, async (snapshot) => {
+				if (snapshot.exists()) {
+					await pc.addIceCandidate(snapshot.val())
+				}
+			})
 		}
 	})
 }
 
 async function createAnswerPeer() {
-	pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
-	registerIceChange('answer')
-	registerTrackChange()
-	await addMedia()
+	const pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
+	registerIceChange(pc, 'answer')
+	registerTrackChange(pc)
+	await addMedia(pc)
+
 	const snapshot = await get(ref(db, `${room}/offer/desc`))
 	await pc.setRemoteDescription(JSON.parse(snapshot.val()))
 	const answerDesc = await pc.createAnswer()
 	await pc.setLocalDescription(answerDesc)
+
 	await set(ref(db, `${room}/answer/desc`), JSON.stringify(answerDesc))
-	onChildAdded(ref(db, `${room}/offer/ice`), async (snapshot) => {
+	const iceRef = ref(db, `${room}/offer/ice`)
+	onChildAdded(iceRef, async (snapshot) => {
 		if (snapshot.exists()) {
 			await pc.addIceCandidate(snapshot.val())
 		}
 	})
 }
 
-async function addMedia() {
+async function addMedia(pc: RTCPeerConnection) {
 	const stream = await navigator.mediaDevices.getUserMedia({
 		video: {
 			frameRate: {
