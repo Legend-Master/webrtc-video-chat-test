@@ -1,3 +1,6 @@
+import { ref, set, get, onValue, push, onChildAdded } from 'firebase/database'
+import { db } from './firebaseInit'
+
 const video = document.getElementById('remote-video') as HTMLVideoElement
 
 const iceSettingDiv = document.getElementById('ice-setting-div') as HTMLDivElement
@@ -8,31 +11,23 @@ const icePassword = document.getElementById('ice-password') as HTMLInputElement
 const iceSet = document.getElementById('ice-set') as HTMLButtonElement
 const iceReset = document.getElementById('ice-reset') as HTMLButtonElement
 
+const pcControlDiv = document.getElementById('pc-control-div') as HTMLDivElement
 const offerBtn = document.getElementById('offer-button') as HTMLButtonElement
 const answerBtn = document.getElementById('answer-button') as HTMLButtonElement
-const answerTextarea = document.getElementById('answer-textarea') as HTMLTextAreaElement
 
-const pcInfoDiv = document.getElementById('pc-info-div') as HTMLDivElement
-const copyBtn = document.getElementById('copy-button') as HTMLButtonElement
-const iceGatherState = document.getElementById('ice-gather-state') as HTMLSpanElement
-const iceOutEl = document.getElementById('ice-out') as HTMLDivElement
-const descOutEl = document.getElementById('desc-out') as HTMLDivElement
-
-type MixedData = {
-	ice: RTCIceCandidateInit[]
-	desc: RTCSessionDescriptionInit
-}
+type PeerType = 'offer' | 'answer'
 
 const serverSaveKey = 'ice-server-data'
 let iceServerConfig: RTCIceServer
 setServerData(readServerData() || getDefaultServerData())
 
 let pc: RTCPeerConnection
-let peerType: 'offer' | 'answer' = 'answer'
 
-const icecandidateData: RTCIceCandidateInit[] = []
-let offerDesc: RTCSessionDescriptionInit
-let answerDesc: RTCSessionDescriptionInit
+const searchParams = new URLSearchParams(location.search)
+let room = searchParams.get('room')
+if (!room) {
+	answerBtn.disabled = true
+}
 
 iceSet.addEventListener('click', async (ev) => {
 	if (!iceUrl.value) {
@@ -48,56 +43,37 @@ iceSet.addEventListener('click', async (ev) => {
 iceReset.addEventListener('click', async (ev) => {
 	resetServerData()
 })
+
 offerBtn.addEventListener('click', async (ev) => {
-	offerBtn.hidden = true
-	peerType = 'offer'
-	await createOfferPeer()
+	pcControlDiv.hidden = true
 	iceSettingDiv.hidden = true
-	pcInfoDiv.hidden = false
+	if (!room) {
+		room = push(ref(db)).key
+		history.replaceState(null, '', `?room=${room}`)
+	}
+	await createOfferPeer()
 })
 answerBtn.addEventListener('click', async (ev) => {
-	const userInput = answerTextarea.value
-	if (!userInput) {
-		return
-	}
-	offerBtn.hidden = true
-	answerBtn.hidden = true
-	answerTextarea.hidden = true
-	const data: MixedData = JSON.parse(userInput)
-	if (peerType === 'answer') {
-		offerDesc = data.desc
-		await createAnswerPeer()
-	} else {
-		await pc.setRemoteDescription(data.desc)
-	}
-	for (const candidate of data.ice) {
-		await pc.addIceCandidate(candidate)
-	}
+	pcControlDiv.hidden = true
 	iceSettingDiv.hidden = true
-	pcInfoDiv.hidden = false
-})
-copyBtn.addEventListener('click', (ev) => {
-	const data: MixedData = {
-		ice: icecandidateData,
-		desc: peerType === 'offer' ? offerDesc : answerDesc,
-	}
-	navigator.clipboard.writeText(JSON.stringify(data))
+	await createAnswerPeer()
 })
 
-function registerIceChange() {
-	pc.addEventListener('icecandidate', (ev) => {
+function registerIceChange(peerType: PeerType) {
+	// const icecandidateData: RTCIceCandidateInit[] = []
+	pc.addEventListener('icecandidate', async (ev) => {
 		if (ev.candidate) {
 			// console.log(ev.candidate.candidate)
-			icecandidateData.push(ev.candidate.toJSON())
-			iceOutEl.innerText = JSON.stringify(icecandidateData)
+			// icecandidateData.push(ev.candidate.toJSON())
+			await set(push(ref(db, `${room}/${peerType}/ice`)), ev.candidate.toJSON())
 		}
 	})
-	pc.addEventListener('icegatheringstatechange', (ev) => {
-		// if (pc.iceGatheringState === 'complete') {
-		// 	iceOutEl.innerText = JSON.stringify(icecandidateData)
-		// }
-		iceGatherState.innerText = ` (${pc.iceGatheringState})`
-	})
+	// pc.addEventListener('icegatheringstatechange', (ev) => {
+	// 	if (pc.iceGatheringState === 'complete') {
+	// 		iceOutEl.innerText = JSON.stringify(icecandidateData)
+	// 	}
+	// 	iceGatherState.innerText = ` (${pc.iceGatheringState})`
+	// })
 }
 
 function registerTrackChange() {
@@ -110,23 +86,39 @@ function registerTrackChange() {
 
 async function createOfferPeer() {
 	pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
-	registerIceChange()
+	registerIceChange('offer')
 	registerTrackChange()
 	await addMedia()
-	offerDesc = await pc.createOffer()
-	descOutEl.innerText = JSON.stringify(offerDesc)
+	const offerDesc = await pc.createOffer()
 	await pc.setLocalDescription(offerDesc)
+	await set(ref(db, `${room}/offer/desc`), JSON.stringify(offerDesc))
+	onChildAdded(ref(db, `${room}/answer/ice`), async (snapshot) => {
+		if (snapshot.exists()) {
+			await pc.addIceCandidate(snapshot.val())
+		}
+	})
+	onValue(ref(db, `${room}/answer/desc`), async (snapshot) => {
+		if (snapshot.exists()) {
+			await pc.setRemoteDescription(JSON.parse(snapshot.val()))
+		}
+	})
 }
 
 async function createAnswerPeer() {
 	pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
-	registerIceChange()
+	registerIceChange('answer')
 	registerTrackChange()
 	await addMedia()
-	await pc.setRemoteDescription(offerDesc)
-	answerDesc = await pc.createAnswer()
-	descOutEl.innerText = JSON.stringify(answerDesc)
+	const snapshot = await get(ref(db, `${room}/offer/desc`))
+	await pc.setRemoteDescription(JSON.parse(snapshot.val()))
+	const answerDesc = await pc.createAnswer()
 	await pc.setLocalDescription(answerDesc)
+	await set(ref(db, `${room}/answer/desc`), JSON.stringify(answerDesc))
+	onChildAdded(ref(db, `${room}/offer/ice`), async (snapshot) => {
+		if (snapshot.exists()) {
+			await pc.addIceCandidate(snapshot.val())
+		}
+	})
 }
 
 async function addMedia() {
