@@ -8,7 +8,6 @@
 
 video {
 	width: 100%;
-	height: 100%;
 }
 
 code {
@@ -42,6 +41,12 @@ button {
 
 #ice-gather-state {
 	font-size: 0.5em;
+}
+
+.flex-container {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
 }
 
 .code-block {
