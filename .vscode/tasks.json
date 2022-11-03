@@ -5,6 +5,21 @@
 			"type": "npm",
 			"label": "vite",
 			"script": "dev",
+			"problemMatcher": {
+				"pattern":[
+					{
+						"regexp": "^([^\\\\s].*)\\\\((\\\\d+,\\\\d+)\\\\):\\\\s*(.*)$",
+						"file": 1,
+						"location": 2,
+						"message": 3
+					}
+				],
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": "VITE v.* ready in .* ms",
+					"endsPattern": "."
+				}
+			},
 			"dependsOn": [
 				"tsc: watch - tsconfig.json"
 			],
