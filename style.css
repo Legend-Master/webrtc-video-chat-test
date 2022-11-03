@@ -36,14 +36,6 @@ button {
 	margin: 4px;
 }
 
-#pc-info-div {
-	margin: 1.5em 0;
-}
-
-#ice-gather-state {
-	font-size: 0.5em;
-}
-
 .flex-container {
 	display: flex;
 	justify-content: center;
