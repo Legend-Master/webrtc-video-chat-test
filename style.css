@@ -8,6 +8,7 @@
 
 video {
 	width: 100%;
+	margin: 8px 0;
 }
 
 code {
@@ -16,6 +17,11 @@ code {
 
 button {
 	padding: 0.3em 0.5em;
+}
+
+#current-ice {
+	max-width: 100%;
+	word-wrap: break-word;
 }
 
 #pc-config-div {
