@@ -1,4 +1,4 @@
-import { ref, set, get, onValue, push, onChildAdded, remove } from 'firebase/database'
+import { ref, set, get, onValue, push, onChildAdded, remove, Unsubscribe } from 'firebase/database'
 import { db } from './firebaseInit'
 
 const video = document.getElementById('remote-video') as HTMLVideoElement
@@ -16,6 +16,8 @@ const offerBtn = document.getElementById('offer-button') as HTMLButtonElement
 const answerBtn = document.getElementById('answer-button') as HTMLButtonElement
 
 type PeerType = 'offer' | 'answer'
+
+let unsubscribeIce: Unsubscribe
 
 const serverSaveKey = 'ice-server-data'
 let iceServerConfig: RTCIceServer
@@ -37,6 +39,9 @@ iceSet.addEventListener('click', async (ev) => {
 		credential: icePassword.value.trim(),
 	})
 	saveServerData()
+	iceUrl.value = ''
+	iceUsername.value = ''
+	icePassword.value = ''
 })
 iceReset.addEventListener('click', async (ev) => {
 	resetServerData()
@@ -47,7 +52,7 @@ offerBtn.addEventListener('click', async (ev) => {
 	iceSettingDiv.hidden = true
 	if (!room) {
 		room = push(ref(db)).key
-		history.replaceState(null, '', `?room=${room}`)
+		history.pushState(null, '', `?room=${room}`)
 	}
 	await createOfferPeer()
 })
@@ -57,14 +62,15 @@ answerBtn.addEventListener('click', async (ev) => {
 	await createAnswerPeer()
 })
 
-function registerIceChange(pc: RTCPeerConnection, peerType: PeerType) {
+async function registerIceChange(pc: RTCPeerConnection, peerType: PeerType) {
 	// const icecandidateData: RTCIceCandidateInit[] = []
 	const iceRef = ref(db, `${room}/${peerType}/ice`)
-	pc.addEventListener('icecandidate', async (ev) => {
+	await remove(iceRef)
+	pc.onicecandidate = async (ev) => {
 		if (ev.candidate) {
 			await set(push(iceRef), ev.candidate.toJSON())
 		}
-	})
+	}
 	// pc.addEventListener('icegatheringstatechange', async (ev) => {
 	// 	await set(push(iceRef), DONE_SIGNAL)
 	// })
@@ -78,23 +84,36 @@ function registerTrackChange(pc: RTCPeerConnection) {
 	})
 }
 
-async function createOfferPeer() {
+async function createPeerCommon() {
 	const pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
-	registerIceChange(pc, 'offer')
 	registerTrackChange(pc)
 	await addMedia(pc)
+	pc.addEventListener('connectionstatechange', async (ev) => {
+		if (pc.connectionState === 'connected') {
+			unsubscribeIce()
+			pc.onicecandidate = null
+			await remove(ref(db, `${room}`))
+		}
+	})
+	return pc
+}
+
+async function createOfferPeer() {
+	const pc = await createPeerCommon()
+	registerIceChange(pc, 'offer')
 
 	const offerDesc = await pc.createOffer()
 	await pc.setLocalDescription(offerDesc)
 
 	await set(ref(db, `${room}/offer/desc`), JSON.stringify(offerDesc))
 	const answerDescRef = ref(db, `${room}/answer/desc`)
-	onValue(answerDescRef, async (snapshot) => {
+	const unsubscribe = onValue(answerDescRef, async (snapshot) => {
 		if (snapshot.exists()) {
+			unsubscribe()
 			await pc.setRemoteDescription(JSON.parse(snapshot.val()))
 			await remove(answerDescRef)
 			const iceRef = ref(db, `${room}/answer/ice`)
-			onChildAdded(iceRef, async (snapshot) => {
+			unsubscribeIce = onChildAdded(iceRef, async (snapshot) => {
 				if (snapshot.exists()) {
 					await pc.addIceCandidate(snapshot.val())
 				}
@@ -104,19 +123,19 @@ async function createOfferPeer() {
 }
 
 async function createAnswerPeer() {
-	const pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
+	const pc = await createPeerCommon()
 	registerIceChange(pc, 'answer')
-	registerTrackChange(pc)
-	await addMedia(pc)
 
-	const snapshot = await get(ref(db, `${room}/offer/desc`))
+	const offerDescRef = ref(db, `${room}/offer/desc`)
+	const snapshot = await get(offerDescRef)
 	await pc.setRemoteDescription(JSON.parse(snapshot.val()))
+	await remove(offerDescRef)
 	const answerDesc = await pc.createAnswer()
 	await pc.setLocalDescription(answerDesc)
 
 	await set(ref(db, `${room}/answer/desc`), JSON.stringify(answerDesc))
 	const iceRef = ref(db, `${room}/offer/ice`)
-	onChildAdded(iceRef, async (snapshot) => {
+	unsubscribeIce = onChildAdded(iceRef, async (snapshot) => {
 		if (snapshot.exists()) {
 			await pc.addIceCandidate(snapshot.val())
 		}
