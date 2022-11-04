@@ -1,5 +1,6 @@
 const modifiers = new Map<string, number>()
 
+// Specification https://www.rfc-editor.org/rfc/rfc4566.html#section-5.8
 // Modified from https://github.com/webrtc/samples/blob/gh-pages/src/content/peerconnection/bandwidth/js/main.js
 // bandwidth default to 10Mbps (10000kbps)
 export function updateBandwidthRestriction(sdp: string, bandwidth: number = 10000) {
