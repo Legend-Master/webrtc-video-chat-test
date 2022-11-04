@@ -1,5 +1,6 @@
 import { ref, set, get, onValue, push, onChildAdded, remove, Unsubscribe } from 'firebase/database'
 import { db } from './firebaseInit'
+import { updateBandwidthRestriction } from './sdpInject'
 
 const video = document.getElementById('remote-video') as HTMLVideoElement
 
@@ -78,8 +79,9 @@ async function registerIceChange(pc: RTCPeerConnection, peerType: PeerType) {
 
 function registerTrackChange(pc: RTCPeerConnection) {
 	pc.addEventListener('track', (ev) => {
-		if (ev.streams[0]) {
-			video.srcObject = ev.streams[0]
+		const stream = ev.streams[0]
+		if (stream) {
+			video.srcObject = stream
 		}
 	})
 }
@@ -104,6 +106,7 @@ async function createOfferPeer() {
 
 	const offerDesc = await pc.createOffer()
 	await pc.setLocalDescription(offerDesc)
+	offerDesc.sdp = updateBandwidthRestriction(offerDesc.sdp!)
 
 	await set(ref(db, `${room}/offer/desc`), JSON.stringify(offerDesc))
 	const answerDescRef = ref(db, `${room}/answer/desc`)
@@ -132,6 +135,7 @@ async function createAnswerPeer() {
 	await remove(offerDescRef)
 	const answerDesc = await pc.createAnswer()
 	await pc.setLocalDescription(answerDesc)
+	answerDesc.sdp = updateBandwidthRestriction(answerDesc.sdp!)
 
 	await set(ref(db, `${room}/answer/desc`), JSON.stringify(answerDesc))
 	const iceRef = ref(db, `${room}/offer/ice`)
