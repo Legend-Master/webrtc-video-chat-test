@@ -114,13 +114,13 @@ async function createOfferPeer() {
 		if (snapshot.exists()) {
 			unsubscribe()
 			await pc.setRemoteDescription(JSON.parse(snapshot.val()))
-			await remove(answerDescRef)
 			const iceRef = ref(db, `${room}/answer/ice`)
 			unsubscribeIce = onChildAdded(iceRef, async (snapshot) => {
 				if (snapshot.exists()) {
 					await pc.addIceCandidate(snapshot.val())
 				}
 			})
+			await remove(answerDescRef)
 		}
 	})
 }
@@ -132,7 +132,6 @@ async function createAnswerPeer() {
 	const offerDescRef = ref(db, `${room}/offer/desc`)
 	const snapshot = await get(offerDescRef)
 	await pc.setRemoteDescription(JSON.parse(snapshot.val()))
-	await remove(offerDescRef)
 	const answerDesc = await pc.createAnswer()
 	await pc.setLocalDescription(answerDesc)
 	answerDesc.sdp = updateBandwidthRestriction(answerDesc.sdp!)
@@ -144,6 +143,7 @@ async function createAnswerPeer() {
 			await pc.addIceCandidate(snapshot.val())
 		}
 	})
+	await remove(offerDescRef)
 }
 
 async function addMedia(pc: RTCPeerConnection) {
