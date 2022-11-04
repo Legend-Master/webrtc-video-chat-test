@@ -66,12 +66,12 @@ answerBtn.addEventListener('click', async (ev) => {
 async function registerIceChange(pc: RTCPeerConnection, peerType: PeerType) {
 	// const icecandidateData: RTCIceCandidateInit[] = []
 	const iceRef = ref(db, `${room}/${peerType}/ice`)
-	await remove(iceRef)
 	pc.onicecandidate = async (ev) => {
 		if (ev.candidate) {
 			await set(push(iceRef), ev.candidate.toJSON())
 		}
 	}
+	await remove(iceRef)
 	// pc.addEventListener('icegatheringstatechange', async (ev) => {
 	// 	await set(push(iceRef), DONE_SIGNAL)
 	// })
