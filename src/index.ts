@@ -1,17 +1,12 @@
 import { ref, set, get, onValue, push, onChildAdded, remove, Unsubscribe } from 'firebase/database'
 import { db } from './firebaseInit'
 import { updateBandwidthRestriction } from './sdpInject'
+import { iceServerConfig } from './iceServerData'
 
 const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
 const iceSettingDiv = document.getElementById('ice-setting-div') as HTMLDivElement
-const currentIce = document.getElementById('current-ice') as HTMLHeadingElement
-const iceUrl = document.getElementById('ice-url') as HTMLInputElement
-const iceUsername = document.getElementById('ice-username') as HTMLInputElement
-const icePassword = document.getElementById('ice-password') as HTMLInputElement
-const iceSet = document.getElementById('ice-set') as HTMLButtonElement
-const iceReset = document.getElementById('ice-reset') as HTMLButtonElement
 
 const pcControlDiv = document.getElementById('pc-control-div') as HTMLDivElement
 const offerBtn = document.getElementById('offer-button') as HTMLButtonElement
@@ -21,33 +16,11 @@ type PeerType = 'offer' | 'answer'
 
 let unsubscribeIce: Unsubscribe
 
-const serverSaveKey = 'ice-server-data'
-let iceServerConfig: RTCIceServer
-setServerData(readServerData() || getDefaultServerData())
-
 const searchParams = new URLSearchParams(location.search)
 let room = searchParams.get('room')
 if (!room) {
 	answerBtn.disabled = true
 }
-
-iceSet.addEventListener('click', async (ev) => {
-	if (!iceUrl.value) {
-		return
-	}
-	setServerData({
-		urls: iceUrl.value.trim(),
-		username: iceUsername.value.trim(),
-		credential: icePassword.value.trim(),
-	})
-	saveServerData()
-	iceUrl.value = ''
-	iceUsername.value = ''
-	icePassword.value = ''
-})
-iceReset.addEventListener('click', async (ev) => {
-	resetServerData()
-})
 
 offerBtn.addEventListener('click', async (ev) => {
 	pcControlDiv.hidden = true
@@ -179,33 +152,4 @@ async function addMedia(pc: RTCPeerConnection) {
 	for (const track of stream.getTracks()) {
 		pc.addTrack(track, stream)
 	}
-}
-
-function getDefaultServerData() {
-	return {
-		urls: 'stun:stun.l.google.com:19302',
-	}
-}
-
-function setServerData(data: RTCIceServer) {
-	iceServerConfig = data
-	currentIce.innerText = iceServerConfig.username
-		? `${iceServerConfig.urls} [${iceServerConfig.username}:${iceServerConfig.credential}]`
-		: `${iceServerConfig.urls}`
-}
-
-function saveServerData() {
-	localStorage.setItem(serverSaveKey, JSON.stringify(iceServerConfig))
-}
-
-function readServerData(): RTCIceServer | undefined {
-	const data = localStorage.getItem(serverSaveKey)
-	if (data) {
-		return JSON.parse(data)
-	}
-}
-
-function resetServerData() {
-	setServerData(getDefaultServerData())
-	localStorage.removeItem(serverSaveKey)
 }
