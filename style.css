@@ -8,7 +8,6 @@
 
 video {
 	width: 100%;
-	margin: 8px 0;
 }
 
 code {
@@ -48,9 +47,11 @@ button {
 	flex-wrap: wrap;
 }
 
-.code-block {
-	border: solid 1px;
-	padding: 2px;
-	margin: 4px;
-	min-height: 20px;
+.video-container {
+	margin: 8px;
+	gap: 1em;
+}
+
+.video-container > div {
+	flex-grow: 1;
 }

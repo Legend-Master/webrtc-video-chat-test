@@ -2,7 +2,8 @@ import { ref, set, get, onValue, push, onChildAdded, remove, Unsubscribe } from 
 import { db } from './firebaseInit'
 import { updateBandwidthRestriction } from './sdpInject'
 
-const video = document.getElementById('remote-video') as HTMLVideoElement
+const localVideo = document.getElementById('local-video') as HTMLVideoElement
+const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
 const iceSettingDiv = document.getElementById('ice-setting-div') as HTMLDivElement
 const currentIce = document.getElementById('current-ice') as HTMLHeadingElement
@@ -63,6 +64,19 @@ answerBtn.addEventListener('click', async (ev) => {
 	await createAnswerPeer()
 })
 
+function localStreamControl(enable: boolean) {
+	return () => {
+		const stream = localVideo.srcObject
+		if (stream && stream instanceof MediaStream) {
+			for (const track of stream.getTracks()) {
+				track.enabled = enable
+			}
+		}
+	}
+}
+localVideo.addEventListener('pause', localStreamControl(false))
+localVideo.addEventListener('play', localStreamControl(true))
+
 async function registerIceChange(pc: RTCPeerConnection, peerType: PeerType) {
 	// const icecandidateData: RTCIceCandidateInit[] = []
 	const iceRef = ref(db, `${room}/${peerType}/ice`)
@@ -81,7 +95,7 @@ function registerTrackChange(pc: RTCPeerConnection) {
 	pc.addEventListener('track', (ev) => {
 		const stream = ev.streams[0]
 		if (stream) {
-			video.srcObject = stream
+			remoteVideo.srcObject = stream
 		}
 	})
 }
@@ -161,7 +175,7 @@ async function addMedia(pc: RTCPeerConnection) {
 		},
 		// audio: true,
 	})
-
+	localVideo.srcObject = stream
 	for (const track of stream.getTracks()) {
 		pc.addTrack(track, stream)
 	}
