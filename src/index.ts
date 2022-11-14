@@ -150,6 +150,10 @@ async function addMedia(pc: RTCPeerConnection) {
 	})
 	localVideo.srcObject = stream
 	for (const track of stream.getTracks()) {
-		pc.addTrack(track, stream)
+		const sender = pc.addTrack(track, stream)
+		sender.setParameters({
+			...sender.getParameters(),
+			degradationPreference: 'maintain-resolution',
+		})
 	}
 }
