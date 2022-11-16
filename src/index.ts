@@ -95,6 +95,7 @@ async function createOfferPeer() {
 	await pc.setLocalDescription(offerDesc)
 	offerDesc.sdp = updateBandwidthRestriction(offerDesc.sdp!)
 
+	await remove(ref(db, `${room}`))
 	await set(ref(db, `${room}/offer/desc`), JSON.stringify(offerDesc))
 	const answerDescRef = ref(db, `${room}/answer/desc`)
 	const unsubscribe = onValue(answerDescRef, async (snapshot) => {
