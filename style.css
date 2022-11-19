@@ -107,6 +107,19 @@ body > div {
 	flex-basis: 400px;
 }
 
+#welcome-dialog > form {
+	padding-top: 1em;
+	padding-bottom: 1em;
+	max-width: 450px;
+}
+#welcome-dialog > form > h2 {
+	margin-top: 0;
+	margin-bottom: 1.5em;
+}
+#welcome-dialog > form > button {
+	font-size: 16px;
+}
+
 #ice-setting-dialog {
 	padding: 0;
 }

@@ -10,7 +10,7 @@ const VIDEO_SETTING = {
 }
 
 const welcomeDialog = document.getElementById('welcome-dialog') as HTMLDialogElement
-const requestPermission = document.getElementById('request-permission') as HTMLButtonElement
+// const requestPermission = document.getElementById('request-permission') as HTMLButtonElement
 
 const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 // const audioSelect = document.getElementById('audio-select') as HTMLSelectElement
@@ -28,12 +28,10 @@ navigator.permissions.query({ name: 'camera' as PermissionName }).then(
 		await populateMediaSelection()
 	}
 )
-requestPermission.addEventListener('click', async () => {
-	if (await getMediaPermission()) {
-		await populateMediaSelection()
-	}
-	welcomeDialog.close()
+welcomeDialog.addEventListener('cancel', (ev) => {
+	ev.preventDefault()
 })
+welcomeDialog.addEventListener('submit', populateMediaSelection)
 
 async function getMediaPermission() {
 	try {

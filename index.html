@@ -10,10 +10,12 @@
 	</head>
 	<body>
 		<dialog id="welcome-dialog">
-			<h3 title="Deny this will make some of features unavailable">
-				This site requires video permission to work
-			</h3>
-			<button id="request-permission">request permission</button>
+			<form method="dialog">
+				<h2 title="Deny this will make some of features unavailable">
+					This site requires video permission to work
+				</h2>
+				<button id="request-permission" type="submit">request permission</button>
+			</form>
 		</dialog>
 		<dialog id="ice-setting-dialog">
 			<form method="dialog" class="flex-container">
