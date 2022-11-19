@@ -4,52 +4,62 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Test</title>
-		<script type="module" src="out/index.js"></script>
-		<!-- <script type="module" src="src/index.ts"></script> -->
+		<!-- <script type="module" src="out/index.js"></script> -->
+		<script type="module" src="src/index.ts"></script>
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
-		<div>
-			<div id="pc-config-div">
-				<h2 id="current-ice"></h2>
-				<div id="ice-setting-div">
-					<div class="flex-container">
-						<div>
-							<label for="ice-url">Url</label>
-							<input id="ice-url"></input>
-						</div>
-						<div>
-							<label for="ice-username">Username</label>
-							<input id="ice-username"></input>
-						</div>
-						<div>
-							<label for="ice-password">Password</label>
-							<input id="ice-password"></input>
-						</div>
+		<dialog id="welcome-dialog">
+			<h3 title="Deny this will make some of features unavailable">
+				This site requires video permission to work
+			</h3>
+			<button id="request-permission">request permission</button>
+		</dialog>
+		<dialog id="ice-setting-dialog">
+			<form method="dialog" class="flex-container">
+				<div class="form-input-container flex-container">
+					<div>
+						<label for="ice-url">Url</label>
+						<input id="ice-url" required />
 					</div>
 					<div>
-						<button id="ice-set">Set STUN/TURN Server</button>
-						<button id="ice-reset">Reset</button>
+						<label for="ice-username">Username</label>
+						<input id="ice-username" />
+					</div>
+					<div>
+						<label for="ice-password">Password</label>
+						<input id="ice-password" />
 					</div>
 				</div>
-			</div>
-			<div id="pc-control-div">
-				<button id="offer-button">Offer</button>
-				<button id="answer-button">Answer</button>
-			</div>
+				<div class="form-button-container flex-container">
+					<button id="ice-set" type="submit">Set STUN/TURN Server</button>
+					<button id="ice-reset" type="button">Reset</button>
+				</div>
+			</form>
+		</dialog>
+		<div>
+			<button id="current-ice"></button>
+		</div>
+		<div id="pc-control-div" class="hidden-after-call">
+			<button id="offer-button">Offer</button>
+			<button id="answer-button">Answer</button>
+		</div>
+		<div id="device-select-div" class="hidden-after-call">
+			<label for="video-select">Select Camera/Video:</label>
+			<select id="video-select"></select>
+			<!-- <label for="audio-select">Select Microphone/Audio</label> -->
+			<!-- <select id="audio-select"></select> -->
 		</div>
 		<div class="video-container flex-container">
 			<div>
-				<video id="local-video" controls autoplay></video>
+				<video id="local-video" controls autoplay muted></video>
 			</div>
 			<div>
 				<video id="remote-video" controls autoplay></video>
 			</div>
 		</div>
-		<div id="view-source">
-			<a href="https://github.com/Legend-Master/webrtc-video-chat-test">
-				View source on Github
-			</a>
+		<div>
+			<a href="https://github.com/Legend-Master/webrtc-video-chat-test">View source on Github</a>
 		</div>
 	</body>
 </html>

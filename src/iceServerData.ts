@@ -1,16 +1,26 @@
-const serverSaveKey = 'ice-server-data'
+const SERVER_SAVE_KEY = 'ice-server-data'
 export let iceServerConfig: RTCIceServer
 
-const currentIce = document.getElementById('current-ice') as HTMLHeadingElement
+const currentIce = document.getElementById('current-ice') as HTMLButtonElement
+const iceSettingDialog = document.getElementById('ice-setting-dialog') as HTMLDialogElement
 
 const iceUrl = document.getElementById('ice-url') as HTMLInputElement
 const iceUsername = document.getElementById('ice-username') as HTMLInputElement
 const icePassword = document.getElementById('ice-password') as HTMLInputElement
 
-const iceSet = document.getElementById('ice-set') as HTMLButtonElement
+// const iceSet = document.getElementById('ice-set') as HTMLButtonElement
 const iceReset = document.getElementById('ice-reset') as HTMLButtonElement
 
-iceSet.addEventListener('click', async (ev) => {
+currentIce.addEventListener('click', (ev) => {
+	iceSettingDialog.showModal()
+})
+iceSettingDialog.addEventListener('mousedown', (ev) => {
+	if (ev.target === iceSettingDialog) {
+		iceSettingDialog.close()
+	}
+})
+
+iceSettingDialog.addEventListener('submit', async (ev) => {
 	if (!iceUrl.value) {
 		return
 	}
@@ -28,6 +38,7 @@ iceSet.addEventListener('click', async (ev) => {
 })
 iceReset.addEventListener('click', async (ev) => {
 	resetServerData()
+	iceSettingDialog.close()
 })
 
 setServerData(readServerData() || getDefaultServerData())
@@ -49,11 +60,11 @@ function setServerData(data: RTCIceServer, save: boolean = false) {
 }
 
 function saveServerData() {
-	localStorage.setItem(serverSaveKey, JSON.stringify(iceServerConfig))
+	localStorage.setItem(SERVER_SAVE_KEY, JSON.stringify(iceServerConfig))
 }
 
 function readServerData(): RTCIceServer | undefined {
-	const data = localStorage.getItem(serverSaveKey)
+	const data = localStorage.getItem(SERVER_SAVE_KEY)
 	if (data) {
 		return JSON.parse(data)
 	}
@@ -61,5 +72,5 @@ function readServerData(): RTCIceServer | undefined {
 
 function resetServerData() {
 	setServerData(getDefaultServerData())
-	localStorage.removeItem(serverSaveKey)
+	localStorage.removeItem(SERVER_SAVE_KEY)
 }

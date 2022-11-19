@@ -2,15 +2,19 @@ import { ref, set, get, onValue, push, onChildAdded, remove, Unsubscribe } from 
 import { db } from './firebaseInit'
 import { updateBandwidthRestriction } from './sdpInject'
 import { iceServerConfig } from './iceServerData'
+import { getUserMedia } from './selectDevice'
+
+const currentIce = document.getElementById('current-ice') as HTMLButtonElement
 
 const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
-const iceSettingDiv = document.getElementById('ice-setting-div') as HTMLDivElement
-
-const pcControlDiv = document.getElementById('pc-control-div') as HTMLDivElement
 const offerBtn = document.getElementById('offer-button') as HTMLButtonElement
 const answerBtn = document.getElementById('answer-button') as HTMLButtonElement
+
+const hiddenAfterCall = document.getElementsByClassName(
+	'hidden-after-call'
+) as HTMLCollectionOf<HTMLElement>
 
 type PeerType = 'offer' | 'answer'
 
@@ -22,20 +26,25 @@ if (!room) {
 	answerBtn.disabled = true
 }
 
-offerBtn.addEventListener('click', async (ev) => {
-	pcControlDiv.hidden = true
-	iceSettingDiv.hidden = true
-	if (!room) {
-		room = push(ref(db)).key
-		history.pushState(null, '', `?room=${room}`)
+function startChat(peerType: PeerType) {
+	return async () => {
+		for (const el of hiddenAfterCall) {
+			el.hidden = true
+		}
+		currentIce.disabled = true
+		if (peerType === 'offer') {
+			if (!room) {
+				room = push(ref(db)).key
+				history.pushState(null, '', `?room=${room}`)
+			}
+			await createOfferPeer()
+		} else {
+			await createAnswerPeer()
+		}
 	}
-	await createOfferPeer()
-})
-answerBtn.addEventListener('click', async (ev) => {
-	pcControlDiv.hidden = true
-	iceSettingDiv.hidden = true
-	await createAnswerPeer()
-})
+}
+offerBtn.addEventListener('click', startChat('offer'))
+answerBtn.addEventListener('click', startChat('answer'))
 
 function localStreamControl(enable: boolean) {
 	return () => {
@@ -135,20 +144,7 @@ async function createAnswerPeer() {
 }
 
 async function addMedia(pc: RTCPeerConnection) {
-	const stream = await navigator.mediaDevices.getUserMedia({
-		video: {
-			frameRate: {
-				ideal: 60,
-			},
-			width: {
-				ideal: 1920,
-			},
-			height: {
-				ideal: 1080,
-			},
-		},
-		// audio: true,
-	})
+	const stream = await getUserMedia()
 	localVideo.srcObject = stream
 	for (const track of stream.getTracks()) {
 		const sender = pc.addTrack(track, stream)

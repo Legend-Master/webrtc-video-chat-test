@@ -20,9 +20,9 @@
 					"endsPattern": "."
 				}
 			},
-			"dependsOn": [
-				"tsc: watch - tsconfig.json"
-			],
+			// "dependsOn": [
+			// 	"tsc: watch - tsconfig.json"
+			// ],
 			"isBackground": true
 		},
 		{
