@@ -17,6 +17,21 @@ video {
 dialog {
 	border: 1px solid var(--button-normal-color);
 }
+@media not (prefers-reduced-motion) {
+	dialog[open] {
+		animation: modal 0.2s;
+	}
+	@keyframes modal {
+		from {
+			scale: 95%;
+			opacity: 0;
+		}
+		to {
+			scale: 100%;
+			opacity: 1;
+		}
+	}
+}
 
 select {
 	border: 1px solid var(--half-transparent);
