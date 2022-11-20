@@ -1,5 +1,7 @@
 :root {
 	text-align: center;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+
 	--button-normal-color: #0e639c;
 	--button-hover-color: #1177bb;
 	--button-active-color: #18a0fb;
@@ -60,8 +62,10 @@ input:focus {
 	color: var(--button-normal-color);
 	background: none;
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
 }
-#current-ice:hover {
+#current-ice:hover,
+#current-ice.ontouch {
 	color: var(--button-hover-color);
 }
 #current-ice:active {
