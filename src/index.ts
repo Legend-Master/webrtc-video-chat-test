@@ -1,6 +1,6 @@
 import { ref, set, get, onValue, push, onChildAdded, remove, Unsubscribe } from 'firebase/database'
 import { db } from './firebaseInit'
-import { updateBandwidthRestriction } from './sdpInject'
+import { updateBandwidthRestriction } from './util/sdpInject'
 import { iceServerConfig } from './iceServerData'
 import { getUserMedia } from './selectDevice'
 
