@@ -1,11 +1,11 @@
 :root {
-	font-family: sans-serif;
+	font-family: Arial, sans-serif;
 	text-align: center;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
 
-	--button-normal-color: #0e639c;
-	--button-hover-color: #1177bb;
-	--button-active-color: #18a0fb;
+	--button-normal-color: hsl(204, 85%, 40%);
+	--button-hover-color: hsl(204, 85%, 35%);
+	--button-active-color: hsl(204, 85%, 30%);
 	--half-transparent: rgba(0, 0, 0, 0.5);
 }
 
@@ -26,7 +26,8 @@ select {
 	outline: none;
 	padding: 0.4em 0.7em;
 	cursor: pointer;
-	font-size: 14px;
+	font-size: 16px;
+	background-color: white;
 }
 
 button {
@@ -36,7 +37,8 @@ button {
 	color: white;
 	background-color: var(--button-normal-color);
 }
-button:hover {
+button:hover,
+button.ontouch {
 	background-color: var(--button-hover-color);
 }
 button:active {
@@ -44,13 +46,13 @@ button:active {
 }
 
 input {
-	font-size: 16px;
+	font-size: 14px;
 	padding: 4px;
 	border: 1px solid var(--half-transparent);
 	outline: none;
 }
 input:focus {
-	border-color: var(--button-active-color);
+	border-color: var(--button-normal-color);
 }
 
 #current-ice {
@@ -58,7 +60,7 @@ input:focus {
 	word-wrap: break-word;
 	padding: 4px;
 	border: none;
-	font-size: 26px;
+	font-size: 28px;
 	font-weight: bold;
 	color: var(--button-normal-color);
 	background: none;
@@ -83,11 +85,18 @@ input:focus {
 }
 
 #pc-control-div > button {
-	font-size: 14px;
+	font-size: 16px;
 }
 
-#device-select-div {
-	align-items: baseline;
+#device-select-div > div {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	gap: 0.5em;
+	/* text-align: left; */
+}
+#device-select-div > div > select {
+	min-width: 150px;
 }
 
 .flex-container,
