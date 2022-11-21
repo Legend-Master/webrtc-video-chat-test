@@ -3,10 +3,18 @@ const touchResponse = document.getElementsByClassName(
 ) as HTMLCollectionOf<HTMLElement>
 
 for (const el of touchResponse) {
-	el.addEventListener('touchstart', () => {
-		el.classList.add('ontouch')
-	})
-	el.addEventListener('touchend', () => {
-		el.classList.remove('ontouch')
-	})
+	el.addEventListener(
+		'touchstart',
+		() => {
+			el.classList.add('ontouch')
+		},
+		{ passive: true }
+	)
+	el.addEventListener(
+		'touchend',
+		() => {
+			el.classList.remove('ontouch')
+		},
+		{ passive: true }
+	)
 }
