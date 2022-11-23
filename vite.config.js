@@ -5,4 +5,7 @@ export default defineConfig({
 	build: {
 		sourcemap: true,
 	},
+	optimizeDeps: {
+		disabled: true,
+	},
 })
