@@ -167,6 +167,7 @@ async function addMedia() {
 	onDeviceSelectChange(async () => {
 		await addMediaInternal(sneders)
 	})
+	refreshVideoButton.hidden = false
 	refreshVideoButton.addEventListener('click', async () => {
 		await addMediaInternal(sneders)
 	})
