@@ -36,6 +36,8 @@ let unsubscribeIce: Unsubscribe
 const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
+const refreshVideoButton = document.getElementById('refresh-video') as HTMLButtonElement
+
 function localStreamControl(enable: boolean) {
 	return () => {
 		const stream = localVideo.srcObject
@@ -165,9 +167,12 @@ async function addMedia() {
 	onDeviceSelectChange(async () => {
 		await addMediaInternal(sneders)
 	})
+	refreshVideoButton.addEventListener('click', async () => {
+		await addMediaInternal(sneders)
+	})
 }
 
-function setPeerType(peerType_: PeerType){
+function setPeerType(peerType_: PeerType) {
 	peerType = peerType_
 	peerIceRef = ref(db, `${room}/${peerType}/ice`)
 	for (const candidateInit of iceCandidates) {
