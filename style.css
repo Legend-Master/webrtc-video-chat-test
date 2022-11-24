@@ -79,7 +79,6 @@ input:focus {
 	content: url('https://api.iconify.design/codicon/edit.svg');
 }
 #current-ice:disabled {
-	opacity: 100%;
 	cursor: default;
 	color: unset;
 }

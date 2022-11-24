@@ -93,13 +93,7 @@ function onConnectionStateChange(this: RTCPeerConnection) {
 		cleanup()
 		unsubscribeIce()
 		this.removeEventListener('icecandidate', onIceCandidate)
-		// registerForRenegotiate()
-		// this.addEventListener('signalingstatechange', () => {
-		// 	if (this.signalingState === 'stable') {
-		// 		cleanup()
-		// 	}
-		// })
-		pc.removeEventListener('connectionstatechange', onConnectionStateChange)
+		this.removeEventListener('connectionstatechange', onConnectionStateChange)
 	}
 }
 
@@ -130,31 +124,6 @@ async function renegotiate() {
 	await pc.setLocalDescription(desc)
 	dataChannel.send(JSON.stringify(updateSdpInfo(desc.toJSON())))
 }
-
-// let unsub: Unsubscribe | undefined
-// let initialOffer = true
-// function registerForRenegotiate() {
-// 	// registerUnsub(
-// 	if (unsub) {
-// 		return
-// 	}
-// 	unsub = onValue(ref(db, `${room}/offer/desc`), async (snapshot) => {
-// 		if (initialOffer) {
-// 			initialOffer = false
-// 			return
-// 		}
-// 		if (!snapshot.val()) {
-// 			return
-// 		}
-// 		if (pc.signalingState === 'stable') {
-// 			await pc.setRemoteDescription(snapshot.val())
-// 			const desc = (await pc.createAnswer()) as RTCSessionDescription
-// 			await pc.setLocalDescription(desc)
-// 			await set(ref(db, `${room}/answer/desc`), desc.toJSON())
-// 		}
-// 	})
-// 	// )
-// }
 
 function cleanup() {
 	unsubscribeAll()
