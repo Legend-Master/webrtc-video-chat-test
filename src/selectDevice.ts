@@ -107,3 +107,7 @@ export async function populateMediaSelection() {
 
 	selectLastMediaOption()
 }
+
+export function onDeviceSelectChange(listener: EventListener) {
+	videoSelect.addEventListener('change', listener)
+}
