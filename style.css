@@ -98,6 +98,25 @@ input:focus {
 	min-width: 150px;
 }
 
+.text-button {
+	font-size: 1.2em;
+	padding: 4px;
+	border: none;
+	font-weight: bold;
+	color: var(--button-normal-color);
+	background: none;
+	cursor: pointer;
+}
+.text-button:hover,
+.text-button.ontouch {
+	color: var(--button-hover-color);
+	background: none;
+}
+.text-button:active {
+	color: var(--button-active-color);
+	background: none;
+}
+
 .flex-container,
 body > div {
 	display: flex;
