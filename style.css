@@ -75,10 +75,14 @@ input:focus {
 	color: var(--button-active-color);
 }
 #current-ice::after {
-	margin: 0.5em;
+	font-size: smaller;
+	margin-left: 0.5em;
 }
 #current-ice:enabled::after {
-	content: url('https://api.iconify.design/codicon/edit.svg');
+	/* content: url('https://api.iconify.design/codicon/edit.svg'); */
+	display: inline-block;
+	content: "✎";
+	rotate: 90deg;
 }
 #current-ice:disabled {
 	cursor: default;
