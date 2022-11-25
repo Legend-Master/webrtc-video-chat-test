@@ -7,7 +7,6 @@ import {
 	runTransaction,
 	onDisconnect,
 	DatabaseReference,
-	Unsubscribe,
 	remove,
 } from 'firebase/database'
 import { db } from './firebaseInit'
@@ -30,8 +29,6 @@ let dataChannel: RTCDataChannel
 function isPolite() {
 	return peerType === 'answer'
 }
-
-let unsubscribeIce: Unsubscribe
 
 const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
@@ -93,7 +90,6 @@ async function onIceCandidate(this: RTCPeerConnection, ev: RTCPeerConnectionIceE
 function onConnectionStateChange(this: RTCPeerConnection) {
 	if (this.connectionState === 'connected') {
 		cleanup()
-		unsubscribeIce()
 		this.removeEventListener('icecandidate', onIceCandidate)
 		this.removeEventListener('connectionstatechange', onConnectionStateChange)
 	}
@@ -127,9 +123,9 @@ async function renegotiate() {
 	dataChannel.send(JSON.stringify(updateSdpInfo(desc.toJSON())))
 }
 
-function cleanup() {
+async function cleanup() {
 	unsubscribeAll()
-	remove(ref(db, `${room}`))
+	await remove(ref(db, `${room}`))
 }
 
 async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
@@ -186,6 +182,9 @@ async function negotiate(this: RTCPeerConnection) {
 	if (dataChannel.readyState === 'open') {
 		renegotiate()
 		return
+	} else if (peerType && dataChannel.readyState === 'connecting') {
+		dataChannel.onopen = renegotiate
+		return
 	}
 
 	await onDisconnect(ref(db, `${room}`)).remove()
@@ -213,14 +212,13 @@ async function negotiate(this: RTCPeerConnection) {
 					return
 				}
 				await this.setRemoteDescription(snapshot.val())
-				const iceRef = ref(db, `${room}/answer/ice`)
-				unsubscribeIce = registerUnsub(
-					onChildAdded(iceRef, async (snapshot) => {
-						if (snapshot.exists()) {
-							await this.addIceCandidate(snapshot.val())
-						}
-					})
-				)
+			})
+		)
+		registerUnsub(
+			onChildAdded(ref(db, `${room}/answer/ice`), async (snapshot) => {
+				if (snapshot.exists()) {
+					await this.addIceCandidate(snapshot.val())
+				}
 			})
 		)
 	} else {
@@ -230,7 +228,7 @@ async function negotiate(this: RTCPeerConnection) {
 		const answer = (await this.createAnswer()) as RTCSessionDescription
 		await this.setLocalDescription(answer)
 		await set(ref(db, `${room}/answer/desc`), updateSdpInfo(answer.toJSON()))
-		unsubscribeIce = registerUnsub(
+		registerUnsub(
 			onChildAdded(ref(db, `${room}/offer/ice`), async (snapshot) => {
 				if (snapshot.exists()) {
 					await this.addIceCandidate(snapshot.val())
