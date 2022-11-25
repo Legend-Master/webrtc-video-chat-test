@@ -30,6 +30,8 @@ function isPolite() {
 	return peerType === 'answer'
 }
 
+const currentIce = document.getElementById('current-ice') as HTMLButtonElement
+
 const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
@@ -48,12 +50,30 @@ function localStreamControl(enable: boolean) {
 localVideo.addEventListener('pause', localStreamControl(false))
 localVideo.addEventListener('play', localStreamControl(true))
 
+function monitorConnectionState(this: RTCPeerConnection) {
+	switch (this.connectionState) {
+		case 'connected':
+			currentIce.dataset.state = "🟢"
+			break
+		case 'new':
+		case 'connecting':
+			currentIce.dataset.state = "🟡"
+			break
+		case 'failed':
+		case 'closed':
+		case 'disconnected':
+			currentIce.dataset.state = "🔴"
+			break
+	}
+}
+
 export async function startPeerConnection() {
 	pc = new RTCPeerConnection({ iceServers: [iceServerConfig] })
 	pc.addEventListener('track', onTrack)
 	pc.addEventListener('icecandidate', onIceCandidate)
 	pc.addEventListener('negotiationneeded', negotiate)
 	pc.addEventListener('connectionstatechange', onConnectionStateChange)
+	pc.addEventListener('connectionstatechange', monitorConnectionState)
 	await addMedia()
 	dataChannel = pc.createDataChannel('renegotiate', {
 		negotiated: true,

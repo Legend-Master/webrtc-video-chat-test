@@ -41,14 +41,14 @@
 			</form>
 		</dialog>
 		<div>
-			<button id="current-ice" class="touch-response">...</button>
+			<button id="current-ice" class="touch-response" data-state="🟡">...</button>
 		</div>
 		<div id="pc-control-div" class="hidden-after-call">
 			<button id="start-button">Start</button>
 		</div>
 		<div id="device-select-div">
 			<div>
-				<div>
+				<div class="center-flex-container">
 					<label for="video-select">Video Source</label>
 					<button
 						id="refresh-video"
@@ -56,7 +56,7 @@
 						title="Refresh video source"
 						hidden
 					>
-						&#x21bb;
+						⟳
 					</button>
 				</div>
 				<select id="video-select"></select>
