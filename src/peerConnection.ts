@@ -53,16 +53,16 @@ localVideo.addEventListener('play', localStreamControl(true))
 function monitorConnectionState(this: RTCPeerConnection) {
 	switch (this.connectionState) {
 		case 'connected':
-			currentIce.dataset.state = "🟢"
+			currentIce.dataset.state = '🟢'
 			break
 		case 'new':
 		case 'connecting':
-			currentIce.dataset.state = "🟡"
+			currentIce.dataset.state = '🟡'
 			break
 		case 'failed':
 		case 'closed':
 		case 'disconnected':
-			currentIce.dataset.state = "🔴"
+			currentIce.dataset.state = '🔴'
 			break
 	}
 }
