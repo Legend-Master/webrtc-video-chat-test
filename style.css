@@ -74,13 +74,18 @@ input:focus {
 #current-ice:active {
 	color: var(--button-active-color);
 }
-#current-ice:enabled::after {
+#current-ice::after {
 	margin: 0.5em;
+}
+#current-ice:enabled::after {
 	content: url('https://api.iconify.design/codicon/edit.svg');
 }
 #current-ice:disabled {
 	cursor: default;
 	color: unset;
+}
+#current-ice:disabled::after {
+	content: attr(data-state);
 }
 
 #pc-control-div > button {
@@ -96,6 +101,12 @@ input:focus {
 }
 #device-select-div > div > select {
 	min-width: 150px;
+}
+
+.center-flex-container {
+	display: flex;
+	place-content: center;
+	place-items: center;
 }
 
 .text-button {
