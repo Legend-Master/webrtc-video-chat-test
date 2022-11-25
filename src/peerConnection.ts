@@ -232,13 +232,13 @@ async function negotiate(this: RTCPeerConnection) {
 					return
 				}
 				await this.setRemoteDescription(snapshot.val())
-			})
-		)
-		registerUnsub(
-			onChildAdded(ref(db, `${room}/answer/ice`), async (snapshot) => {
-				if (snapshot.exists()) {
-					await this.addIceCandidate(snapshot.val())
-				}
+				registerUnsub(
+					onChildAdded(ref(db, `${room}/answer/ice`), async (snapshot) => {
+						if (snapshot.exists()) {
+							await this.addIceCandidate(snapshot.val())
+						}
+					})
+				)
 			})
 		)
 	} else {
