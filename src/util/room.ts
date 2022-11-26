@@ -1,5 +1,5 @@
 import { push, ref } from 'firebase/database'
-import { db } from './firebaseInit'
+import { db } from '../firebaseInit'
 
 const searchParams = new URLSearchParams(location.search)
 

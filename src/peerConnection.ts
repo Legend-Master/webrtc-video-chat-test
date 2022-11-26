@@ -11,10 +11,10 @@ import {
 } from 'firebase/database'
 import { db } from './firebaseInit'
 import { updateBandwidthRestriction } from './util/sdpInject'
+import { room } from './util/room'
+import { registerUnsub, unsubscribeAll } from './util/unsubscribeAll'
 import { iceServerConfig } from './iceServerData'
 import { getUserMedia, onDeviceSelectChange } from './selectDevice'
-import { room } from './room'
-import { registerUnsub, unsubscribeAll } from './unsubscribeAll'
 
 type PeerType = 'offer' | 'answer'
 

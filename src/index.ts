@@ -1,5 +1,5 @@
+import { createRoom } from './util/room'
 import { startPeerConnection } from './peerConnection'
-import { createRoom } from './room'
 
 const currentIce = document.getElementById('current-ice') as HTMLButtonElement
 
