@@ -15,19 +15,21 @@ const welcomeDialog = document.getElementById('welcome-dialog') as HTMLDialogEle
 const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 // const audioSelect = document.getElementById('audio-select') as HTMLSelectElement
 
-navigator.permissions.query({ name: 'camera' as PermissionName }).then(
-	async (status) => {
+;(async function () {
+	let shouldPopulate = true
+	try {
+		// Firefox doesn't have camera query
+		// Lower version Safari and Android WebView doesn't have navigator.permissions
+		const status = await navigator.permissions.query({ name: 'camera' as PermissionName })
 		if (status.state === 'prompt') {
 			welcomeDialog.showModal()
-		} else {
-			await populateMediaSelection()
+			shouldPopulate = false
 		}
-	},
-	// Firefox doesn't have this
-	async (error) => {
+	} catch {}
+	if (shouldPopulate) {
 		await populateMediaSelection()
 	}
-)
+})()
 welcomeDialog.addEventListener('cancel', (ev) => {
 	ev.preventDefault()
 })
@@ -79,7 +81,7 @@ function selectLastMediaOption() {
 	}
 }
 
-export async function populateMediaSelection() {
+async function populateMediaSelection() {
 	// Mobile don't have getDisplayMedia capability yet
 	if (typeof navigator.mediaDevices.getDisplayMedia === 'function') {
 		const option = document.createElement('option')
