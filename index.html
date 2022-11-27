@@ -3,7 +3,14 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
 		<title>Test</title>
+
+		<script>
+			window.addEventListener('error', (ev) => alert(ev.error))
+			window.addEventListener('unhandledrejection', (ev) => alert(ev.reason))
+		</script>
+
 		<!-- <script type="module" src="out/index.js"></script> -->
 		<script type="module" src="src/index.ts"></script>
 		<script type="module" src="src/styleHelper/touchResponse.ts"></script>
@@ -62,8 +69,8 @@
 				<select id="video-select"></select>
 			</div>
 			<!-- <div> -->
-				<!-- <label for="audio-select">Select Microphone/Audio</label> -->
-				<!-- <select id="audio-select"></select> -->
+			<!-- <label for="audio-select">Select Microphone/Audio</label> -->
+			<!-- <select id="audio-select"></select> -->
 			<!-- </div> -->
 		</div>
 		<div class="video-container flex-container">
