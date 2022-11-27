@@ -115,6 +115,20 @@ function onConnectionStateChange(this: RTCPeerConnection) {
 	}
 }
 
+/**
+ * Generate a new {@link RTCSessionDescriptionInit},
+ * Won't mutate the given description (desc)
+ */
+function processDescription(desc: RTCSessionDescription | RTCSessionDescriptionInit) {
+	if (desc instanceof RTCSessionDescription) {
+		desc = desc.toJSON()
+	} else {
+		desc = { ...desc }
+	}
+	updateSdpInfo(desc)
+	return desc
+}
+
 function updateSdpInfo(desc: RTCSessionDescriptionInit) {
 	desc.sdp = updateBandwidthRestriction(desc.sdp!)
 	return desc
@@ -131,16 +145,16 @@ async function onDataChannelMessage(this: RTCDataChannel, ev: MessageEvent) {
 	}
 	await pc.setRemoteDescription(desc)
 	if (desc.type === 'offer') {
-		const desc = (await pc.createAnswer()) as RTCSessionDescription
+		const desc = await pc.createAnswer()
 		await pc.setLocalDescription(desc)
-		this.send(JSON.stringify(updateSdpInfo(desc.toJSON())))
+		this.send(JSON.stringify(processDescription(desc)))
 	}
 }
 
 async function renegotiate() {
-	const desc = (await pc.createOffer()) as RTCSessionDescription
+	const desc = await pc.createOffer()
 	await pc.setLocalDescription(desc)
-	dataChannel.send(JSON.stringify(updateSdpInfo(desc.toJSON())))
+	dataChannel.send(JSON.stringify(processDescription(desc)))
 }
 
 async function cleanup() {
@@ -209,7 +223,7 @@ async function negotiate(this: RTCPeerConnection) {
 
 	await onDisconnect(ref(db, `${room}`)).remove()
 
-	const offer = (await this.createOffer()) as RTCSessionDescription
+	const offer = await this.createOffer()
 	await this.setLocalDescription(offer)
 
 	let remoteDesc: RTCSessionDescriptionInit
@@ -217,7 +231,7 @@ async function negotiate(this: RTCPeerConnection) {
 		if (data) {
 			remoteDesc = data
 		} else {
-			return updateSdpInfo(offer.toJSON())
+			return processDescription(offer)
 		}
 	})
 
@@ -245,9 +259,9 @@ async function negotiate(this: RTCPeerConnection) {
 		// Anwser side
 		// await this.setLocalDescription({ type: 'rollback' })
 		await this.setRemoteDescription(remoteDesc!)
-		const answer = (await this.createAnswer()) as RTCSessionDescription
+		const answer = await this.createAnswer()
 		await this.setLocalDescription(answer)
-		await set(ref(db, `${room}/answer/desc`), updateSdpInfo(answer.toJSON()))
+		await set(ref(db, `${room}/answer/desc`), processDescription(answer))
 		registerUnsub(
 			onChildAdded(ref(db, `${room}/offer/ice`), async (snapshot) => {
 				if (snapshot.exists()) {
