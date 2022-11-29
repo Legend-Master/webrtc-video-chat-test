@@ -54,6 +54,9 @@ input {
 input:focus {
 	border-color: var(--button-normal-color);
 }
+input:invalid {
+	border-color: brown;
+}
 
 #current-ice {
 	max-width: 100%;

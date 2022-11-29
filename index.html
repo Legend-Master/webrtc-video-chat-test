@@ -30,15 +30,15 @@
 				<div class="form-input-container flex-container">
 					<div>
 						<label for="ice-url">Url</label>
-						<input id="ice-url" required />
+						<input id="ice-url" required pattern="^(stun|stuns|turns|turn):.+" type="url" />
 					</div>
 					<div>
 						<label for="ice-username">Username</label>
-						<input id="ice-username" />
+						<input id="ice-username" autocapitalize="off" />
 					</div>
 					<div>
 						<label for="ice-password">Password</label>
-						<input id="ice-password" />
+						<input id="ice-password" autocapitalize="off" />
 					</div>
 				</div>
 				<div class="form-button-container flex-container">
