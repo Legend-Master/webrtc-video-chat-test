@@ -37,11 +37,13 @@ button {
 	color: white;
 	background-color: var(--button-normal-color);
 }
-button:hover,
-button.ontouch {
-	background-color: var(--button-hover-color);
+@media (hover: hover) {
+	button:hover {
+		background-color: var(--button-hover-color);
+	}
 }
-button:active {
+button:active,
+button.ontouch {
 	background-color: var(--button-active-color);
 }
 
@@ -70,11 +72,13 @@ input:invalid {
 	cursor: pointer;
 	-webkit-tap-highlight-color: transparent;
 }
-#current-ice:hover,
-#current-ice.ontouch {
-	color: var(--button-hover-color);
+@media (hover: hover) {
+	#current-ice:hover {
+		color: var(--button-hover-color);
+	}
 }
-#current-ice:active {
+#current-ice:active,
+#current-ice.ontouch {
 	color: var(--button-active-color);
 }
 #current-ice::after {
@@ -84,7 +88,7 @@ input:invalid {
 #current-ice:enabled::after {
 	/* content: url('https://api.iconify.design/codicon/edit.svg'); */
 	display: inline-block;
-	content: "✎";
+	content: '✎';
 	rotate: 90deg;
 }
 #current-ice:disabled {
@@ -125,12 +129,14 @@ input:invalid {
 	background: none;
 	cursor: pointer;
 }
-.text-button:hover,
-.text-button.ontouch {
-	color: var(--button-hover-color);
-	background: none;
+@media (hover: hover) {
+	.text-button:hover {
+		color: var(--button-hover-color);
+		background: none;
+	}
 }
-.text-button:active {
+.text-button:active,
+.text-button.ontouch {
 	color: var(--button-active-color);
 	background: none;
 }
