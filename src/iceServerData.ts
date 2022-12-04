@@ -1,3 +1,5 @@
+import { createIcon } from './styleHelper/icon'
+
 const SERVER_SAVE_KEY = 'ice-server-data'
 export let iceServerConfig: RTCIceServer[] = []
 
@@ -75,12 +77,6 @@ function setIceFormValues(data?: RTCIceServer) {
 	validateInput()
 }
 
-function createMaterialIcon(icon: string) {
-	const el = document.createElement('iconify-icon')
-	el.setAttribute('icon', icon)
-	return el
-}
-
 function addIceServerEl(data: RTCIceServer) {
 	const container = document.createElement('div')
 	const label = document.createElement('span')
@@ -92,7 +88,7 @@ function addIceServerEl(data: RTCIceServer) {
 
 	edit.type = 'button'
 	edit.classList.add('icon-button')
-	edit.appendChild(createMaterialIcon('mdi:edit'))
+	edit.appendChild(createIcon('mdi:edit'))
 	edit.addEventListener('click', () => {
 		const index = [...iceServerContainer.children].indexOf(container)
 		const data = iceServerConfig[index]
@@ -103,7 +99,7 @@ function addIceServerEl(data: RTCIceServer) {
 
 	remove.type = 'button'
 	remove.classList.add('icon-button')
-	remove.appendChild(createMaterialIcon('mdi:delete'))
+	remove.appendChild(createIcon('mdi:delete'))
 	remove.addEventListener('click', () => {
 		const index = [...iceServerContainer.children].indexOf(container)
 		iceServerConfig.splice(index, 1)
