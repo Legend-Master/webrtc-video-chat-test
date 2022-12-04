@@ -30,7 +30,7 @@ function isPolite() {
 	return peerType === 'answer'
 }
 
-// const currentIce = document.getElementById('current-ice') as HTMLButtonElement
+const stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
 
 const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
@@ -51,20 +51,20 @@ localVideo.addEventListener('pause', localStreamControl(false))
 localVideo.addEventListener('play', localStreamControl(true))
 
 function monitorConnectionState(this: RTCPeerConnection) {
-	// switch (this.connectionState) {
-	// 	case 'connected':
-	// 		currentIce.dataset.state = '🟢'
-	// 		break
-	// 	case 'new':
-	// 	case 'connecting':
-	// 		currentIce.dataset.state = '🟡'
-	// 		break
-	// 	case 'failed':
-	// 	case 'closed':
-	// 	case 'disconnected':
-	// 		currentIce.dataset.state = '🔴'
-	// 		break
-	// }
+	switch (this.connectionState) {
+		case 'connected':
+			stateIndicator.innerText = '🟢'
+			break
+		case 'new':
+		case 'connecting':
+			stateIndicator.innerText = '🟡'
+			break
+		case 'failed':
+		case 'closed':
+		case 'disconnected':
+			stateIndicator.innerText = '🔴'
+			break
+	}
 }
 
 export async function startPeerConnection() {
