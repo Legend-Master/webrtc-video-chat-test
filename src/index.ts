@@ -1,8 +1,6 @@
 import { createRoom } from './util/room'
 import { startPeerConnection } from './peerConnection'
 
-const currentIce = document.getElementById('current-ice') as HTMLButtonElement
-
 const startBtn = document.getElementById('start-button') as HTMLButtonElement
 
 const hiddenAfterCall = document.getElementsByClassName(
@@ -14,7 +12,6 @@ function startChat() {
 		for (const el of hiddenAfterCall) {
 			el.hidden = true
 		}
-		currentIce.disabled = true
 		createRoom()
 		startPeerConnection()
 	}

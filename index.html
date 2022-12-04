@@ -13,7 +13,9 @@
 
 		<!-- <script type="module" src="out/index.js"></script> -->
 		<script type="module" src="src/index.ts"></script>
+		<script type="module" src="src/styleHelper/icon.ts"></script>
 		<script type="module" src="src/styleHelper/touchResponse.ts"></script>
+
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
@@ -25,7 +27,16 @@
 				<button id="request-permission" type="submit">request permission</button>
 			</form>
 		</dialog>
-		<dialog id="ice-setting-dialog">
+		<dialog id="config-ice-dialog">
+			<form method="dialog" class="flex-container">
+				<div id="ice-server-container" class="flex-container"></div>
+				<div class="form-button-container flex-container">
+					<button id="new-server" type="button">Add STUN/TURN Server</button>
+					<button id="ice-reset" type="button">Reset</button>
+				</div>
+			</form>
+		</dialog>
+		<dialog id="add-ice-dialog">
 			<form method="dialog" class="flex-container">
 				<div class="form-input-container flex-container">
 					<div>
@@ -42,28 +53,25 @@
 					</div>
 				</div>
 				<div class="form-button-container flex-container">
-					<button id="ice-set" type="submit">Set STUN/TURN Server</button>
-					<button id="ice-reset" type="button">Reset</button>
+					<button id="ice-add" type="submit">Submit</button>
 				</div>
 			</form>
 		</dialog>
-		<div>
-			<button id="current-ice" data-state="">...</button>
-		</div>
+		<!-- <div> -->
+		<!-- <button id="current-ice" data-state="">...</button> -->
+		<!-- </div> -->
 		<div id="pc-control-div" class="hidden-after-call">
 			<button id="start-button">Start</button>
+			<button id="config-ice" class="icon-button" title="Config ICE servers">
+				<iconify-icon icon="mdi:cog"></iconify-icon>
+			</button>
 		</div>
 		<div id="device-select-div">
 			<div>
-				<div class="center-flex-container">
+				<div class="flex-container flex-center label-icon-button">
 					<label for="video-select">Video Source</label>
-					<button
-						id="refresh-video"
-						class="text-button"
-						title="Refresh video source"
-						hidden
-					>
-						⟳
+					<button id="refresh-video" class="icon-button" title="Refresh video source" hidden>
+						<iconify-icon icon="mdi:refresh"></iconify-icon>
 					</button>
 				</div>
 				<select id="video-select"></select>
