@@ -1,14 +1,31 @@
 import { push, ref } from 'firebase/database'
 import { db } from '../firebaseInit'
 
-const searchParams = new URLSearchParams(location.search)
+const DB_PATH = 'room'
 
-export let room = searchParams.get('room')
+export let roomId: string
+export let room: string
+
+const searchParams = new URLSearchParams(location.search)
+const roomParam = searchParams.get('room')
+if (roomParam) {
+	setRoom(roomParam)
+}
 
 export function createRoom() {
-	if (!room) {
-		room = push(ref(db)).key
-		history.pushState(null, '', `?room=${room}`)
+	if (!roomId) {
+		const id = push(ref(db, DB_PATH)).key
+		if (id) {
+			setRoom(id)
+			history.pushState(null, '', `?room=${roomId}`)
+		} else {
+			throw new Error("Can't get a new unique room id");
+		}
 	}
-	return room
+	return roomId
+}
+
+function setRoom(id: string) {
+	roomId = id
+	room = `${DB_PATH}/${roomId}`
 }
