@@ -125,7 +125,7 @@ body > div {
 	/* text-align: left; */
 }
 #device-select-div > div > select {
-	min-width: 150px;
+	min-width: 15em;
 }
 
 /* .text-button {
