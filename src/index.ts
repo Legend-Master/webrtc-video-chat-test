@@ -1,12 +1,13 @@
 import { createRoom } from './util/room'
 import { startPeerConnection } from './peerConnection'
 
-const currentIce = document.getElementById('current-ice') as HTMLButtonElement
-
 const startBtn = document.getElementById('start-button') as HTMLButtonElement
 
 const hiddenAfterCall = document.getElementsByClassName(
 	'hidden-after-call'
+) as HTMLCollectionOf<HTMLElement>
+const shownAfterCall = document.getElementsByClassName(
+	'shown-after-call'
 ) as HTMLCollectionOf<HTMLElement>
 
 function startChat() {
@@ -14,7 +15,9 @@ function startChat() {
 		for (const el of hiddenAfterCall) {
 			el.hidden = true
 		}
-		currentIce.disabled = true
+		for (const el of shownAfterCall) {
+			el.hidden = false
+		}
 		createRoom()
 		startPeerConnection()
 	}
