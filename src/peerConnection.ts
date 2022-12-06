@@ -50,19 +50,60 @@ function localStreamControl(enable: boolean) {
 localVideo.addEventListener('pause', localStreamControl(false))
 localVideo.addEventListener('play', localStreamControl(true))
 
+const STATES = {
+	connected: '🟢 Connected',
+	connecting: '🟡 Connecting',
+	disconnected: '🔴 Disconnected',
+
+	stable: '🟡 Waiting for connection',
+	localOffer: '🟡 Waiting for another peer',
+	connectedLocalOffer: '🟡 Waiting for another peer for new channel',
+	remoteOffer: '🟡 Waiting for connection',
+	connectedRemoteOffer: '🟡 Waiting for connection for new channel',
+}
+
 function monitorConnectionState(this: RTCPeerConnection) {
 	switch (this.connectionState) {
 		case 'connected':
-			stateIndicator.innerText = '🟢'
+			stateIndicator.innerText = STATES.connected
 			break
-		case 'new':
+		// case 'new':
 		case 'connecting':
-			stateIndicator.innerText = '🟡'
+			stateIndicator.innerText = STATES.connecting
 			break
 		case 'failed':
 		case 'closed':
 		case 'disconnected':
-			stateIndicator.innerText = '🔴'
+			stateIndicator.innerText = STATES.disconnected
+			break
+	}
+}
+
+function monitoSignalingState(this: RTCPeerConnection) {
+	switch (this.signalingState) {
+		case 'stable':
+			if (this.connectionState === 'connected') {
+				stateIndicator.innerText = STATES.connected
+			} else {
+				stateIndicator.innerText = STATES.stable
+			}
+			break
+		case 'have-local-offer':
+			if (this.connectionState === 'connected') {
+				stateIndicator.innerText = STATES.connectedLocalOffer
+			} else {
+				stateIndicator.innerText = STATES.localOffer
+			}
+			break
+		case 'have-remote-offer':
+			if (this.connectionState === 'connected') {
+				stateIndicator.innerText = STATES.connectedRemoteOffer
+			} else {
+				stateIndicator.innerText = STATES.remoteOffer
+			}
+			break
+		case 'closed':
+			stateIndicator.innerText = STATES.disconnected
 			break
 	}
 }
@@ -72,6 +113,7 @@ export async function startPeerConnection() {
 	pc.addEventListener('track', onTrack)
 	pc.addEventListener('icecandidate', onIceCandidate)
 	pc.addEventListener('negotiationneeded', negotiate)
+	pc.addEventListener('signalingstatechange', monitoSignalingState)
 	pc.addEventListener('connectionstatechange', onConnectionStateChange)
 	pc.addEventListener('connectionstatechange', monitorConnectionState)
 	await addMedia()
