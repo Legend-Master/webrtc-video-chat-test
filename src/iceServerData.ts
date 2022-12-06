@@ -101,10 +101,13 @@ function addIceServerEl(data: RTCIceServer) {
 	remove.classList.add('icon-button')
 	remove.appendChild(createIcon('mdi:delete'))
 	remove.addEventListener('click', () => {
-		const index = [...iceServerContainer.children].indexOf(container)
-		iceServerConfig.splice(index, 1)
-		saveServerData()
-		iceServerContainer.removeChild(container)
+		const choice = confirm(`Are you sure you want to delete '${label.innerText}'`)
+		if (choice) {
+			const index = [...iceServerContainer.children].indexOf(container)
+			iceServerConfig.splice(index, 1)
+			saveServerData()
+			iceServerContainer.removeChild(container)
+		}
 	})
 
 	container.appendChild(label)
