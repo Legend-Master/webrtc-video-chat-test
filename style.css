@@ -44,7 +44,6 @@ select {
 	outline: none;
 	padding: 0.4em 0.7em;
 	cursor: pointer;
-	font-size: 16px;
 	background-color: white;
 }
 
@@ -66,8 +65,8 @@ button.ontouch {
 }
 
 input {
-	font-size: 14px;
-	padding: 6px;
+	font-size: 0.9em;
+	padding: 0.4em;
 	border: 1px solid var(--half-transparent);
 	outline: none;
 }
@@ -102,7 +101,7 @@ body > div {
 	align-items: center;
 }
 #pc-control-div > button {
-	font-size: 24px;
+	font-size: 1.5em;
 }
 #start-button {
 	grid-column-start: 2;
@@ -114,7 +113,7 @@ body > div {
 }
 
 #connection-state-indicator {
-	font-size: 24px;
+	font-size: 1.5em;
 }
 
 #device-select-div > div {
@@ -197,9 +196,6 @@ body > div {
 	margin-top: 0;
 	margin-bottom: 1.5em;
 }
-#welcome-dialog > form > button {
-	font-size: 16px;
-}
 
 #config-ice-dialog > form {
 	flex-direction: column;
@@ -219,7 +215,6 @@ body > div {
 	gap: 1em;
 	text-align: left;
 	max-width: 100%;
-	font-size: 16px;
 	padding: 0.5em;
 }
 #ice-server-container > div:not(:first-child) {
@@ -232,6 +227,7 @@ body > div {
 #ice-server-container > div > div {
 	display: flex;
 	flex-wrap: nowrap;
+	font-size: 1.1em;
 }
 
 #add-ice-dialog > form {
