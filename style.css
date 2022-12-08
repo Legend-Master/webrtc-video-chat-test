@@ -110,7 +110,7 @@ body > div {
 	margin-bottom: 0.5em;
 }
 #config-ice {
-	margin-right: auto;
+	justify-self: left;
 }
 
 #connection-state-indicator {
