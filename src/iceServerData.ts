@@ -52,7 +52,10 @@ addIceDialog.addEventListener('submit', async (ev) => {
 	setIceFormValues()
 })
 iceReset.addEventListener('click', async (ev) => {
-	resetServerData()
+	const choice = confirm('Are you sure you want to reset ice servers to default?')
+	if (choice) {
+		resetServerData()
+	}
 })
 
 function validateInput() {
