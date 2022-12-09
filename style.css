@@ -40,6 +40,7 @@ dialog > form {
 }
 
 select {
+	text-align: center;
 	border: 1px solid var(--half-transparent);
 	outline: none;
 	padding: 0.4em 0.7em;

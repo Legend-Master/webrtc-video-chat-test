@@ -10,16 +10,13 @@ const shownAfterCall = document.getElementsByClassName(
 	'shown-after-call'
 ) as HTMLCollectionOf<HTMLElement>
 
-function startChat() {
-	return async () => {
-		for (const el of hiddenAfterCall) {
-			el.hidden = true
-		}
-		for (const el of shownAfterCall) {
-			el.hidden = false
-		}
-		createRoom()
-		startPeerConnection()
+startBtn.addEventListener('click', () => {
+	for (const el of hiddenAfterCall) {
+		el.hidden = true
 	}
-}
-startBtn.addEventListener('click', startChat())
+	for (const el of shownAfterCall) {
+		el.hidden = false
+	}
+	createRoom()
+	startPeerConnection()
+})

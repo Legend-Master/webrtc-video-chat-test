@@ -52,18 +52,31 @@ async function getMediaPermission() {
 
 export async function getUserMedia() {
 	localStorage.setItem(VIDEO_DEVICE_SAVE_KEY, videoSelect.value)
-	if (videoSelect.value === SCREEN_CAPTURE) {
-		return await navigator.mediaDevices.getDisplayMedia({
-			video: VIDEO_SETTING,
-			audio: true,
-		})
-	} else {
-		return await navigator.mediaDevices.getUserMedia({
-			video: {
-				...VIDEO_SETTING,
-				deviceId: videoSelect.value,
-			},
-		})
+	if (!videoSelect.value) {
+		return
+	}
+	try {
+		if (videoSelect.value === SCREEN_CAPTURE) {
+			return await navigator.mediaDevices.getDisplayMedia({
+				video: VIDEO_SETTING,
+				audio: true,
+			})
+		} else {
+			return await navigator.mediaDevices.getUserMedia({
+				video: {
+					...VIDEO_SETTING,
+					deviceId: videoSelect.value,
+				},
+			})
+		}
+	} catch (error) {
+		if (error instanceof DOMException) {
+			if (error.name !== 'NotAllowedError') {
+				alert(`${error}\n\nVideo capture failed, but you can still see another user's video, or click the refresh icon after 'Video Source' to try again`)
+			}
+		} else {
+			throw error
+		}
 	}
 }
 
@@ -85,7 +98,7 @@ async function populateMediaSelection() {
 	// Mobile don't have getDisplayMedia capability yet
 	if (typeof navigator.mediaDevices.getDisplayMedia === 'function') {
 		const option = document.createElement('option')
-		option.label = 'Screen Capture (Browser)'
+		option.innerText = 'Screen Capture (Browser)'
 		option.value = SCREEN_CAPTURE
 		videoSelect.add(option)
 	}
@@ -94,7 +107,7 @@ async function populateMediaSelection() {
 		for (const device of await navigator.mediaDevices.enumerateDevices()) {
 			if (device.kind === 'videoinput') {
 				const option = document.createElement('option')
-				option.label = device.label
+				option.innerText = device.label
 				option.value = device.deviceId
 				videoSelect.add(option)
 			}
