@@ -18,6 +18,7 @@ import { getUserMedia, onDeviceSelectChange } from './selectDevice'
 
 type PeerType = 'offer' | 'answer'
 
+const OFFER_PLACEHOLDER = ''
 const DATA_CHANNEL_ID = 0
 
 let pc: RTCPeerConnection
@@ -135,16 +136,12 @@ function onTrack(this: RTCPeerConnection, ev: RTCTrackEvent) {
 	remoteVideo.controls = true
 }
 
-// Cache ice candidates before we figure out if we're offer or answer side
 let peerIceRef: DatabaseReference
-let iceCandidates: RTCIceCandidateInit[] = []
 async function onIceCandidate(this: RTCPeerConnection, ev: RTCPeerConnectionIceEvent) {
 	if (ev.candidate) {
 		const candidateInit = ev.candidate.toJSON()
 		if (peerType) {
 			await set(push(peerIceRef), candidateInit)
-		} else {
-			iceCandidates.push(candidateInit)
 		}
 	}
 }
@@ -251,68 +248,72 @@ async function addMedia() {
 function setPeerType(peerType_: PeerType) {
 	peerType = peerType_
 	peerIceRef = ref(db, `${room}/${peerType}/ice`)
-	for (const candidateInit of iceCandidates) {
-		// Don't have to await
-		set(push(peerIceRef), candidateInit)
-	}
 }
 
 async function negotiate(this: RTCPeerConnection) {
-	if (dataChannel.readyState === 'open') {
-		renegotiate()
-		return
-	} else if (peerType && dataChannel.readyState === 'connecting') {
-		dataChannel.onopen = renegotiate
+	// Only renegotiate through p2p data channel
+	if (peerType) {
+		if (dataChannel.readyState === 'open') {
+			renegotiate()
+		} else {
+			dataChannel.onopen = renegotiate
+		}
 		return
 	}
 
 	await onDisconnect(ref(db, `${room}`)).remove()
 
-	const offer = await this.createOffer()
-	await this.setLocalDescription(offer)
-
-	let remoteDesc: RTCSessionDescriptionInit
-	const result = await runTransaction(ref(db, `${room}/offer/desc`), (data) => {
-		if (data) {
-			remoteDesc = data
-		} else {
-			return processDescription(offer)
+	// Get if we're 'offer' or 'answer' side first
+	const offerDescRef = ref(db, `${room}/offer/desc`)
+	const result = await runTransaction(offerDescRef, (data) => {
+		if (!data && data !== OFFER_PLACEHOLDER) {
+			// Mark as used, and we're the 'offer' side
+			return OFFER_PLACEHOLDER
 		}
 	})
-
 	setPeerType(result.committed ? 'offer' : 'answer')
+	const remotePeerType = result.committed ? 'answer' : 'offer'
 
-	if (result.committed) {
-		// Offer side
-		const answerDescRef = ref(db, `${room}/answer/desc`)
-		registerUnsub(
-			onValue(answerDescRef, async (snapshot) => {
-				if (!snapshot.exists()) {
-					return
-				}
-				await this.setRemoteDescription(snapshot.val())
-				registerUnsub(
-					onChildAdded(ref(db, `${room}/answer/ice`), async (snapshot) => {
-						if (snapshot.exists()) {
-							await this.addIceCandidate(snapshot.val())
-						}
-					})
-				)
-			})
-		)
-	} else {
-		// Anwser side
-		// await this.setLocalDescription({ type: 'rollback' })
-		await this.setRemoteDescription(remoteDesc!)
-		const answer = await this.createAnswer()
-		await this.setLocalDescription(answer)
-		await set(ref(db, `${room}/answer/desc`), processDescription(answer))
-		registerUnsub(
-			onChildAdded(ref(db, `${room}/offer/ice`), async (snapshot) => {
-				if (snapshot.exists()) {
-					await this.addIceCandidate(snapshot.val())
-				}
-			})
-		)
+	if (peerType === 'offer') {
+		const offer = await this.createOffer()
+		await this.setLocalDescription(offer)
+		await set(offerDescRef, processDescription(offer))
 	}
+
+	const remoteDescRef = ref(db, `${room}/${remotePeerType}/desc`)
+	registerUnsub(
+		onValue(remoteDescRef, async (snapshot) => {
+			if (!snapshot.exists()) {
+				if (this.remoteDescription) {
+					cleanup()
+					alert('Another peer disconnected before connection established')
+					window.location.reload()
+				}
+				return
+			}
+			if (this.remoteDescription) {
+				return
+			}
+			const val = snapshot.val()
+			if (val === OFFER_PLACEHOLDER) {
+				return
+			}
+
+			await this.setRemoteDescription(val)
+
+			if (peerType === 'answer') {
+				const answer = await this.createAnswer()
+				await this.setLocalDescription(answer)
+				await set(ref(db, `${room}/answer/desc`), processDescription(answer))
+			}
+
+			registerUnsub(
+				onChildAdded(ref(db, `${room}/${remotePeerType}/ice`), async (snapshot) => {
+					if (snapshot.exists()) {
+						await this.addIceCandidate(snapshot.val())
+					}
+				})
+			)
+		})
+	)
 }
