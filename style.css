@@ -32,7 +32,8 @@ video {
 
 dialog {
 	padding: 0;
-	border: 1px solid var(--button-normal-color);
+	border: none;
+	box-shadow: 0 0 8px var(--half-transparent);
 }
 dialog > form {
 	max-width: 90vw;
