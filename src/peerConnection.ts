@@ -6,7 +6,6 @@ import {
 	onChildAdded,
 	runTransaction,
 	onDisconnect,
-	DatabaseReference,
 	remove,
 } from 'firebase/database'
 import { db } from './firebaseInit'
@@ -41,7 +40,7 @@ const refreshVideoButton = document.getElementById('refresh-video') as HTMLButto
 function localStreamControl(enable: boolean) {
 	return () => {
 		const stream = localVideo.srcObject
-		if (stream && stream instanceof MediaStream) {
+		if (stream instanceof MediaStream) {
 			for (const track of stream.getTracks()) {
 				track.enabled = enable
 			}
@@ -136,12 +135,11 @@ function onTrack(this: RTCPeerConnection, ev: RTCTrackEvent) {
 	remoteVideo.controls = true
 }
 
-let peerIceRef: DatabaseReference
 async function onIceCandidate(this: RTCPeerConnection, ev: RTCPeerConnectionIceEvent) {
 	if (ev.candidate) {
 		const candidateInit = ev.candidate.toJSON()
 		if (peerType) {
-			await set(push(peerIceRef), candidateInit)
+			await set(push(ref(db, `${room}/${peerType}/ice`)), candidateInit)
 		}
 	}
 }
@@ -245,11 +243,6 @@ async function addMedia() {
 	})
 }
 
-function setPeerType(peerType_: PeerType) {
-	peerType = peerType_
-	peerIceRef = ref(db, `${room}/${peerType}/ice`)
-}
-
 async function negotiate(this: RTCPeerConnection) {
 	// Only renegotiate through p2p data channel
 	if (peerType) {
@@ -271,8 +264,11 @@ async function negotiate(this: RTCPeerConnection) {
 			return OFFER_PLACEHOLDER
 		}
 	})
-	setPeerType(result.committed ? 'offer' : 'answer')
-	const remotePeerType = result.committed ? 'answer' : 'offer'
+	function getPeerType(isOffer: boolean): PeerType {
+		return isOffer ? 'offer' : 'answer'
+	}
+	peerType = getPeerType(result.committed)
+	const remotePeerType = getPeerType(!result.committed)
 
 	if (peerType === 'offer') {
 		const offer = await this.createOffer()

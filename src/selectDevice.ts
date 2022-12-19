@@ -3,10 +3,11 @@ const VIDEO_DEVICE_SAVE_KEY = 'video-device-select'
 
 const SCREEN_CAPTURE = 'screen-capture'
 
-const VIDEO_SETTING = {
+const VIDEO_SETTING: MediaTrackConstraints = {
 	frameRate: 60,
 	width: 10_000,
 	height: 10_000,
+	// suppressLocalAudioPlayback: true,
 }
 
 const welcomeDialog = document.getElementById('welcome-dialog') as HTMLDialogElement
@@ -72,7 +73,9 @@ export async function getUserMedia() {
 	} catch (error) {
 		if (error instanceof DOMException) {
 			if (error.name !== 'NotAllowedError') {
-				alert(`${error}\n\nVideo capture failed, but you can still see another user's video, or click the refresh icon after 'Video Source' to try again`)
+				alert(
+					`${error}\n\nVideo capture failed, but you can still see another user's video, or click the refresh icon after 'Video Source' to try again`
+				)
 			}
 		} else {
 			throw error
