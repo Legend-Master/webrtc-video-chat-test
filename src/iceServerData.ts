@@ -1,4 +1,5 @@
 import { createIcon } from './styleHelper/icon'
+import { addTouchResponse } from './styleHelper/touchResponse'
 
 const SERVER_SAVE_KEY = 'ice-server-data'
 export let iceServerConfig: RTCIceServer[] = []
@@ -83,8 +84,8 @@ function setIceFormValues(data?: RTCIceServer) {
 function addIceServerEl(data: RTCIceServer) {
 	const container = document.createElement('div')
 	const label = document.createElement('span')
-	const edit = document.createElement('button')
-	const remove = document.createElement('button')
+	const edit = addTouchResponse(document.createElement('button'))
+	const remove = addTouchResponse(document.createElement('button'))
 	const buttonWrapper = document.createElement('div')
 
 	label.innerText = generateLabel(data)

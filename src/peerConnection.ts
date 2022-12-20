@@ -8,7 +8,7 @@ import {
 	onDisconnect,
 	remove,
 } from 'firebase/database'
-import { db } from './firebaseInit'
+import { db } from './util/firebaseInit'
 import { updateBandwidthRestriction } from './util/sdpInject'
 import { room } from './util/room'
 import { registerUnsub, unsubscribeAll } from './util/unsubscribeAll'
