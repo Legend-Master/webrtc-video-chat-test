@@ -3,10 +3,30 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Test</title>
+
+		<title>Webrtc Chat Test</title>
+
+		<meta name="description" content="A webrtc chat test" />
+
+		<link rel="icon" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/favicon-256.png" />
+
+		<script>
+			window.addEventListener('error', (ev) => alert(ev.error))
+			window.addEventListener('unhandledrejection', (ev) => alert(ev.reason))
+		</script>
+
 		<!-- <script type="module" src="out/index.js"></script> -->
 		<script type="module" src="src/index.ts"></script>
+
 		<link rel="stylesheet" href="style.css" />
+
+		<style>
+			iconify-icon {
+				width: 1em;
+				height: 1em;
+			}
+		</style>
 	</head>
 	<body>
 		<dialog id="welcome-dialog">
@@ -17,47 +37,68 @@
 				<button id="request-permission" type="submit">request permission</button>
 			</form>
 		</dialog>
-		<dialog id="ice-setting-dialog">
+		<dialog id="config-ice-dialog">
 			<form method="dialog" class="flex-container">
-				<div class="form-input-container flex-container">
-					<div>
-						<label for="ice-url">Url</label>
-						<input id="ice-url" required />
-					</div>
-					<div>
-						<label for="ice-username">Username</label>
-						<input id="ice-username" />
-					</div>
-					<div>
-						<label for="ice-password">Password</label>
-						<input id="ice-password" />
-					</div>
-				</div>
+				<div id="ice-server-container" class="flex-container"></div>
 				<div class="form-button-container flex-container">
-					<button id="ice-set" type="submit">Set STUN/TURN Server</button>
+					<button id="new-server" type="button">Add STUN/TURN Server</button>
 					<button id="ice-reset" type="button">Reset</button>
 				</div>
 			</form>
 		</dialog>
-		<div>
-			<button id="current-ice"></button>
-		</div>
+		<dialog id="add-ice-dialog">
+			<form method="dialog" class="flex-container">
+				<div class="form-input-container flex-container">
+					<div>
+						<label for="ice-url">Url</label>
+						<input id="ice-url" required pattern="^(stun|stuns|turns|turn):.+" type="url" />
+					</div>
+					<div>
+						<label for="ice-username">Username</label>
+						<input id="ice-username" autocapitalize="off" />
+					</div>
+					<div>
+						<label for="ice-password">Password</label>
+						<input id="ice-password" autocapitalize="off" />
+					</div>
+				</div>
+				<div class="form-button-container flex-container">
+					<button id="ice-add" type="submit">Submit</button>
+				</div>
+			</form>
+		</dialog>
 		<div id="pc-control-div" class="hidden-after-call">
-			<button id="offer-button">Offer</button>
-			<button id="answer-button">Answer</button>
+			<button id="start-button">Start</button>
+			<button id="config-ice" class="icon-button" title="Config ICE servers">
+				<iconify-icon icon="mdi:cog"></iconify-icon>
+			</button>
 		</div>
-		<div id="device-select-div" class="hidden-after-call">
-			<label for="video-select">Select Camera/Video:</label>
-			<select id="video-select"></select>
+		<div class="shown-after-call" hidden>
+			<div id="connection-state-indicator">🟡</div>
+		</div>
+		<div id="device-select-div">
+			<div>
+				<div class="flex-container flex-center label-icon-button">
+					<label for="video-select">Video Source</label>
+					<button id="refresh-video" class="icon-button" title="Refresh video source" hidden>
+						<iconify-icon icon="mdi:refresh"></iconify-icon>
+					</button>
+				</div>
+				<select id="video-select">
+					<option value="">None</option>
+				</select>
+			</div>
+			<!-- <div> -->
 			<!-- <label for="audio-select">Select Microphone/Audio</label> -->
 			<!-- <select id="audio-select"></select> -->
+			<!-- </div> -->
 		</div>
-		<div class="video-container flex-container">
+		<div class="video-container">
 			<div>
-				<video id="local-video" controls autoplay muted></video>
+				<video id="local-video" playsinline controls autoplay muted></video>
 			</div>
 			<div>
-				<video id="remote-video" controls autoplay></video>
+				<video id="remote-video" playsinline controls autoplay></video>
 			</div>
 		</div>
 		<div>

@@ -3,10 +3,11 @@ const VIDEO_DEVICE_SAVE_KEY = 'video-device-select'
 
 const SCREEN_CAPTURE = 'screen-capture'
 
-const VIDEO_SETTING = {
+const VIDEO_SETTING: MediaTrackConstraints = {
 	frameRate: 60,
 	width: 10_000,
 	height: 10_000,
+	// suppressLocalAudioPlayback: true,
 }
 
 const welcomeDialog = document.getElementById('welcome-dialog') as HTMLDialogElement
@@ -15,19 +16,21 @@ const welcomeDialog = document.getElementById('welcome-dialog') as HTMLDialogEle
 const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 // const audioSelect = document.getElementById('audio-select') as HTMLSelectElement
 
-navigator.permissions.query({ name: 'camera' as PermissionName }).then(
-	async (status) => {
+;(async function () {
+	let shouldPopulate = true
+	try {
+		// Firefox doesn't have camera query
+		// Lower version Safari and Android WebView doesn't have navigator.permissions
+		const status = await navigator.permissions.query({ name: 'camera' as PermissionName })
 		if (status.state === 'prompt') {
 			welcomeDialog.showModal()
-		} else {
-			await populateMediaSelection()
+			shouldPopulate = false
 		}
-	},
-	// Firefox doesn't have this
-	async (error) => {
+	} catch {}
+	if (shouldPopulate) {
 		await populateMediaSelection()
 	}
-)
+})()
 welcomeDialog.addEventListener('cancel', (ev) => {
 	ev.preventDefault()
 })
@@ -50,18 +53,33 @@ async function getMediaPermission() {
 
 export async function getUserMedia() {
 	localStorage.setItem(VIDEO_DEVICE_SAVE_KEY, videoSelect.value)
-	if (videoSelect.value === SCREEN_CAPTURE) {
-		return await navigator.mediaDevices.getDisplayMedia({
-			video: VIDEO_SETTING,
-			audio: true,
-		})
-	} else {
-		return await navigator.mediaDevices.getUserMedia({
-			video: {
-				...VIDEO_SETTING,
-				deviceId: videoSelect.value,
-			},
-		})
+	if (!videoSelect.value) {
+		return
+	}
+	try {
+		if (videoSelect.value === SCREEN_CAPTURE) {
+			return await navigator.mediaDevices.getDisplayMedia({
+				video: VIDEO_SETTING,
+				audio: true,
+			})
+		} else {
+			return await navigator.mediaDevices.getUserMedia({
+				video: {
+					...VIDEO_SETTING,
+					deviceId: videoSelect.value,
+				},
+			})
+		}
+	} catch (error) {
+		if (error instanceof DOMException) {
+			if (error.name !== 'NotAllowedError') {
+				alert(
+					`${error}\n\nVideo capture failed, but you can still see another user's video, or click the refresh icon after 'Video Source' to try again`
+				)
+			}
+		} else {
+			throw error
+		}
 	}
 }
 
@@ -79,11 +97,11 @@ function selectLastMediaOption() {
 	}
 }
 
-export async function populateMediaSelection() {
+async function populateMediaSelection() {
 	// Mobile don't have getDisplayMedia capability yet
 	if (typeof navigator.mediaDevices.getDisplayMedia === 'function') {
 		const option = document.createElement('option')
-		option.label = 'Screen Capture (Browser)'
+		option.innerText = 'Screen Capture (Browser)'
 		option.value = SCREEN_CAPTURE
 		videoSelect.add(option)
 	}
@@ -92,7 +110,7 @@ export async function populateMediaSelection() {
 		for (const device of await navigator.mediaDevices.enumerateDevices()) {
 			if (device.kind === 'videoinput') {
 				const option = document.createElement('option')
-				option.label = device.label
+				option.innerText = device.label
 				option.value = device.deviceId
 				videoSelect.add(option)
 			}
@@ -106,4 +124,8 @@ export async function populateMediaSelection() {
 	}
 
 	selectLastMediaOption()
+}
+
+export function onDeviceSelectChange(listener: EventListener) {
+	videoSelect.addEventListener('change', listener)
 }
