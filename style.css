@@ -30,7 +30,7 @@ video {
 	width: 100%;
 }
 video::-webkit-media-controls-timeline {
-    display: none;
+	display: none;
 }
 
 dialog {
@@ -50,6 +50,9 @@ select {
 	padding: 0.4em 0.7em;
 	cursor: pointer;
 	background-color: white;
+}
+select:focus {
+	border-color: var(--button-normal-color);
 }
 
 button {
