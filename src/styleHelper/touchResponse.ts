@@ -15,6 +15,7 @@ export function addTouchResponse<T extends HTMLElement>(el: T) {
 	el.addEventListener('touchstart', addTouchClass, { passive: true })
 	el.addEventListener('touchend', removeTouchClass, { passive: true })
 	el.addEventListener('touchmove', removeTouchClass, { passive: true })
+	el.addEventListener('touchcancel', removeTouchClass, { passive: true })
 	return el
 }
 

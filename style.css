@@ -61,6 +61,8 @@ button {
 	cursor: pointer;
 	color: white;
 	background-color: var(--button-normal-color);
+
+	-webkit-tap-highlight-color: transparent;
 }
 @media (hover: hover) {
 	button:hover {
@@ -168,17 +170,21 @@ body > div {
 
 	cursor: pointer;
 	user-select: none;
+
+	transition: all 150ms;
 }
 @media (hover: hover) {
 	.icon-button:hover {
 		color: var(--button-hover-color);
 		background: rgba(0, 0, 0, 0.1);
+		transition: none;
 	}
 }
 .icon-button:active,
 .icon-button.ontouch {
 	color: var(--button-active-color);
 	background: rgba(0, 0, 0, 0.2);
+	transition: none;
 }
 
 .label-icon-button {
