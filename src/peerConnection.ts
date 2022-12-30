@@ -23,6 +23,7 @@ const DATA_CHANNEL_ID = 0
 let pc: RTCPeerConnection
 let peerType: PeerType
 let dataChannel: RTCDataChannel
+let firstConnected: boolean
 
 // The one who says "you go first"
 // https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation
@@ -114,7 +115,7 @@ export async function startPeerConnection() {
 	pc.addEventListener('icecandidate', onIceCandidate)
 	pc.addEventListener('negotiationneeded', negotiate)
 	pc.addEventListener('signalingstatechange', monitoSignalingState)
-	pc.addEventListener('connectionstatechange', onConnectionStateChange)
+	pc.addEventListener('connectionstatechange', monitorFirstConnected)
 	pc.addEventListener('connectionstatechange', monitorConnectionState)
 	await addMedia()
 	dataChannel = pc.createDataChannel('renegotiate', {
@@ -144,11 +145,10 @@ async function onIceCandidate(this: RTCPeerConnection, ev: RTCPeerConnectionIceE
 	}
 }
 
-function onConnectionStateChange(this: RTCPeerConnection) {
+function monitorFirstConnected(this: RTCPeerConnection) {
 	if (this.connectionState === 'connected') {
-		cleanup()
-		this.removeEventListener('icecandidate', onIceCandidate)
-		this.removeEventListener('connectionstatechange', onConnectionStateChange)
+		firstConnected = true
+		this.removeEventListener('connectionstatechange', monitorFirstConnected)
 	}
 }
 
@@ -192,11 +192,6 @@ async function renegotiate() {
 	const desc = await pc.createOffer()
 	await pc.setLocalDescription(desc)
 	dataChannel.send(JSON.stringify(processDescription(desc)))
-}
-
-async function cleanup() {
-	unsubscribeAll()
-	await remove(ref(db, `${room}`))
 }
 
 async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
@@ -280,8 +275,10 @@ async function negotiate(this: RTCPeerConnection) {
 	registerUnsub(
 		onValue(remoteDescRef, async (snapshot) => {
 			if (!snapshot.exists()) {
-				if (this.remoteDescription) {
-					cleanup()
+				// Have another peer's info but not connected yet
+				if (this.remoteDescription && !firstConnected) {
+					unsubscribeAll()
+					this.close()
 					alert('Another peer disconnected before connection established')
 					window.location.reload()
 				}
