@@ -1,4 +1,5 @@
 import './styleHelper/icon'
+import './styleHelper/iconButton'
 import './styleHelper/touchResponse'
 
 import './iceServerData'

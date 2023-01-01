@@ -1,5 +1,4 @@
-import { createIcon } from './styleHelper/icon'
-import { addTouchResponse } from './styleHelper/touchResponse'
+import createIconButton from './styleHelper/iconButton'
 
 const SERVER_SAVE_KEY = 'ice-server-data'
 export let iceServerConfig: RTCIceServer[] = []
@@ -84,15 +83,13 @@ function setIceFormValues(data?: RTCIceServer) {
 function addIceServerEl(data: RTCIceServer) {
 	const container = document.createElement('div')
 	const label = document.createElement('span')
-	const edit = addTouchResponse(document.createElement('button'))
-	const remove = addTouchResponse(document.createElement('button'))
+	const edit = createIconButton('mdi:edit')
+	const remove = createIconButton('mdi:delete')
 	const buttonWrapper = document.createElement('div')
 
 	label.innerText = generateLabel(data)
 
 	edit.type = 'button'
-	edit.classList.add('icon-button')
-	edit.appendChild(createIcon('mdi:edit'))
 	edit.addEventListener('click', () => {
 		const index = [...iceServerContainer.children].indexOf(container)
 		const data = iceServerConfig[index]
@@ -102,8 +99,6 @@ function addIceServerEl(data: RTCIceServer) {
 	})
 
 	remove.type = 'button'
-	remove.classList.add('icon-button')
-	remove.appendChild(createIcon('mdi:delete'))
 	remove.addEventListener('click', () => {
 		const choice = confirm(`Are you sure you want to delete '${label.innerText}'?`)
 		if (choice) {

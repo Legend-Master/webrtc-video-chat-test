@@ -171,20 +171,19 @@ body > div {
 	cursor: pointer;
 	user-select: none;
 
-	transition: all 150ms;
+	border: 1px solid transparent;
+	/* border-radius: 50%; */
 }
 @media (hover: hover) {
 	.icon-button:hover {
 		color: var(--button-hover-color);
 		background: rgba(0, 0, 0, 0.1);
-		transition: none;
 	}
 }
 .icon-button:active,
 .icon-button.ontouch {
 	color: var(--button-active-color);
 	background: rgba(0, 0, 0, 0.2);
-	transition: none;
 }
 
 .label-icon-button {
