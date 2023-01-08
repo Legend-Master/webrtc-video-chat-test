@@ -249,7 +249,8 @@ async function negotiate(this: RTCPeerConnection) {
 		return
 	}
 
-	await onDisconnect(ref(db, `${room}`)).remove()
+	const onDisconnectRef = onDisconnect(ref(db, `${room}`))
+	await onDisconnectRef.remove()
 
 	// Get if we're 'offer' or 'answer' side first
 	const offerDescRef = ref(db, `${room}/offer/desc`)
@@ -275,12 +276,26 @@ async function negotiate(this: RTCPeerConnection) {
 	registerUnsub(
 		onValue(remoteDescRef, async (snapshot) => {
 			if (!snapshot.exists()) {
-				// Have another peer's info but not connected yet
-				if (this.remoteDescription && !firstConnected) {
-					unsubscribeAll()
-					this.close()
-					alert('Another peer disconnected before connection established')
-					window.location.reload()
+
+				// Another peer disconnected after we tried to connect to them
+
+				// Cancel purge on disconnect since
+				// another peer already removed data from database,
+				// don't do it anymore in case another peer tries to
+				// reload and restart a new one
+				// (not a perfect solution to this tho)
+
+				// If not connected: cleanup and prompt user to restart
+
+				if (this.remoteDescription) {
+					onDisconnectRef.cancel()
+					if (!firstConnected) {
+						// Cleanup
+						unsubscribeAll()
+						this.close()
+						alert('Another peer disconnected before connection established')
+						window.location.reload()
+					}
 				}
 				return
 			}
