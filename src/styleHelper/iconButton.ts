@@ -1,21 +1,14 @@
 import { createIcon } from './icon'
 import { addTouchResponse } from './touchResponse'
 
-function animteFadeOutBorder(this: HTMLElement) {
-	this.animate(
-		[
-			{
-				borderColor: 'rgba(0, 0, 0, 0.2)',
-			},
-			{
-				borderColor: 'transparent',
-			},
-		],
-		300
-	)
+function onClick(this: HTMLElement) {
 	// Refresh focus to remove active state on touch screen
 	this.blur()
 	this.focus()
+}
+
+function addIconButtonListeners(button: HTMLButtonElement) {
+	button.addEventListener('click', onClick)
 }
 
 export default function createIconButton(icon: string) {
@@ -23,7 +16,7 @@ export default function createIconButton(icon: string) {
 	button.classList.add('icon-button')
 	addTouchResponse(button)
 	button.appendChild(createIcon(icon))
-	button.addEventListener('click', animteFadeOutBorder)
+	addIconButtonListeners(button)
 	return button
 }
 
@@ -31,5 +24,5 @@ const buttons = document.getElementsByClassName(
 	'icon-button'
 ) as HTMLCollectionOf<HTMLButtonElement>
 for (const button of buttons) {
-	button.addEventListener('click', animteFadeOutBorder)
+	addIconButtonListeners(button)
 }

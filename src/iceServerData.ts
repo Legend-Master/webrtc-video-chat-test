@@ -83,7 +83,7 @@ function setIceFormValues(data?: RTCIceServer) {
 function addIceServerEl(data: RTCIceServer) {
 	const container = document.createElement('div')
 	const label = document.createElement('span')
-	const edit = createIconButton('mdi:edit')
+	const edit = createIconButton('mdi:pencil')
 	const remove = createIconButton('mdi:delete')
 	const buttonWrapper = document.createElement('div')
 
