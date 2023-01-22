@@ -55,7 +55,7 @@ select:focus {
 	border-color: var(--button-normal-color);
 }
 
-button {
+:where(button) {
 	padding: 0.5em 0.8em;
 	border: none;
 	cursor: pointer;
