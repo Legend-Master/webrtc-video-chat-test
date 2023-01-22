@@ -146,7 +146,7 @@ function setServerData(data: RTCIceServer[]) {
 }
 
 function editServerData(index: number, data: RTCIceServer) {
-	const label = iceServerContainer.children[index].querySelector('span')!
+	const label = iceServerContainer.children[index]!.querySelector('span')!
 	label.innerText = generateLabel(data)
 	iceServerConfig.splice(index, 1, data)
 	saveServerData()
