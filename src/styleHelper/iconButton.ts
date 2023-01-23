@@ -11,7 +11,7 @@ function addIconButtonListeners(button: HTMLButtonElement) {
 	button.addEventListener('click', onClick)
 }
 
-export default function createIconButton(icon: string) {
+export function createIconButton(icon: string) {
 	const button = document.createElement('button')
 	button.classList.add('icon-button')
 	addTouchResponse(button)

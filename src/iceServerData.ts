@@ -1,4 +1,4 @@
-import createIconButton from './styleHelper/iconButton'
+import { createIconButton } from './styleHelper/iconButton'
 
 const SERVER_SAVE_KEY = 'ice-server-data'
 export let iceServerConfig: RTCIceServer[] = []
@@ -36,9 +36,6 @@ configIceDialog.addEventListener('mousedown', dialogOnMouseDown)
 addIceDialog.addEventListener('mousedown', dialogOnMouseDown)
 
 addIceDialog.addEventListener('submit', async (ev) => {
-	if (!iceUrl.value) {
-		return
-	}
 	const data: RTCIceServer = {
 		urls: iceUrl.value.trim(),
 		username: iceUsername.value.trim(),
@@ -49,7 +46,6 @@ addIceDialog.addEventListener('submit', async (ev) => {
 	} else {
 		addServerData(data)
 	}
-	setIceFormValues()
 })
 iceReset.addEventListener('click', async (ev) => {
 	const choice = confirm('Are you sure you want to reset ice servers to default?')
@@ -88,6 +84,7 @@ function addIceServerEl(data: RTCIceServer) {
 	const buttonWrapper = document.createElement('div')
 
 	label.innerText = generateLabel(data)
+	label.translate = false
 
 	edit.type = 'button'
 	edit.addEventListener('click', () => {
