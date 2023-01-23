@@ -1,5 +1,4 @@
-import { createIcon } from './styleHelper/icon'
-import { addTouchResponse } from './styleHelper/touchResponse'
+import { createIconButton } from './styleHelper/iconButton'
 
 const SERVER_SAVE_KEY = 'ice-server-data'
 export let iceServerConfig: RTCIceServer[] = []
@@ -37,9 +36,6 @@ configIceDialog.addEventListener('mousedown', dialogOnMouseDown)
 addIceDialog.addEventListener('mousedown', dialogOnMouseDown)
 
 addIceDialog.addEventListener('submit', async (ev) => {
-	if (!iceUrl.value) {
-		return
-	}
 	const data: RTCIceServer = {
 		urls: iceUrl.value.trim(),
 		username: iceUsername.value.trim(),
@@ -50,7 +46,6 @@ addIceDialog.addEventListener('submit', async (ev) => {
 	} else {
 		addServerData(data)
 	}
-	setIceFormValues()
 })
 iceReset.addEventListener('click', async (ev) => {
 	const choice = confirm('Are you sure you want to reset ice servers to default?')
@@ -84,15 +79,14 @@ function setIceFormValues(data?: RTCIceServer) {
 function addIceServerEl(data: RTCIceServer) {
 	const container = document.createElement('div')
 	const label = document.createElement('span')
-	const edit = addTouchResponse(document.createElement('button'))
-	const remove = addTouchResponse(document.createElement('button'))
+	const edit = createIconButton('mdi:pencil')
+	const remove = createIconButton('mdi:delete')
 	const buttonWrapper = document.createElement('div')
 
 	label.innerText = generateLabel(data)
+	label.translate = false
 
 	edit.type = 'button'
-	edit.classList.add('icon-button')
-	edit.appendChild(createIcon('mdi:edit'))
 	edit.addEventListener('click', () => {
 		const index = [...iceServerContainer.children].indexOf(container)
 		const data = iceServerConfig[index]
@@ -102,8 +96,6 @@ function addIceServerEl(data: RTCIceServer) {
 	})
 
 	remove.type = 'button'
-	remove.classList.add('icon-button')
-	remove.appendChild(createIcon('mdi:delete'))
 	remove.addEventListener('click', () => {
 		const choice = confirm(`Are you sure you want to delete '${label.innerText}'?`)
 		if (choice) {
@@ -151,7 +143,7 @@ function setServerData(data: RTCIceServer[]) {
 }
 
 function editServerData(index: number, data: RTCIceServer) {
-	const label = iceServerContainer.children[index].querySelector('span')!
+	const label = iceServerContainer.children[index]!.querySelector('span')!
 	label.innerText = generateLabel(data)
 	iceServerConfig.splice(index, 1, data)
 	saveServerData()

@@ -23,6 +23,7 @@ const DATA_CHANNEL_ID = 0
 let pc: RTCPeerConnection
 let peerType: PeerType
 let dataChannel: RTCDataChannel
+let firstConnected: boolean
 
 // The one who says "you go first"
 // https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation
@@ -114,7 +115,7 @@ export async function startPeerConnection() {
 	pc.addEventListener('icecandidate', onIceCandidate)
 	pc.addEventListener('negotiationneeded', negotiate)
 	pc.addEventListener('signalingstatechange', monitoSignalingState)
-	pc.addEventListener('connectionstatechange', onConnectionStateChange)
+	pc.addEventListener('connectionstatechange', monitorFirstConnected)
 	pc.addEventListener('connectionstatechange', monitorConnectionState)
 	await addMedia()
 	dataChannel = pc.createDataChannel('renegotiate', {
@@ -144,11 +145,10 @@ async function onIceCandidate(this: RTCPeerConnection, ev: RTCPeerConnectionIceE
 	}
 }
 
-function onConnectionStateChange(this: RTCPeerConnection) {
+function monitorFirstConnected(this: RTCPeerConnection) {
 	if (this.connectionState === 'connected') {
-		cleanup()
-		this.removeEventListener('icecandidate', onIceCandidate)
-		this.removeEventListener('connectionstatechange', onConnectionStateChange)
+		firstConnected = true
+		this.removeEventListener('connectionstatechange', monitorFirstConnected)
 	}
 }
 
@@ -194,11 +194,6 @@ async function renegotiate() {
 	dataChannel.send(JSON.stringify(processDescription(desc)))
 }
 
-async function cleanup() {
-	unsubscribeAll()
-	await remove(ref(db, `${room}`))
-}
-
 async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 	for (const [_, sender] of senders) {
 		sender.track?.stop()
@@ -206,7 +201,7 @@ async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 	// const newSenders = new Set(senders.keys())
 	const stream = await getUserMedia()
 	if (!stream) {
-		return
+		return senders
 	}
 	localVideo.srcObject = stream
 	for (const track of stream.getTracks()) {
@@ -254,7 +249,8 @@ async function negotiate(this: RTCPeerConnection) {
 		return
 	}
 
-	await onDisconnect(ref(db, `${room}`)).remove()
+	const onDisconnectRef = onDisconnect(ref(db, `${room}`))
+	await onDisconnectRef.remove()
 
 	// Get if we're 'offer' or 'answer' side first
 	const offerDescRef = ref(db, `${room}/offer/desc`)
@@ -280,10 +276,26 @@ async function negotiate(this: RTCPeerConnection) {
 	registerUnsub(
 		onValue(remoteDescRef, async (snapshot) => {
 			if (!snapshot.exists()) {
+
+				// Another peer disconnected after we tried to connect to them
+
+				// Cancel purge on disconnect since
+				// another peer already removed data from database,
+				// don't do it anymore in case another peer tries to
+				// reload and restart a new one
+				// (not a perfect solution to this tho)
+
+				// If not connected: cleanup and prompt user to restart
+
 				if (this.remoteDescription) {
-					cleanup()
-					alert('Another peer disconnected before connection established')
-					window.location.reload()
+					onDisconnectRef.cancel()
+					if (!firstConnected) {
+						// Cleanup
+						unsubscribeAll()
+						this.close()
+						alert('Another peer disconnected before connection established')
+						window.location.reload()
+					}
 				}
 				return
 			}
