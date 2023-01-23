@@ -5,7 +5,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "firebase": "^9.15.0",
+    "firebase": "^9.16.0",
     "iconify-icon": "^1.0.2"
   },
   "devDependencies": {
