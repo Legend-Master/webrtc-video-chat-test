@@ -43,29 +43,20 @@ dialog > form {
 	padding: 1em;
 }
 @media not (prefers-reduced-motion) {
-	dialog[open] {
-		animation: modal-in 0.2s;
+	dialog {
+		transition: 0.2s;
 	}
-	dialog[open]::backdrop {
-		animation: modal-in-backdrop 0.2s;
+	dialog::backdrop {
+		transition: 0.2s;
 	}
-	@keyframes modal-in {
-		from {
-			scale: 95%;
-			opacity: 0;
-		}
-		to {
-			scale: 100%;
-			opacity: 1;
-		}
+	/* Not using it directly on modal is because transition can't work with display none */
+	/* :modal is not supported on firefox yet, use open attribute for now */
+	dialog[open].closed {
+		scale: 95%;
+		opacity: 0;
 	}
-	@keyframes modal-in-backdrop {
-		from {
-			opacity: 0;
-		}
-		to {
-			opacity: 1;
-		}
+	dialog[open].closed::backdrop {
+		opacity: 0;
 	}
 }
 

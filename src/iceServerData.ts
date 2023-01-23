@@ -1,3 +1,4 @@
+import { closeDialog, openDialogModal } from './styleHelper/dialog'
 import { createIconButton } from './styleHelper/iconButton'
 
 const SERVER_SAVE_KEY = 'ice-server-data'
@@ -20,16 +21,16 @@ const icePassword = document.getElementById('ice-password') as HTMLInputElement
 const iceReset = document.getElementById('ice-reset') as HTMLButtonElement
 
 configIce.addEventListener('click', (ev) => {
-	configIceDialog.showModal()
+	openDialogModal(configIceDialog)
 })
 newServer.addEventListener('click', (ev) => {
 	editingIceIndex = iceServerConfig.length
 	setIceFormValues()
-	addIceDialog.showModal()
+	openDialogModal(addIceDialog)
 })
 function dialogOnMouseDown(this: HTMLDialogElement, ev: MouseEvent) {
 	if (ev.target === this) {
-		this.close()
+		closeDialog(this)
 	}
 }
 configIceDialog.addEventListener('mousedown', dialogOnMouseDown)
@@ -92,7 +93,7 @@ function addIceServerEl(data: RTCIceServer) {
 		const data = iceServerConfig[index]
 		setIceFormValues(data)
 		editingIceIndex = index
-		addIceDialog.showModal()
+		openDialogModal(addIceDialog)
 	})
 
 	remove.type = 'button'
