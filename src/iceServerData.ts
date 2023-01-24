@@ -1,4 +1,4 @@
-import { closeDialog, openDialogModal } from './styleHelper/dialog'
+import { closeDialogOnClickOutside, openDialogModal } from './styleHelper/dialog'
 import { createIconButton } from './styleHelper/iconButton'
 
 const SERVER_SAVE_KEY = 'ice-server-data'
@@ -20,6 +20,9 @@ const icePassword = document.getElementById('ice-password') as HTMLInputElement
 // const iceAdd = document.getElementById('ice-add') as HTMLButtonElement
 const iceReset = document.getElementById('ice-reset') as HTMLButtonElement
 
+closeDialogOnClickOutside(configIceDialog)
+closeDialogOnClickOutside(addIceDialog)
+
 configIce.addEventListener('click', (ev) => {
 	openDialogModal(configIceDialog)
 })
@@ -28,13 +31,6 @@ newServer.addEventListener('click', (ev) => {
 	setIceFormValues()
 	openDialogModal(addIceDialog)
 })
-function dialogOnMouseDown(this: HTMLDialogElement, ev: MouseEvent) {
-	if (ev.target === this) {
-		closeDialog(this)
-	}
-}
-configIceDialog.addEventListener('mousedown', dialogOnMouseDown)
-addIceDialog.addEventListener('mousedown', dialogOnMouseDown)
 
 addIceDialog.addEventListener('submit', async (ev) => {
 	const data: RTCIceServer = {

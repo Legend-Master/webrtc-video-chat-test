@@ -20,17 +20,35 @@ export function openDialogModal(dialog: HTMLDialogElement) {
 	dialog.classList.remove('closed')
 }
 
-// TODO: make sure this is the last handler to run or use something else to do this
-function closeProxy(this: HTMLDialogElement, ev: Event) {
-	if (!ev.defaultPrevented) {
-		ev.preventDefault()
+function dialogOnMouseDown(this: HTMLDialogElement, ev: MouseEvent) {
+	if (ev.target === this) {
 		closeDialog(this)
+	}
+}
+export function closeDialogOnClickOutside(dialog: HTMLDialogElement) {
+	dialog.addEventListener('mousedown', dialogOnMouseDown)
+}
+
+function closeProxy(this: HTMLDialogElement, ev: Event) {
+	if (ev.isTrusted && ev.target) {
+		ev.preventDefault()
+		ev.stopImmediatePropagation()
+		// How to do this in typescript?
+		// const fakeEvent = new ev.constructor(ev.type, ev)
+		// const fakeEvent = new (ev.constructor as any)(ev.type, ev)
+		const ctor = ev instanceof SubmitEvent ? SubmitEvent : Event
+		const fakeEvent = new ctor(ev.type, ev)
+		ev.target.dispatchEvent(fakeEvent)
+		if (!fakeEvent.defaultPrevented) {
+			fakeEvent.preventDefault()
+			closeDialog(this)
+		}
 	}
 }
 
 const dialogs = document.getElementsByTagName('dialog')
 for (const dialog of dialogs) {
 	dialog.classList.add('closed')
-	dialog.addEventListener('cancel', closeProxy)
-	dialog.addEventListener('submit', closeProxy)
+	dialog.addEventListener('cancel', closeProxy, { capture: true })
+	dialog.addEventListener('submit', closeProxy, { capture: true })
 }
