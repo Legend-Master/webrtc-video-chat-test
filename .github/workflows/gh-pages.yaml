@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-node@v3
 
       - run: npm install
-      - run: npm run build --public-url
+      - run: npm run build -- --public-url /webrtc-video-chat-test
 
       - name: Setup Pages
         uses: actions/configure-pages@v2
