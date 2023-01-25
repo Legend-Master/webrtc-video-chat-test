@@ -3,7 +3,7 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"label": "vite",
+			"label": "parcel",
 			"script": "dev",
 			"problemMatcher": {
 				"pattern":[
@@ -16,7 +16,7 @@
 				],
 				"background": {
 					"activeOnStart": true,
-					"beginsPattern": "VITE v.* ready in .* ms",
+					"beginsPattern": "Server running at .*",
 					"endsPattern": "."
 				}
 			},
