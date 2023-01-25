@@ -1,4 +1,4 @@
-const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion)')
+const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
 export function closeDialog(dialog: HTMLDialogElement) {
 	dialog.classList.add('closed')

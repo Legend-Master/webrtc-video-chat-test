@@ -42,7 +42,7 @@ dialog > form {
 	max-width: 90vw;
 	padding: 1em;
 }
-@media not (prefers-reduced-motion) {
+@media (prefers-reduced-motion: no-preference) {
 	dialog {
 		transition: 0.2s;
 	}
