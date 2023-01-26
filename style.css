@@ -42,6 +42,23 @@ dialog > form {
 	max-width: 90vw;
 	padding: 1em;
 }
+@media (prefers-reduced-motion: no-preference) {
+	dialog {
+		transition: 0.2s;
+	}
+	dialog::backdrop {
+		transition: 0.2s;
+	}
+	/* Not using it directly on modal is because transition can't work with display none */
+	/* :modal is not supported on firefox yet, use open attribute for now */
+	dialog[open].closed {
+		scale: 95%;
+		opacity: 0;
+	}
+	dialog[open].closed::backdrop {
+		opacity: 0;
+	}
+}
 
 select {
 	text-align: center;

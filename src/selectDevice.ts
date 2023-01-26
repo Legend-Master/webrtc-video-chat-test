@@ -1,3 +1,5 @@
+import { openDialogModal } from "./styleHelper/dialog";
+
 const VIDEO_DEVICE_SAVE_KEY = 'video-device-select'
 // const AUDIO_DEVICE_SAVE_KEY = 'audio-device-select'
 
@@ -23,7 +25,7 @@ const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 		// Lower version Safari and Android WebView doesn't have navigator.permissions
 		const status = await navigator.permissions.query({ name: 'camera' as PermissionName })
 		if (status.state === 'prompt') {
-			welcomeDialog.showModal()
+			openDialogModal(welcomeDialog)
 			shouldPopulate = false
 		}
 	} catch {}
