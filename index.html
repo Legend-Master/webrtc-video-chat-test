@@ -8,8 +8,8 @@
 
 		<meta name="description" content="A webrtc chat test" />
 
-		<link rel="icon" href="./public/favicon.svg" />
-		<link rel="apple-touch-icon" href="./public/favicon-512.png" />
+		<link rel="icon" href="public/favicon.svg" />
+		<link rel="apple-touch-icon" href="public/favicon-512.png" />
 
 		<script>
 			window.addEventListener('error', (ev) => alert(ev.error))
@@ -19,14 +19,15 @@
 		<!-- <script type="module" src="out/index.js"></script> -->
 		<script type="module" src="src/index.ts"></script>
 
-		<link rel="stylesheet" href="style.css" />
-
+		<!-- Inline css using parcel -->
 		<style>
+			@import url(style.css);
 			iconify-icon {
 				width: 1em;
 				height: 1em;
 			}
 		</style>
+		<!-- <link rel="stylesheet" href="style.css" /> -->
 	</head>
 	<body>
 		<dialog id="welcome-dialog">

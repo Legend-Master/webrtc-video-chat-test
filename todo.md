@@ -7,5 +7,5 @@
 
 ## Build
 
-- [ ] Try inline stylesheets (fairly small, about 1KB gzipped) for faster first paint
+- [x] Try inline stylesheets (fairly small, about 1KB gzipped) for faster first paint
 - [ ] Move license comments to a separate file
