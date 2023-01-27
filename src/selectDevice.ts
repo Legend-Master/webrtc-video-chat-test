@@ -1,4 +1,4 @@
-import { openDialogModal } from "./styleHelper/dialog";
+import { openDialogModal } from './styleHelper/dialog'
 
 const VIDEO_DEVICE_SAVE_KEY = 'video-device-select'
 // const AUDIO_DEVICE_SAVE_KEY = 'audio-device-select'
@@ -20,6 +20,7 @@ const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 
 ;(async function () {
 	let shouldPopulate = true
+	let hasPermission = false
 	try {
 		// Firefox doesn't have camera query
 		// Lower version Safari and Android WebView doesn't have navigator.permissions
@@ -28,15 +29,16 @@ const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 			openDialogModal(welcomeDialog)
 			shouldPopulate = false
 		}
+		hasPermission = status.state === 'granted'
 	} catch {}
 	if (shouldPopulate) {
-		await populateMediaSelection()
+		await populateMediaSelection(hasPermission)
 	}
 })()
 welcomeDialog.addEventListener('cancel', (ev) => {
 	ev.preventDefault()
 })
-welcomeDialog.addEventListener('submit', populateMediaSelection)
+welcomeDialog.addEventListener('submit', () => populateMediaSelection())
 
 async function getMediaPermission() {
 	try {
@@ -99,7 +101,7 @@ function selectLastMediaOption() {
 	}
 }
 
-async function populateMediaSelection() {
+async function populateMediaSelection(hadPermission?: boolean) {
 	// Mobile don't have getDisplayMedia capability yet
 	if (typeof navigator.mediaDevices.getDisplayMedia === 'function') {
 		const option = document.createElement('option')
@@ -108,7 +110,7 @@ async function populateMediaSelection() {
 		videoSelect.add(option)
 	}
 
-	if (await getMediaPermission()) {
+	if (hadPermission || (await getMediaPermission())) {
 		for (const device of await navigator.mediaDevices.enumerateDevices()) {
 			if (device.kind === 'videoinput') {
 				const option = document.createElement('option')
