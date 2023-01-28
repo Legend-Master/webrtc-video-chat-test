@@ -1,11 +1,8 @@
 import 'iconify-icon'
+import { IconifyIconHTMLElement } from 'iconify-icon'
 
-export function createIcon(iconName: string) {
+export function createIcon(iconName: IconifyIconHTMLElement['icon']) {
 	const el = document.createElement('iconify-icon')
-	el.setAttribute('icon', iconName)
+	el.icon = iconName
 	return el
-}
-
-export function changeIcon(icon: HTMLElement, iconName: string) {
-	icon.setAttribute('icon', iconName)
 }
