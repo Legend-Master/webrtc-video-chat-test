@@ -27,3 +27,8 @@ css is powerfull, but there's a lot of missing features like continue to finish 
 So basically you'll have to fully using javascript for styles like these to work, but this is not a great idea to be honest, not only because it's a lot of work, it's pretty hard to get everything right for all the input methods (and even combinations)
 
 ---
+
+Switching from Vite to Parcel is due to
+
+- Vite can't inline things (script and style)
+- Using vscode + chrome debug with vite is problematic (wrong break point and slow refresh)
