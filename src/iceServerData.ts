@@ -84,6 +84,7 @@ function addIceServerEl(data: RTCIceServer) {
 	label.translate = false
 
 	edit.type = 'button'
+	edit.title = 'Edit'
 	edit.addEventListener('click', () => {
 		const index = [...iceServerContainer.children].indexOf(container)
 		const data = iceServerConfig[index]
@@ -93,6 +94,7 @@ function addIceServerEl(data: RTCIceServer) {
 	})
 
 	remove.type = 'button'
+	remove.title = 'Remove'
 	remove.addEventListener('click', () => {
 		const choice = confirm(`Are you sure you want to delete '${label.innerText}'?`)
 		if (choice) {
