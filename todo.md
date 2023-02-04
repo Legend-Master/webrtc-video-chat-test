@@ -1,6 +1,6 @@
 ## Feature
 
-- [ ] Make ICE server toggleable (temp disable some servers)
+- [x] Make ICE server toggleable (temp disable some servers)
 - [ ] Ability to import and export ICE settings
     - Export all enabled ICE servers to string for import
     - Export all enabled ICE servers to url for sending people temp fully configured site
@@ -16,6 +16,7 @@
 - [ ] Fix clicking on scrollbar treats as outside of dialog modal (closes it)
     - `mousedown`/`pointerdown` event has this problem
     - `click` event will breaks on mouse down inside then moving out and release (selecting text)
+- [ ] Don't allow duplicated ICE servers
 
 ## Optimize
 

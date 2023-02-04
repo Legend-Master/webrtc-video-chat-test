@@ -1,8 +1,23 @@
 import { closeDialogOnClickOutside, openDialogModal } from './styleHelper/dialog'
 import { createIconButton } from './styleHelper/iconButton'
 
+type IceServerData = Omit<RTCIceServer, 'urls'> & {
+	urls: string
+	enabled: boolean
+}
+
 const SERVER_SAVE_KEY = 'ice-server-data'
-export let iceServerConfig: RTCIceServer[] = []
+let iceServerConfig: IceServerData[] = []
+
+export function getIceServers() {
+	const servers: RTCIceServer[] = []
+	for (const server of iceServerConfig) {
+		if (server.enabled) {
+			servers.push(server)
+		}
+	}
+	return servers
+}
 
 let editingIceIndex: number = 0
 
@@ -33,10 +48,11 @@ newServer.addEventListener('click', (ev) => {
 })
 
 addIceDialog.addEventListener('submit', async (ev) => {
-	const data: RTCIceServer = {
+	const data: IceServerData = {
 		urls: iceUrl.value.trim(),
-		username: iceUsername.value.trim(),
-		credential: icePassword.value.trim(),
+		username: iceUsername.value.trim() || undefined,
+		credential: icePassword.value.trim() || undefined,
+		enabled: true,
 	}
 	if (editingIceIndex < iceServerConfig.length) {
 		editServerData(editingIceIndex, data)
@@ -60,7 +76,7 @@ iceUrl.addEventListener('input', validateInput)
 
 setServerData(readServerData() || getDefaultServerData())
 
-function setIceFormValues(data?: RTCIceServer) {
+function setIceFormValues(data?: IceServerData) {
 	if (data) {
 		iceUrl.value = data.urls as string
 		iceUsername.value = data.username || ''
@@ -73,14 +89,32 @@ function setIceFormValues(data?: RTCIceServer) {
 	validateInput()
 }
 
-function addIceServerEl(data: RTCIceServer) {
+function addIceServerEl(data: IceServerData) {
 	const container = document.createElement('div')
-	const label = document.createElement('span')
+
+	const labelWrapper = document.createElement('div')
+	const checkbox = document.createElement('input')
+	const label = document.createElement('label')
+
+	const buttonWrapper = document.createElement('div')
 	const edit = createIconButton('mdi:pencil')
 	const remove = createIconButton('mdi:delete')
-	const buttonWrapper = document.createElement('div')
 
-	label.innerText = generateLabel(data)
+	const labelText = generateLabel(data)
+	const labelId = `ice-item-${labelText}`
+
+	checkbox.type = 'checkbox'
+	checkbox.id = labelId
+	checkbox.checked = data.enabled
+	checkbox.addEventListener('change', () => {
+		const index = [...iceServerContainer.children].indexOf(container)
+		const data = iceServerConfig[index]
+		data!.enabled = checkbox.checked
+		saveServerData()
+	})
+
+	label.htmlFor = labelId
+	label.innerText = labelText
 	label.translate = false
 
 	edit.type = 'button'
@@ -105,35 +139,44 @@ function addIceServerEl(data: RTCIceServer) {
 		}
 	})
 
-	container.appendChild(label)
-	container.appendChild(buttonWrapper)
+	labelWrapper.className = 'label-container'
+	buttonWrapper.className = 'button-container'
+
+	labelWrapper.appendChild(checkbox)
+	labelWrapper.appendChild(label)
 	buttonWrapper.appendChild(edit)
 	buttonWrapper.appendChild(remove)
+	container.appendChild(labelWrapper)
+	container.appendChild(buttonWrapper)
 	iceServerContainer.appendChild(container)
 }
 
-function getDefaultServerData(): RTCIceServer[] {
+function getDefaultServerData(): IceServerData[] {
 	return [
 		{
 			urls: 'stun:stun.syncthing.net',
+			enabled: true,
 		},
 		{
 			urls: 'stun:stun.stunprotocol.org',
+			enabled: true,
 		},
 		{
 			urls: 'stun:stun.l.google.com:19302',
+			enabled: true,
 		},
 		{
 			urls: 'stun:stun.qq.com',
+			enabled: true,
 		},
 	]
 }
 
-function generateLabel(data: RTCIceServer) {
+function generateLabel(data: IceServerData) {
 	return data.username ? `${data.urls} [${data.username}:${data.credential}]` : `${data.urls}`
 }
 
-function setServerData(data: RTCIceServer[]) {
+function setServerData(data: IceServerData[]) {
 	iceServerConfig = data
 	iceServerContainer.innerHTML = ''
 	for (const data of iceServerConfig) {
@@ -141,14 +184,14 @@ function setServerData(data: RTCIceServer[]) {
 	}
 }
 
-function editServerData(index: number, data: RTCIceServer) {
-	const label = iceServerContainer.children[index]!.querySelector('span')!
+function editServerData(index: number, data: IceServerData) {
+	const label = iceServerContainer.children[index]!.querySelector('label')!
 	label.innerText = generateLabel(data)
 	iceServerConfig.splice(index, 1, data)
 	saveServerData()
 }
 
-function addServerData(data: RTCIceServer) {
+function addServerData(data: IceServerData) {
 	iceServerConfig.push(data)
 	addIceServerEl(data)
 	saveServerData()
@@ -158,15 +201,23 @@ function saveServerData() {
 	localStorage.setItem(SERVER_SAVE_KEY, JSON.stringify(iceServerConfig))
 }
 
-function readServerData(): RTCIceServer[] | undefined {
+// Need a better way to validate and handle/upgrade old data
+function readServerData(): IceServerData[] | undefined {
 	const data = localStorage.getItem(SERVER_SAVE_KEY)
 	if (data) {
 		const parsed = JSON.parse(data)
 		// It's a single server data before
 		if (Array.isArray(parsed)) {
+			// Handle old data without `enabled field`
+			for (const server of parsed) {
+				if (server.enabled === undefined) {
+					server.enabled = true
+				}
+			}
 			return parsed
 		} else {
 			const servers = getDefaultServerData()
+			parsed.enabled = true
 			servers.push(parsed)
 			return servers
 		}

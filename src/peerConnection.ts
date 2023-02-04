@@ -6,13 +6,12 @@ import {
 	onChildAdded,
 	runTransaction,
 	onDisconnect,
-	remove,
 } from 'firebase/database'
 import { db } from './util/firebaseInit'
 import { updateBandwidthRestriction } from './util/sdpInject'
 import { room } from './util/room'
 import { registerUnsub, unsubscribeAll } from './util/unsubscribeAll'
-import { iceServerConfig } from './iceServerData'
+import { getIceServers } from './iceServerData'
 import { getUserMedia, onDeviceSelectChange } from './selectDevice'
 
 type PeerType = 'offer' | 'answer'
@@ -110,7 +109,7 @@ function monitoSignalingState(this: RTCPeerConnection) {
 }
 
 export async function startPeerConnection() {
-	pc = new RTCPeerConnection({ iceServers: iceServerConfig })
+	pc = new RTCPeerConnection({ iceServers: getIceServers() })
 	pc.addEventListener('track', onTrack)
 	pc.addEventListener('icecandidate', onIceCandidate)
 	pc.addEventListener('negotiationneeded', negotiate)

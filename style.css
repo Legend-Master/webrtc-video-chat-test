@@ -38,10 +38,6 @@ dialog {
 	border: none;
 	box-shadow: 0 0 8px var(--half-transparent);
 }
-dialog > form {
-	max-width: 90vw;
-	padding: 1em;
-}
 @media (prefers-reduced-motion: no-preference) {
 	dialog {
 		transition: 0.2s;
@@ -101,6 +97,12 @@ input:focus {
 }
 input:invalid {
 	border-color: brown;
+}
+input[type='checkbox'] {
+	outline: revert;
+	cursor: pointer;
+	margin: 0;
+	accent-color: var(--button-normal-color);
 }
 
 .flex-container,
@@ -263,8 +265,7 @@ because it's impossible to do transition/animation only on switching state away 
 }
 
 #welcome-dialog > form {
-	padding-top: 2em;
-	padding-bottom: 2em;
+	padding: 2em 1em;
 	max-width: 450px;
 }
 #welcome-dialog > form > h2 {
@@ -272,16 +273,20 @@ because it's impossible to do transition/animation only on switching state away 
 	margin-bottom: 1.5em;
 }
 
-#config-ice-dialog > form {
+#config-ice-dialog {
+	max-width: 100%;
+	max-height: 80%;
+}
+#config-ice-dialog > div {
 	flex-direction: column;
 	gap: 2em;
 	padding: 2em;
 }
 #ice-server-container {
-	flex-direction: column;
 	width: 500px;
 	max-width: 100%;
-	gap: 0;
+	max-height: 50vh;
+	overflow: auto;
 }
 #ice-server-container > div {
 	display: flex;
@@ -295,11 +300,20 @@ because it's impossible to do transition/animation only on switching state away 
 #ice-server-container > div:not(:first-child) {
 	border-top: 1px solid rgba(0, 0, 0, 0.2);
 }
-#ice-server-container > div > span {
+#ice-server-container label {
+	flex-grow: 1;
+	padding-left: 1em;
+	cursor: pointer;
 	overflow-wrap: break-word;
 	overflow: auto;
 }
-#ice-server-container > div > div {
+#ice-server-container .label-container {
+	display: flex;
+	flex-wrap: nowrap;
+	flex-grow: 1;
+	overflow: auto;
+}
+#ice-server-container .button-container {
 	display: flex;
 	flex-wrap: nowrap;
 	font-size: 1.1em;
