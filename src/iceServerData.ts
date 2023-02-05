@@ -225,7 +225,7 @@ function readServerData(): IceServerData[] | undefined {
 					})
 				}
 			}
-			return parsed
+			return servers
 		} else {
 			const servers = getDefaultServerData()
 			servers.push({
