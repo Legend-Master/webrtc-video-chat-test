@@ -1,8 +1,11 @@
 import { closeDialogOnClickOutside, openDialogModal } from './styleHelper/dialog'
 import { createIconButton } from './styleHelper/iconButton'
 
-type IceServerData = Omit<RTCIceServer, 'urls'> & {
+type IceServer = Omit<RTCIceServer, 'urls'> & {
 	urls: string
+}
+type IceServerData = {
+	server: IceServer
 	enabled: boolean
 }
 
@@ -10,10 +13,10 @@ const SERVER_SAVE_KEY = 'ice-server-data'
 let iceServerConfig: IceServerData[] = []
 
 export function getIceServers() {
-	const servers: RTCIceServer[] = []
-	for (const server of iceServerConfig) {
-		if (server.enabled) {
-			servers.push(server)
+	const servers: IceServer[] = []
+	for (const data of iceServerConfig) {
+		if (data.enabled) {
+			servers.push(data.server)
 		}
 	}
 	return servers
@@ -48,16 +51,15 @@ newServer.addEventListener('click', (ev) => {
 })
 
 addIceDialog.addEventListener('submit', async (ev) => {
-	const data: IceServerData = {
+	const server: IceServer = {
 		urls: iceUrl.value.trim(),
 		username: iceUsername.value.trim() || undefined,
 		credential: icePassword.value.trim() || undefined,
-		enabled: true,
 	}
 	if (editingIceIndex < iceServerConfig.length) {
-		editServerData(editingIceIndex, data)
+		editServerData(editingIceIndex, server)
 	} else {
-		addServerData(data)
+		addServerData(server)
 	}
 })
 iceReset.addEventListener('click', async (ev) => {
@@ -76,11 +78,11 @@ iceUrl.addEventListener('input', validateInput)
 
 setServerData(readServerData() || getDefaultServerData())
 
-function setIceFormValues(data?: IceServerData) {
-	if (data) {
-		iceUrl.value = data.urls as string
-		iceUsername.value = data.username || ''
-		icePassword.value = data.credential || ''
+function setIceFormValues(server?: IceServer) {
+	if (server) {
+		iceUrl.value = server.urls
+		iceUsername.value = server.username || ''
+		icePassword.value = server.credential || ''
 	} else {
 		iceUrl.value = ''
 		iceUsername.value = ''
@@ -100,7 +102,7 @@ function addIceServerEl(data: IceServerData) {
 	const edit = createIconButton('mdi:pencil')
 	const remove = createIconButton('mdi:delete')
 
-	const labelText = generateLabel(data)
+	const labelText = generateLabel(data.server)
 	const labelId = `ice-item-${labelText}`
 
 	checkbox.type = 'checkbox'
@@ -121,8 +123,8 @@ function addIceServerEl(data: IceServerData) {
 	edit.title = 'Edit'
 	edit.addEventListener('click', () => {
 		const index = [...iceServerContainer.children].indexOf(container)
-		const data = iceServerConfig[index]
-		setIceFormValues(data)
+		const server = iceServerConfig[index]!.server
+		setIceFormValues(server)
 		editingIceIndex = index
 		openDialogModal(addIceDialog)
 	})
@@ -152,28 +154,28 @@ function addIceServerEl(data: IceServerData) {
 }
 
 function getDefaultServerData(): IceServerData[] {
-	return [
+	const defaultServers = [
 		{
 			urls: 'stun:stun.syncthing.net',
-			enabled: true,
 		},
 		{
 			urls: 'stun:stun.stunprotocol.org',
-			enabled: true,
 		},
 		{
 			urls: 'stun:stun.l.google.com:19302',
-			enabled: true,
 		},
 		{
 			urls: 'stun:stun.qq.com',
-			enabled: true,
 		},
 	]
+	return defaultServers.map((server) => ({
+		server: server,
+		enabled: true,
+	}))
 }
 
-function generateLabel(data: IceServerData) {
-	return data.username ? `${data.urls} [${data.username}:${data.credential}]` : `${data.urls}`
+function generateLabel(server: IceServer) {
+	return server.username ? `${server.urls} [${server.username}:${server.credential}]` : `${server.urls}`
 }
 
 function setServerData(data: IceServerData[]) {
@@ -184,14 +186,18 @@ function setServerData(data: IceServerData[]) {
 	}
 }
 
-function editServerData(index: number, data: IceServerData) {
+function editServerData(index: number, server: IceServer) {
 	const label = iceServerContainer.children[index]!.querySelector('label')!
-	label.innerText = generateLabel(data)
-	iceServerConfig.splice(index, 1, data)
+	label.innerText = generateLabel(server)
+	iceServerConfig[index]!.server = server
 	saveServerData()
 }
 
-function addServerData(data: IceServerData) {
+function addServerData(server: IceServer) {
+	const data: IceServerData = {
+		server,
+		enabled: true,
+	}
 	iceServerConfig.push(data)
 	addIceServerEl(data)
 	saveServerData()
@@ -209,16 +215,23 @@ function readServerData(): IceServerData[] | undefined {
 		// It's a single server data before
 		if (Array.isArray(parsed)) {
 			// Handle old data without `enabled field`
+			const servers: IceServerData[] = []
+			// Was only server data before
 			for (const server of parsed) {
-				if (server.enabled === undefined) {
-					server.enabled = true
+				if (server.server === undefined) {
+					servers.push({
+						server: server,
+						enabled: true,
+					})
 				}
 			}
 			return parsed
 		} else {
 			const servers = getDefaultServerData()
-			parsed.enabled = true
-			servers.push(parsed)
+			servers.push({
+				server: parsed,
+				enabled: true,
+			})
 			return servers
 		}
 	}
