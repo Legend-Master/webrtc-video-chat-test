@@ -1,7 +1,7 @@
 ## Feature
 
 - [x] Make ICE server toggleable (temp disable some servers)
-- [ ] Ability to import and export ICE settings
+- [x] Ability to import and export ICE settings
     - Export all enabled ICE servers to string for import
     - Export all enabled ICE servers to url for sending people temp fully configured site
     - Import ICE servers from string (clipboard)
@@ -30,6 +30,7 @@
 
 ## Refactor
 
+- [ ] Migrate from `localStorage` to `IndexedDB`
 - [ ] Versioning saved data
 
 ## Experiment

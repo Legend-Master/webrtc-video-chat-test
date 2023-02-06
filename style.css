@@ -105,6 +105,11 @@ input[type='checkbox'] {
 	accent-color: var(--button-normal-color);
 }
 
+code {
+	font-family: Consolas, monospace;
+	text-align: start;
+}
+
 .flex-container,
 body > div {
 	display: flex;
@@ -279,13 +284,22 @@ because it's impossible to do transition/animation only on switching state away 
 }
 #config-ice-dialog > div {
 	flex-direction: column;
-	gap: 2em;
 	padding: 2em;
 }
 @media (width < 500px) {
 	#config-ice-dialog > div {
 		padding: 2em 1em;
 	}
+}
+.import-container {
+	display: flex;
+	justify-content: space-between;
+	gap: 1em;
+	padding: 0 1em;
+}
+.import-container input {
+	flex-grow: 1;
+	overflow: auto;
 }
 #ice-server-container {
 	width: 500px;
@@ -345,4 +359,36 @@ because it's impossible to do transition/animation only on switching state away 
 .form-input-container input {
 	width: 250px;
 	max-width: 60vw;
+}
+
+#export-ice-dialog {
+	width: 500px;
+}
+
+.export-container {
+	padding: 2em;
+	display: flex;
+	flex-direction: column;
+	gap: 1em;
+}
+
+.export-container > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1em;
+	background-color: #f6f8fa; /* Color from Github --color-canvas-subtle */
+	padding: 1em;
+}
+
+.export-container code {
+	display: block;
+	overflow: auto;
+	overflow-wrap: break-word;
+	font-size: 0.9em;
+	line-height: 1.45;
+}
+
+.export-container button {
+	font-size: 1.3em;
 }

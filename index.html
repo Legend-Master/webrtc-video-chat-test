@@ -28,6 +28,7 @@
 		<link rel="stylesheet" href="style.css" />
 	</head>
 	<body>
+		<!-- Every dialog should have a wrapper element inside to avoid clicking on empty space closes it  -->
 		<dialog id="welcome-dialog">
 			<form method="dialog">
 				<h2 title="Deny this will make some of features unavailable">
@@ -38,10 +39,15 @@
 		</dialog>
 		<dialog id="config-ice-dialog">
 			<div class="flex-container">
+				<form id="import-form" class="import-container">
+					<input id="import-ice-input" autocapitalize="false" autocomplete="off" />
+					<button type="submit">Import</button>
+				</form>
 				<div id="ice-server-container"></div>
 				<div class="form-button-container flex-container">
-					<button id="new-server">Add STUN/TURN Server</button>
+					<button id="new-server">Add</button>
 					<button id="ice-reset">Reset</button>
+					<button id="export-ice-button">Export</button>
 				</div>
 			</div>
 		</dialog>
@@ -62,9 +68,25 @@
 					</div>
 				</div>
 				<div class="form-button-container flex-container">
-					<button id="ice-add" type="submit">Submit</button>
+					<button type="submit">Submit</button>
 				</div>
 			</form>
+		</dialog>
+		<dialog id="export-ice-dialog">
+			<div class="export-container">
+				<div>
+					<code id="export-ice-json"></code>
+					<button id="copy-ice-json" class="icon-button" title="Copy JSON">
+						<iconify-icon icon="mdi:content-copy"></iconify-icon>
+					</button>
+				</div>
+				<div>
+					<code id="export-ice-url"></code>
+					<button id="copy-ice-url" class="icon-button" title="Copy URL">
+						<iconify-icon icon="mdi:content-copy"></iconify-icon>
+					</button>
+				</div>
+			</div>
 		</dialog>
 		<div id="pc-control-div" class="hidden-after-call">
 			<button id="start-button">Start</button>

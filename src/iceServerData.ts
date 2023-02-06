@@ -24,32 +24,82 @@ export function getIceServers() {
 
 let editingIceIndex: number = 0
 
-const iceServerContainer = document.getElementById('ice-server-container') as HTMLDivElement
 const configIce = document.getElementById('config-ice') as HTMLButtonElement
 const configIceDialog = document.getElementById('config-ice-dialog') as HTMLDialogElement
+
+const importIceInput = document.getElementById('import-ice-input') as HTMLInputElement
+const importForm = document.getElementById('import-form') as HTMLFormElement
+
+const iceServerContainer = document.getElementById('ice-server-container') as HTMLDivElement
+
 const newServer = document.getElementById('new-server') as HTMLButtonElement
+const iceReset = document.getElementById('ice-reset') as HTMLButtonElement
+const exportIceButton = document.getElementById('export-ice-button') as HTMLButtonElement
 
 const addIceDialog = document.getElementById('add-ice-dialog') as HTMLDialogElement
-
 const iceUrl = document.getElementById('ice-url') as HTMLInputElement
 const iceUsername = document.getElementById('ice-username') as HTMLInputElement
 const icePassword = document.getElementById('ice-password') as HTMLInputElement
 
-// const iceAdd = document.getElementById('ice-add') as HTMLButtonElement
-const iceReset = document.getElementById('ice-reset') as HTMLButtonElement
+const exportIceDialog = document.getElementById('export-ice-dialog') as HTMLDialogElement
+const exportJson = document.getElementById('export-ice-json') as HTMLElement
+const exportUrl = document.getElementById('export-ice-url') as HTMLElement
+const copyJson = document.getElementById('copy-ice-json') as HTMLButtonElement
+const copyUrl = document.getElementById('copy-ice-url') as HTMLButtonElement
+
+const params = new URLSearchParams(location.search)
+const lockedServers = params.get('servers')
+if (lockedServers) {
+	configIce.hidden = true
+	iceServerConfig = iceServersToData(JSON.parse(lockedServers))
+} else {
+	setServerData(readServerData() || getDefaultServerData())
+}
 
 closeDialogOnClickOutside(configIceDialog)
 closeDialogOnClickOutside(addIceDialog)
+closeDialogOnClickOutside(exportIceDialog)
 
-configIce.addEventListener('click', (ev) => {
+configIce.addEventListener('click', () => {
 	openDialogModal(configIceDialog)
+	// Prevent bringing up mobile virtual keyboard
+	importIceInput.readOnly = true
+	requestAnimationFrame(() => {
+		importIceInput.readOnly = false
+	})
 })
-newServer.addEventListener('click', (ev) => {
+
+importForm.addEventListener('submit', (ev) => {
+	ev.preventDefault()
+	try {
+		// Guess we'll have to trust the user to not throw in bad data
+		// since I'm too lazy to do the validation
+		const parsed = JSON.parse(importIceInput.value)
+		if (Array.isArray(parsed)) {
+			// Better batch update then save all
+			for (const server of parsed) {
+				addServerData(server)
+			}
+		} else {
+			throw Error('Not an array')
+		}
+		importIceInput.value = ''
+	} catch (error) {
+		importIceInput.setCustomValidity(`Invalid JSON\n${error}`)
+		importIceInput.reportValidity()
+	}
+})
+function removeInvalid(this: HTMLInputElement) {
+	this.setCustomValidity('')
+}
+importIceInput.addEventListener('input', removeInvalid)
+importIceInput.addEventListener('blur', removeInvalid)
+
+newServer.addEventListener('click', () => {
 	editingIceIndex = iceServerConfig.length
 	setIceFormValues()
 	openDialogModal(addIceDialog)
 })
-
 addIceDialog.addEventListener('submit', async (ev) => {
 	const server: IceServer = {
 		urls: iceUrl.value.trim(),
@@ -62,13 +112,6 @@ addIceDialog.addEventListener('submit', async (ev) => {
 		addServerData(server)
 	}
 })
-iceReset.addEventListener('click', async (ev) => {
-	const choice = confirm('Are you sure you want to reset ice servers to default?')
-	if (choice) {
-		resetServerData()
-	}
-})
-
 function validateInput() {
 	const required = iceUrl.value.startsWith('turn')
 	iceUsername.required = required
@@ -76,7 +119,29 @@ function validateInput() {
 }
 iceUrl.addEventListener('input', validateInput)
 
-setServerData(readServerData() || getDefaultServerData())
+iceReset.addEventListener('click', async (ev) => {
+	const choice = confirm('Are you sure you want to reset ice servers to default?')
+	if (choice) {
+		resetServerData()
+	}
+})
+
+exportIceButton.addEventListener('click', () => {
+	openDialogModal(exportIceDialog)
+
+	const servers = JSON.stringify(getIceServers())
+	exportJson.innerText = servers
+
+	const params = new URLSearchParams(location.search)
+	params.append('servers', servers)
+	exportUrl.innerText = `${location.origin}${location.pathname}?${params}`
+})
+copyJson.addEventListener('click', () => {
+	navigator.clipboard.writeText(exportJson.innerText)
+})
+copyUrl.addEventListener('click', () => {
+	navigator.clipboard.writeText(exportUrl.innerText)
+})
 
 function setIceFormValues(server?: IceServer) {
 	if (server) {
