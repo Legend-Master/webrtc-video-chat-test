@@ -311,7 +311,11 @@ because it's impossible to do transition/animation only on switching state away 
 	display: flex;
 	flex-wrap: nowrap;
 	flex-grow: 1;
+	align-items: center;
 	overflow: auto;
+}
+#ice-server-container .label-container > input[type=checkbox] {
+	margin-left: revert;
 }
 #ice-server-container .button-container {
 	display: flex;
