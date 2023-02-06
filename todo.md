@@ -10,10 +10,13 @@
 
 - [ ] Make font size bigger on mobile without looking awful
 - [ ] Ask if user wanna discard changes on cancel/close page when adding/editing ICE server
+- [ ] Pop a notification (maybe toast) on copy
+- [ ] Make add/edit ICE form nicer to use
+    - Use radio buttons to select stun/turn(s)?
 
 ## Fix
 
-- [ ] Fix clicking on scrollbar treats as outside of dialog modal (closes it)
+- [x] Fix clicking on scrollbar treats as outside of dialog modal (closes it)
     - `mousedown`/`pointerdown` event has this problem
     - `click` event will breaks on mouse down inside then moving out and release (selecting text)
 - [ ] Don't allow duplicated ICE servers
