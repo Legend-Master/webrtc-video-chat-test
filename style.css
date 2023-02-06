@@ -282,6 +282,11 @@ because it's impossible to do transition/animation only on switching state away 
 	gap: 2em;
 	padding: 2em;
 }
+@media (width < 500px) {
+	#config-ice-dialog > div {
+		padding: 2em 1em;
+	}
+}
 #ice-server-container {
 	width: 500px;
 	max-width: 100%;
