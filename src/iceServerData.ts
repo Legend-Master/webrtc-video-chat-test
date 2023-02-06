@@ -153,6 +153,13 @@ function addIceServerEl(data: IceServerData) {
 	iceServerContainer.appendChild(container)
 }
 
+function iceServersToData(servers: IceServer[]): IceServerData[] {
+	return servers.map((server) => ({
+		server: server,
+		enabled: true,
+	}))
+}
+
 function getDefaultServerData(): IceServerData[] {
 	const defaultServers = [
 		{
@@ -168,14 +175,13 @@ function getDefaultServerData(): IceServerData[] {
 			urls: 'stun:stun.qq.com',
 		},
 	]
-	return defaultServers.map((server) => ({
-		server: server,
-		enabled: true,
-	}))
+	return iceServersToData(defaultServers)
 }
 
 function generateLabel(server: IceServer) {
-	return server.username ? `${server.urls} [${server.username}:${server.credential}]` : `${server.urls}`
+	return server.username
+		? `${server.urls} [${server.username}:${server.credential}]`
+		: `${server.urls}`
 }
 
 function setServerData(data: IceServerData[]) {
@@ -211,25 +217,25 @@ function saveServerData() {
 function readServerData(): IceServerData[] | undefined {
 	const data = localStorage.getItem(SERVER_SAVE_KEY)
 	if (data) {
-		const parsed = JSON.parse(data)
+		const parsed = JSON.parse(data) as unknown
 		// It's a single server data before
 		if (Array.isArray(parsed)) {
-			// Handle old data without `enabled field`
-			const servers: IceServerData[] = []
-			// Was only server data before
-			for (const server of parsed) {
-				if (server.server === undefined) {
-					servers.push({
-						server: server,
-						enabled: true,
-					})
-				}
+			// Was `IceServer[]` before
+			let servers = parsed as IceServer[] | IceServerData[]
+			const firstServer = servers[0]
+			if (!firstServer) {
+				return servers as IceServerData[]
 			}
-			return servers
+			if ('server' in firstServer) {
+				return servers as typeof firstServer[]
+			} else {
+				return iceServersToData(servers as typeof firstServer[])
+			}
 		} else {
+			let server = parsed as IceServer
 			const servers = getDefaultServerData()
 			servers.push({
-				server: parsed,
+				server: server,
 				enabled: true,
 			})
 			return servers

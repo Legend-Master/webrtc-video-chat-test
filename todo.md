@@ -28,6 +28,10 @@
     - Parcel doesn't support inline bundle source map yet (https://github.com/parcel-bundler/parcel/issues/6225)
 - [ ] Move license comments to a separate file
 
+## Refactor
+
+- [ ] Versioning saved data
+
 ## Experiment
 
 - [ ] Test custom video resolution
