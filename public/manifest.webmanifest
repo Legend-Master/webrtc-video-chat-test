@@ -1,0 +1,13 @@
+{
+	"icons": [
+		{
+			"src": "favicon.svg",
+			"sizes": "any"
+		},
+		{
+			"purpose": "maskable",
+			"src": "maskable-icon.svg",
+			"sizes": "any"
+		}
+	]
+}
