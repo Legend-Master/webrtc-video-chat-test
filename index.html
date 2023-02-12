@@ -11,7 +11,7 @@
 		<link rel="icon" href="public/favicon.svg" />
 		<link rel="apple-touch-icon" href="public/favicon-512.png" />
 
-		<link rel="manifest" href="public/manifest.webmanifest">
+		<link rel="manifest" href="public/manifest.webmanifest" />
 
 		<script>
 			window.addEventListener('error', (ev) => alert(ev.error))
@@ -42,7 +42,12 @@
 		<dialog id="config-ice-dialog">
 			<div class="flex-container">
 				<form id="import-form" class="import-container">
-					<input id="import-ice-input" autocapitalize="false" autocomplete="off" />
+					<input
+						id="import-ice-input"
+						autocapitalize="false"
+						autocomplete="off"
+						title="Import ICE servers from JSON string"
+					/>
 					<button type="submit">Import</button>
 				</form>
 				<div id="ice-server-container"></div>
