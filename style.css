@@ -37,6 +37,9 @@ dialog {
 	padding: 0;
 	border: none;
 	box-shadow: 0 0 8px var(--half-transparent);
+
+	/* Why you can scroll the content behind the dialog??? */
+	overscroll-behavior: contain;
 }
 @media (prefers-reduced-motion: no-preference) {
 	dialog {
