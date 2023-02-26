@@ -231,7 +231,7 @@ function getDefaultServerData(): IceServerData[] {
 			urls: 'stun:stun.syncthing.net',
 		},
 		{
-			urls: 'stun:stun.stunprotocol.org',
+			urls: 'stun:stunserver.stunprotocol.org',
 		},
 		{
 			urls: 'stun:stun.l.google.com:19302',
