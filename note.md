@@ -32,3 +32,16 @@ Switching from Vite to Parcel is due to
 
 - Vite can't inline things (script and style)
 - Using vscode + chrome debug with vite is problematic (wrong break point and slow refresh)
+
+---
+
+Dialog exit animation is way too hard than it should be
+
+The default dialog element close can't really have any animation since it's transitioning to `display: none`
+
+If we do an animation and close it after animation done, there're some problems since it's not really closed
+
+- Can still interact with the content inside it
+- Can't interact with the content behined it
+
+In the other hand, if we change the `display: none` to something else, then we lose the inert and top layer behavior
