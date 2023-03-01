@@ -230,7 +230,7 @@ because it's impossible to do transition/animation only on switching state away 
 	border-radius: inherit;
 
 	/* Desktop web YouTube */
-	transition: background-color 0.1s, border-color 0.4s;
+	transition: background-color ease-out 0.1s, border-color ease-in-out 0.4s;
 	/* Android YouTube app (1/6s, 1/3s) */
 	/* transition: background-color 0.17s, border-color 0.33s; */
 }
