@@ -4,8 +4,8 @@
 		"build": "parcel build index.html"
 	},
 	"dependencies": {
-		"firebase": "^9.17.1",
-		"iconify-icon": "^1.0.5"
+		"firebase": "^9.17.2",
+		"iconify-icon": "^1.0.7"
 	},
 	"devDependencies": {
 		"@parcel/packager-raw-url": "^2.8.3",
