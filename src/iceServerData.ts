@@ -159,19 +159,17 @@ function setIceFormValues(server?: IceServer) {
 function addIceServerEl(data: IceServerData) {
 	const container = document.createElement('div')
 
-	const labelWrapper = document.createElement('div')
-	const checkbox = document.createElement('input')
 	const label = document.createElement('label')
+	const checkbox = document.createElement('input')
+	const labelText = document.createElement('span')
 
 	const buttonWrapper = document.createElement('div')
 	const edit = createIconButton('mdi:pencil')
 	const remove = createIconButton('mdi:delete')
 
-	const labelText = generateLabel(data.server)
-	const labelId = `ice-item-${labelText}`
+	label.translate = false
 
 	checkbox.type = 'checkbox'
-	checkbox.id = labelId
 	checkbox.checked = data.enabled
 	checkbox.addEventListener('change', () => {
 		const index = [...iceServerContainer.children].indexOf(container)
@@ -180,9 +178,7 @@ function addIceServerEl(data: IceServerData) {
 		saveServerData()
 	})
 
-	label.htmlFor = labelId
-	label.innerText = labelText
-	label.translate = false
+	labelText.innerText = generateLabel(data.server)
 
 	edit.type = 'button'
 	edit.title = 'Edit'
@@ -197,7 +193,7 @@ function addIceServerEl(data: IceServerData) {
 	remove.type = 'button'
 	remove.title = 'Remove'
 	remove.addEventListener('click', () => {
-		const choice = confirm(`Are you sure you want to delete '${label.innerText}'?`)
+		const choice = confirm(`Are you sure you want to delete '${labelText.innerText}'?`)
 		if (choice) {
 			const index = [...iceServerContainer.children].indexOf(container)
 			iceServerConfig.splice(index, 1)
@@ -206,16 +202,15 @@ function addIceServerEl(data: IceServerData) {
 		}
 	})
 
-	labelWrapper.className = 'label-container'
 	buttonWrapper.className = 'button-container'
 
-	labelWrapper.appendChild(checkbox)
-	labelWrapper.appendChild(label)
-	buttonWrapper.appendChild(edit)
-	buttonWrapper.appendChild(remove)
-	container.appendChild(labelWrapper)
-	container.appendChild(buttonWrapper)
-	iceServerContainer.appendChild(container)
+	label.append(checkbox)
+	label.append(labelText)
+	buttonWrapper.append(edit)
+	buttonWrapper.append(remove)
+	container.append(label)
+	container.append(buttonWrapper)
+	iceServerContainer.append(container)
 }
 
 function iceServersToData(servers: IceServer[]): IceServerData[] {
@@ -258,8 +253,8 @@ function setServerData(data: IceServerData[]) {
 }
 
 function editServerData(index: number, server: IceServer) {
-	const label = iceServerContainer.children[index]!.querySelector('label')!
-	label.innerText = generateLabel(server)
+	const labelText = iceServerContainer.children[index]!.querySelector('span')!
+	labelText.innerText = generateLabel(server)
 	iceServerConfig[index]!.server = server
 	saveServerData()
 }

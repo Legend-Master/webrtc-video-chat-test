@@ -301,6 +301,7 @@ because it's impossible to do transition/animation only on switching state away 
 	justify-content: space-between;
 	gap: 1em;
 	padding: 0 1em;
+	max-width: 100%;
 }
 .import-container input {
 	flex-grow: 1;
@@ -315,7 +316,6 @@ because it's impossible to do transition/animation only on switching state away 
 #ice-server-container > div {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
 	gap: 1em;
 	text-align: left;
 	max-width: 100%;
@@ -326,19 +326,20 @@ because it's impossible to do transition/animation only on switching state away 
 }
 #ice-server-container label {
 	flex-grow: 1;
-	padding-left: 1em;
+	flex-wrap: nowrap;
 	cursor: pointer;
+	overflow: auto;
+
+	display: flex;
+	align-items: center;
+	gap: 1em;
+}
+#ice-server-container label span {
 	overflow-wrap: break-word;
 	overflow: auto;
+
 }
-#ice-server-container .label-container {
-	display: flex;
-	flex-wrap: nowrap;
-	flex-grow: 1;
-	align-items: center;
-	overflow: auto;
-}
-#ice-server-container .label-container > input[type=checkbox] {
+#ice-server-container input[type=checkbox] {
 	margin-left: revert;
 }
 #ice-server-container .button-container {

@@ -16,7 +16,7 @@ export function createIconButton(icon: IconifyIconHTMLElement['icon']) {
 	const button = document.createElement('button')
 	button.classList.add('icon-button')
 	addTouchResponse(button)
-	button.appendChild(createIcon(icon))
+	button.append(createIcon(icon))
 	addIconButtonListeners(button)
 	return button
 }
