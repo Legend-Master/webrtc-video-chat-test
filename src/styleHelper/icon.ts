@@ -1,8 +1,5 @@
-import 'iconify-icon'
-import { IconifyIconHTMLElement } from 'iconify-icon'
+const parser = new DOMParser()
 
-export function createIcon(iconName: IconifyIconHTMLElement['icon']) {
-	const el = document.createElement('iconify-icon')
-	el.icon = iconName
-	return el
+export function createIcon(iconSvg: string) {
+	return parser.parseFromString(iconSvg, 'image/svg+xml').documentElement
 }

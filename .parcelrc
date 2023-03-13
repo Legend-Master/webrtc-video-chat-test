@@ -1,0 +1,17 @@
+{
+    "extends": "@parcel/config-default",
+    "transformers": {
+        "*.html": [
+            "parcel-transformer-icon",
+            "...",
+        ],
+        "iconify-icon:*": [
+            "parcel-transformer-icon",
+            "...",
+        ],
+    },
+    "resolvers": [
+        "parcel-resolver-icon",
+        "...",
+    ]
+}

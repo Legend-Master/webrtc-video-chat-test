@@ -1,6 +1,9 @@
 import { closeDialogOnClickOutside, openDialogModal } from './styleHelper/dialog'
 import { createIconButton } from './styleHelper/iconButton'
 
+import mdiPencil from 'iconify-icon:mdi/pencil'
+import mdiDelete from 'iconify-icon:mdi:delete'
+
 type IceServer = Omit<RTCIceServer, 'urls'> & {
 	urls: string
 }
@@ -164,8 +167,8 @@ function addIceServerEl(data: IceServerData) {
 	const labelText = document.createElement('span')
 
 	const buttonWrapper = document.createElement('div')
-	const edit = createIconButton('mdi:pencil')
-	const remove = createIconButton('mdi:delete')
+	const edit = createIconButton(mdiPencil)
+	const remove = createIconButton(mdiDelete)
 
 	label.translate = false
 

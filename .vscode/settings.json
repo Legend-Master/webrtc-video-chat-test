@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        ".parcelrc": "jsonc"
+    },
+    "json.schemas": [
+        {
+            "fileMatch": [
+                ".parcelrc"
+            ],
+            "schema": {
+                "allowTrailingCommas": true
+            }
+        }
+    ],
+}

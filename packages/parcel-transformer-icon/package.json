@@ -1,0 +1,13 @@
+{
+  "name": "parcel-transformer-icon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "parcel": "2.x"
+  },
+  "dependencies": {
+    "@parcel/plugin": "^2.8.3",
+    "posthtml": "^0.16.6",
+    "posthtml-render": "^3.0.0"
+  }
+}
