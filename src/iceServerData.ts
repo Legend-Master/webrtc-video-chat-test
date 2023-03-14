@@ -2,7 +2,7 @@ import { closeDialogOnClickOutside, openDialogModal } from './styleHelper/dialog
 import { createIconButton } from './styleHelper/iconButton'
 
 import mdiPencil from 'iconify-icon:mdi/pencil'
-import mdiDelete from 'iconify-icon:mdi:delete'
+import mdiDelete from 'iconify-icon:mdi/delete'
 
 type IceServer = Omit<RTCIceServer, 'urls'> & {
 	urls: string
