@@ -6,7 +6,7 @@ module.exports = new Resolver({
 		if (pipeline === 'iconify-icon') {
 			return {
 				filePath: path.join(__dirname, specifier),
-				code: specifier
+				code: specifier,
 			}
 		}
 	},

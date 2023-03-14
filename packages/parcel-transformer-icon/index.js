@@ -1,7 +1,7 @@
 const { Transformer } = require('@parcel/plugin')
-const posthtml = require('posthtml')
+const PostHTML = require('posthtml')
 const { render } = require('posthtml-render')
-const { loadNodeIcon } = require('@iconify/utils/lib/loader/node-loader.cjs')
+const { loadNodeIcon } = require('@iconify/utils/lib/loader/node-loader.cjs') // Parcel got some problems without the .cjs extension
 
 async function loadIcon(fullname, separator) {
 	const [prefix, name] = fullname.split(separator)
@@ -17,11 +17,11 @@ module.exports = new Transformer({
 		if (asset.type !== 'html') {
 			return
 		}
-		const posthtmlInst = posthtml()
+		const postHtml = PostHTML()
 		return {
-			type: posthtmlInst.name,
-			version: posthtmlInst.version,
-			program: (await posthtmlInst.process(await asset.getCode())).tree,
+			type: postHtml.name,
+			version: postHtml.version,
+			program: (await postHtml.process(await asset.getCode())).tree,
 		}
 	},
 
@@ -58,10 +58,8 @@ module.exports = new Transformer({
 	},
 
 	generate({ asset, ast }) {
-		if (asset.type === 'html') {
-			return {
-				content: render(ast.program),
-			}
+		return {
+			content: asset.type === 'html' ? render(ast.program) : '',
 		}
 	},
 })
