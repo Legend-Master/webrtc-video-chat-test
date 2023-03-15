@@ -6,6 +6,10 @@
 	--button-normal-color: hsl(204, 85%, 40%);
 	--button-hover-color: hsl(204, 85%, 35%);
 	--button-active-color: hsl(204, 85%, 30%);
+
+	--button-normal-color-light: hsl(204, 85%, 96%);
+	--button-hover-color-light: hsl(204, 85%, 93%);
+
 	--half-transparent: rgba(0, 0, 0, 0.5);
 }
 
@@ -74,6 +78,9 @@ select:focus {
 	border-color: var(--button-normal-color);
 }
 
+button {
+	display: inline-flex;
+}
 :where(button) {
 	padding: 0.5em 0.8em;
 	border: none;
@@ -156,12 +163,23 @@ body > div {
 
 #device-select-div > div {
 	display: flex;
-	justify-content: center;
-	flex-direction: column;
-	gap: 0.5em;
-	/* text-align: left; */
 }
-#device-select-div > div > select {
+#device-select-div > div > *,
+#device-select-div option {
+	background-color: var(--button-normal-color-light);
+}
+@media (hover: hover) {
+	#device-select-div > div > *:hover,
+	#device-select-div > div > *:focus-visible {
+		background-color: var(--button-hover-color-light);
+	}
+}
+#device-select-div button {
+	font-size: 1.3em;
+}
+#device-select-div select {
+	border: none;
+	border-left: white solid 1px;
 	min-width: 15em;
 }
 
@@ -188,7 +206,6 @@ body > div {
 
 .icon-button {
 	/* For the icon inside */
-	display: inline-flex;
 	justify-content: center;
 	align-items: center;
 
@@ -258,10 +275,6 @@ because it's impossible to do transition/animation only on switching state away 
 .icon-button:active,
 .icon-button.ontouch {
 	color: var(--button-active-color);
-}
-
-.label-icon-button {
-	gap: 0.5em;
 }
 
 .video-container {
@@ -337,9 +350,8 @@ because it's impossible to do transition/animation only on switching state away 
 #ice-server-container label span {
 	overflow-wrap: break-word;
 	overflow: auto;
-
 }
-#ice-server-container input[type=checkbox] {
+#ice-server-container input[type='checkbox'] {
 	margin-left: revert;
 }
 #ice-server-container .button-container {

@@ -1,6 +1,10 @@
 import { openDialogModal } from './styleHelper/dialog'
 
+import mdiVideo from 'iconify-icon:mdi/video'
+import mdiVideoOff from 'iconify-icon:mdi/video-off'
+
 const VIDEO_DEVICE_SAVE_KEY = 'video-device-select'
+const VIDEO_DISABLED_SAVE_KEY = 'video-disabled'
 // const AUDIO_DEVICE_SAVE_KEY = 'audio-device-select'
 
 const SCREEN_CAPTURE = 'screen-capture'
@@ -15,6 +19,7 @@ const VIDEO_SETTING: MediaTrackConstraints = {
 const welcomeDialog = document.getElementById('welcome-dialog') as HTMLDialogElement
 // const requestPermission = document.getElementById('request-permission') as HTMLButtonElement
 
+const videoToggle = document.getElementById('toggle-video') as HTMLButtonElement
 const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 // const audioSelect = document.getElementById('audio-select') as HTMLSelectElement
 
@@ -40,6 +45,35 @@ welcomeDialog.addEventListener('cancel', (ev) => {
 })
 welcomeDialog.addEventListener('submit', () => populateMediaSelection())
 
+export let videoState: boolean
+type StateChangeListener = (state: boolean) => void
+const videoStateChangeListeners: StateChangeListener[] = []
+function setVideoState(state: boolean) {
+	videoState = state
+	videoToggle.innerHTML = videoState ? mdiVideo : mdiVideoOff
+	videoToggle.title = videoState ? 'Turn off camera' : 'Turn on camera'
+	videoState
+		? localStorage.removeItem(VIDEO_DISABLED_SAVE_KEY)
+		: localStorage.setItem(VIDEO_DISABLED_SAVE_KEY, '1')
+	for (const fn of videoStateChangeListeners) {
+		fn(videoState)
+	}
+}
+export function onVideoStateChange(fn: StateChangeListener) {
+	videoStateChangeListeners.push(fn)
+}
+setVideoState(!localStorage.getItem(VIDEO_DISABLED_SAVE_KEY))
+videoToggle.addEventListener('click', () => {
+	setVideoState(!videoState)
+})
+
+export function onDeviceSelectChange(listener: EventListener) {
+	videoSelect.addEventListener('change', listener)
+}
+onDeviceSelectChange(() => {
+	localStorage.setItem(VIDEO_DEVICE_SAVE_KEY, videoSelect.value)
+})
+
 async function getMediaPermission() {
 	try {
 		const stream = await navigator.mediaDevices.getUserMedia({
@@ -56,8 +90,7 @@ async function getMediaPermission() {
 }
 
 export async function getUserMedia() {
-	localStorage.setItem(VIDEO_DEVICE_SAVE_KEY, videoSelect.value)
-	if (!videoSelect.value) {
+	if (!videoState || !videoSelect.value) {
 		return
 	}
 	try {
@@ -128,8 +161,4 @@ async function populateMediaSelection(hadPermission?: boolean) {
 	}
 
 	selectLastMediaOption()
-}
-
-export function onDeviceSelectChange(listener: EventListener) {
-	videoSelect.addEventListener('change', listener)
 }

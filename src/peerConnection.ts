@@ -12,7 +12,7 @@ import { updateBandwidthRestriction } from './util/sdpInject'
 import { room } from './util/room'
 import { registerUnsub, unsubscribeAll } from './util/unsubscribeAll'
 import { getIceServers } from './iceServerData'
-import { getUserMedia, onDeviceSelectChange } from './selectDevice'
+import { getUserMedia, onDeviceSelectChange, onVideoStateChange } from './selectDevice'
 
 type PeerType = 'offer' | 'answer'
 
@@ -34,8 +34,6 @@ const stateIndicator = document.getElementById('connection-state-indicator') as 
 
 const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
-
-const refreshVideoButton = document.getElementById('refresh-video') as HTMLButtonElement
 
 function localStreamControl(enable: boolean) {
 	return () => {
@@ -228,13 +226,11 @@ async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 
 async function addMedia() {
 	const sneders = await addMediaInternal()
-	onDeviceSelectChange(async () => {
+	async function refresh() {
 		await addMediaInternal(sneders)
-	})
-	refreshVideoButton.hidden = false
-	refreshVideoButton.addEventListener('click', async () => {
-		await addMediaInternal(sneders)
-	})
+	}
+	onDeviceSelectChange(refresh)
+	onVideoStateChange(refresh)
 }
 
 async function negotiate(this: RTCPeerConnection) {
