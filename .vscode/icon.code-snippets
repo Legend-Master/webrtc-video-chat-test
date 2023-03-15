@@ -8,7 +8,7 @@
 	"Iconify icon": {
 		"scope": "html",
 		"prefix": "icon",
-		"body": "<iconify-icon icon=\"$1\"></iconify-icon>",
+		"body": "<iconify-icon icon=\"$0\"></iconify-icon>",
 		"description": "Iconify icon"
 	}
 }
