@@ -1,4 +1,3 @@
-import { IconifyIconHTMLElement } from 'iconify-icon'
 import { createIcon } from './icon'
 import { addTouchResponse } from './touchResponse'
 
@@ -12,11 +11,11 @@ function addIconButtonListeners(button: HTMLButtonElement) {
 	button.addEventListener('click', onClick)
 }
 
-export function createIconButton(icon: IconifyIconHTMLElement['icon']) {
+export function createIconButton(iconSvg: string) {
 	const button = document.createElement('button')
 	button.classList.add('icon-button')
 	addTouchResponse(button)
-	button.append(createIcon(icon))
+	button.append(createIcon(iconSvg))
 	addIconButtonListeners(button)
 	return button
 }

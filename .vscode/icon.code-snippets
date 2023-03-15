@@ -1,0 +1,14 @@
+{
+	"Import iconify icon": {
+		"scope": "typescript",
+		"prefix": "icon",
+		"body": "import $1${2/(.*)/${1:/pascalcase}/} from 'iconify-icon:${1:prefix}/${2:name}'",
+		"description": "Import icon"
+	},
+	"Iconify icon": {
+		"scope": "html",
+		"prefix": "icon",
+		"body": "<iconify-icon icon=\"$1\"></iconify-icon>",
+		"description": "Iconify icon"
+	}
+}

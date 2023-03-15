@@ -23,12 +23,9 @@
     - `click` event will breaks on mouse down inside then moving out and release (selecting text)
 - [ ] Don't allow duplicated ICE servers
 
-## Optimize
-
-- [ ] Try drop iconify icon (currently only 4 small icons are being used, not worth it, and it can also solves no icon on initial page load)
-
 ## Build
 
+- [x] Try drop iconify icon (currently only a few small icons are being used, not worth it, and it can also solves no icon on initial page load)
 - [ ] Try inline stylesheets (fairly small, about 1KB gzipped) for faster first paint
     - Parcel doesn't support inline bundle source map yet (https://github.com/parcel-bundler/parcel/issues/6225)
 - [ ] Move license comments to a separate file

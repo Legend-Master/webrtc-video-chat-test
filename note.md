@@ -45,3 +45,13 @@ If we do an animation and close it after animation done, there're some problems 
 - Can't interact with the content behined it
 
 In the other hand, if we change the `display: none` to something else, then we lose the inert and top layer behavior
+
+---
+
+Web bundlers are such a pain to deal with
+
+Things like Webpack, Rollup, need too much configurations
+
+With things like Vite, Parcel, they're much easier to start, but way harder to customize (plugins are not a easy fix at all), and they can't even do some pretty bassic things like inline stylesheets out of box (Parcel can, but no source map)
+
+SSR/SSG is another big problem (not the case in this project tho), Parcel doesn't even have any documentation talking about this (having a plan on Github Discussion tho)
