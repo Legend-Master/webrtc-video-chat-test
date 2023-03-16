@@ -5,22 +5,18 @@ import mdiVideoOff from 'iconify-icon:mdi/video-off'
 
 const VIDEO_DEVICE_SAVE_KEY = 'video-device-select'
 const VIDEO_DISABLED_SAVE_KEY = 'video-disabled'
+const VIDEO_RESOLUTION_SAVE_KEY = 'video-resolution'
 // const AUDIO_DEVICE_SAVE_KEY = 'audio-device-select'
 
 const SCREEN_CAPTURE = 'screen-capture'
-
-const VIDEO_SETTING: MediaTrackConstraints = {
-	frameRate: 60,
-	width: 10_000,
-	height: 10_000,
-	// suppressLocalAudioPlayback: true,
-}
 
 const welcomeDialog = document.getElementById('welcome-dialog') as HTMLDialogElement
 // const requestPermission = document.getElementById('request-permission') as HTMLButtonElement
 
 const videoToggle = document.getElementById('toggle-video') as HTMLButtonElement
 const videoSelect = document.getElementById('video-select') as HTMLSelectElement
+
+const resolutionSelect = document.getElementById('video-resolution-select') as HTMLSelectElement
 // const audioSelect = document.getElementById('audio-select') as HTMLSelectElement
 
 ;(async function () {
@@ -62,10 +58,10 @@ function setVideoState(state: boolean) {
 export function onVideoStateChange(fn: StateChangeListener) {
 	videoStateChangeListeners.push(fn)
 }
-setVideoState(!localStorage.getItem(VIDEO_DISABLED_SAVE_KEY))
 videoToggle.addEventListener('click', () => {
 	setVideoState(!videoState)
 })
+setVideoState(!localStorage.getItem(VIDEO_DISABLED_SAVE_KEY))
 
 export function onDeviceSelectChange(listener: EventListener) {
 	videoSelect.addEventListener('change', listener)
@@ -73,6 +69,42 @@ export function onDeviceSelectChange(listener: EventListener) {
 onDeviceSelectChange(() => {
 	localStorage.setItem(VIDEO_DEVICE_SAVE_KEY, videoSelect.value)
 })
+
+const RESOLUTION_NO_LIMIT = 100_000
+export let videoWidth = RESOLUTION_NO_LIMIT
+export let videoHeight = RESOLUTION_NO_LIMIT
+type ResolutionChangeListener = (width: number, height: number) => void
+const resolutionChangeListeners: ResolutionChangeListener[] = []
+export function onResolutionChange(fn: ResolutionChangeListener) {
+	resolutionChangeListeners.push(fn)
+}
+function setResolution(value: string) {
+	const [width, height] = value.split(':')
+	videoWidth = width ? Number(width) : RESOLUTION_NO_LIMIT
+	videoHeight = height ? Number(height) : RESOLUTION_NO_LIMIT
+	width
+		? localStorage.setItem(VIDEO_RESOLUTION_SAVE_KEY, value)
+		: localStorage.removeItem(VIDEO_RESOLUTION_SAVE_KEY)
+	selectIndexByValue(resolutionSelect, value)
+	for (const fn of resolutionChangeListeners) {
+		fn(videoWidth, videoHeight)
+	}
+}
+resolutionSelect.addEventListener('change', () => {
+	setResolution(resolutionSelect.value)
+})
+const resolutionStorage = localStorage.getItem(VIDEO_RESOLUTION_SAVE_KEY)
+if (resolutionStorage) {
+	setResolution(resolutionStorage)
+}
+
+function getVideoSettings(): MediaTrackConstraints {
+	return {
+		frameRate: 60,
+		width: videoWidth,
+		height: videoHeight,
+	}
+}
 
 async function getMediaPermission() {
 	try {
@@ -96,13 +128,13 @@ export async function getUserMedia() {
 	try {
 		if (videoSelect.value === SCREEN_CAPTURE) {
 			return await navigator.mediaDevices.getDisplayMedia({
-				video: VIDEO_SETTING,
+				video: getVideoSettings(),
 				audio: true,
 			})
 		} else {
 			return await navigator.mediaDevices.getUserMedia({
 				video: {
-					...VIDEO_SETTING,
+					...getVideoSettings(),
 					deviceId: videoSelect.value,
 				},
 			})
@@ -124,14 +156,7 @@ function selectLastMediaOption() {
 	const videoId = localStorage.getItem(VIDEO_DEVICE_SAVE_KEY)
 	// const audioId = localStorage.getItem(AUDIO_DEVICE_SAVE_KEY)
 
-	for (const [index, option] of Object.entries(videoSelect)) {
-		if (option instanceof HTMLOptionElement) {
-			if (option.value === videoId) {
-				videoSelect.selectedIndex = Number(index)
-				break
-			}
-		}
-	}
+	selectIndexByValue(videoSelect, videoId)
 }
 
 async function populateMediaSelection(hadPermission?: boolean) {
@@ -161,4 +186,16 @@ async function populateMediaSelection(hadPermission?: boolean) {
 	}
 
 	selectLastMediaOption()
+}
+
+function selectIndexByValue(selectElement: HTMLSelectElement, value?: string | null) {
+	if (!value) {
+		return
+	}
+	for (const [index, option] of Object.entries(selectElement.options)) {
+		if (option.value === value) {
+			selectElement.selectedIndex = Number(index)
+			break
+		}
+	}
 }

@@ -12,7 +12,12 @@ import { updateBandwidthRestriction } from './util/sdpInject'
 import { room } from './util/room'
 import { registerUnsub, unsubscribeAll } from './util/unsubscribeAll'
 import { getIceServers } from './iceServerData'
-import { getUserMedia, onDeviceSelectChange, onVideoStateChange } from './selectDevice'
+import {
+	getUserMedia,
+	onDeviceSelectChange,
+	onResolutionChange,
+	onVideoStateChange,
+} from './selectDevice'
 
 type PeerType = 'offer' | 'answer'
 
@@ -225,12 +230,13 @@ async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 }
 
 async function addMedia() {
-	const sneders = await addMediaInternal()
+	const senders = await addMediaInternal()
 	async function refresh() {
-		await addMediaInternal(sneders)
+		await addMediaInternal(senders)
 	}
 	onDeviceSelectChange(refresh)
 	onVideoStateChange(refresh)
+	onResolutionChange(refresh)
 }
 
 async function negotiate(this: RTCPeerConnection) {
