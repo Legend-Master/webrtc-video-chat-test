@@ -205,6 +205,10 @@ async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 	if (!stream) {
 		return senders
 	}
+	// const videoTrack = stream.getVideoTracks()[0]!
+	// console.log(videoTrack.getSettings())
+	// console.log(videoTrack.getCapabilities())
+	// console.log(videoTrack.getConstraints())
 	localVideo.srcObject = stream
 	for (const track of stream.getTracks()) {
 		const sender = senders.get(track.kind)

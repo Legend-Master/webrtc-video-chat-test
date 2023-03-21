@@ -55,3 +55,13 @@ Things like Webpack, Rollup, need too much configurations
 With things like Vite, Parcel, they're much easier to start, but way harder to customize (plugins are not a easy fix at all), and they can't even do some pretty bassic things like inline stylesheets out of box (Parcel can, but no source map)
 
 SSR/SSG is another big problem (not the case in this project tho), Parcel doesn't even have any documentation talking about this (having a plan on Github Discussion tho)
+
+---
+
+Common resolutions:
+
+- 1440:	2x HD
+- 1080:	3/2 HD
+- 720:	HD
+- 480:	2/3 HD
+- 360:	1/2 HD

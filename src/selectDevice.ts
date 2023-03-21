@@ -71,38 +71,41 @@ onDeviceSelectChange(() => {
 })
 
 const RESOLUTION_NO_LIMIT = 100_000
-export let videoWidth = RESOLUTION_NO_LIMIT
-export let videoHeight = RESOLUTION_NO_LIMIT
-type ResolutionChangeListener = (width: number, height: number) => void
+export let videoResolution = RESOLUTION_NO_LIMIT
+type ResolutionChangeListener = (resolution: number) => void
 const resolutionChangeListeners: ResolutionChangeListener[] = []
 export function onResolutionChange(fn: ResolutionChangeListener) {
 	resolutionChangeListeners.push(fn)
 }
 function setResolution(value: string) {
-	const [width, height] = value.split(':')
-	videoWidth = width ? Number(width) : RESOLUTION_NO_LIMIT
-	videoHeight = height ? Number(height) : RESOLUTION_NO_LIMIT
-	width
+	const resolution = Number(value)
+	videoResolution = isNaN(resolution) || resolution === 0 ? RESOLUTION_NO_LIMIT : resolution
+	resolution
 		? localStorage.setItem(VIDEO_RESOLUTION_SAVE_KEY, value)
 		: localStorage.removeItem(VIDEO_RESOLUTION_SAVE_KEY)
-	selectIndexByValue(resolutionSelect, value)
 	for (const fn of resolutionChangeListeners) {
-		fn(videoWidth, videoHeight)
+		fn(videoResolution)
 	}
 }
 resolutionSelect.addEventListener('change', () => {
 	setResolution(resolutionSelect.value)
 })
-const resolutionStorage = localStorage.getItem(VIDEO_RESOLUTION_SAVE_KEY)
-if (resolutionStorage) {
-	setResolution(resolutionStorage)
+const savedResolution = localStorage.getItem(VIDEO_RESOLUTION_SAVE_KEY)
+const selected = selectIndexByValue(resolutionSelect, savedResolution)
+// Don't apply the effect to confuse people if we can't select the right UI
+if (selected) {
+	setResolution(savedResolution!)
 }
 
 function getVideoSettings(): MediaTrackConstraints {
+	// Really hacky way to prefer 4 / 3 aspect ratio (most mobile cameras are 4 / 3)
+	// This will give back correct original aspect ratio (in Chrome (PC and Android) with (4 / 3 or 16 / 9) at least)
+	// Firefox doesn't support aspectRatio constraint yet
 	return {
 		frameRate: 60,
-		width: videoWidth,
-		height: videoHeight,
+		width: videoResolution * (16 / 9),
+		height: videoResolution,
+		aspectRatio: 4 / 3,
 	}
 }
 
@@ -188,14 +191,14 @@ async function populateMediaSelection(hadPermission?: boolean) {
 	selectLastMediaOption()
 }
 
-function selectIndexByValue(selectElement: HTMLSelectElement, value?: string | null) {
-	if (!value) {
-		return
-	}
-	for (const [index, option] of Object.entries(selectElement.options)) {
-		if (option.value === value) {
-			selectElement.selectedIndex = Number(index)
-			break
+function selectIndexByValue(selectElement: HTMLSelectElement, value?: string | null): boolean {
+	if (typeof value === 'string') {
+		for (const [index, option] of Object.entries(selectElement.options)) {
+			if (option.value === value) {
+				selectElement.selectedIndex = Number(index)
+				return true
+			}
 		}
 	}
+	return false
 }
