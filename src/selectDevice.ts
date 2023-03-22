@@ -98,8 +98,10 @@ if (selected) {
 }
 
 function getVideoSettings(): MediaTrackConstraints {
-	// Really hacky way to prefer 4 / 3 aspect ratio (most mobile cameras are 4 / 3)
-	// This will give back correct original aspect ratio (in Chrome (PC and Android) with (4 / 3 or 16 / 9) at least)
+	// Really hacky way to prefer 4:3 aspect ratio (most mobile cameras are 4:3)
+	// This will give back correct original aspect ratio
+	// In Chrome (PC and Android (some resolutions will still give back 16:9 even when 4:3 is available))
+	// and Safari iPhone (14 pro max) with (4:3 or 16:9) at least
 	// Firefox doesn't support aspectRatio constraint yet
 	return {
 		frameRate: 60,
