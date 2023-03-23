@@ -70,6 +70,7 @@ dialog::backdrop {
 select {
 	text-align: center;
 	border: 1px solid var(--half-transparent);
+	border-radius: 0;
 	outline: none;
 	padding: 0.4em 0.7em;
 	cursor: pointer;
