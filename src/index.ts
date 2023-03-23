@@ -29,3 +29,23 @@ startBtn.addEventListener('click', () => {
 	createRoom()
 	startPeerConnection()
 })
+
+// for (const video of document.getElementsByTagName('video')) {
+// 	video.addEventListener('fullscreenchange', () => {
+// 		console.log('fullscreen change')
+// 	})
+// }
+// screen.orientation.addEventListener('change', () => {
+// 	for (const video of document.getElementsByTagName('video')) {
+// 		video.controls = false
+// 	}
+// 	console.log('orientation change')
+// })
+
+for (const video of document.getElementsByTagName('video')) {
+	video.addEventListener('fullscreenchange', async () => {
+		if (!document.fullscreenElement) {
+			await video.play()
+		}
+	})
+}
