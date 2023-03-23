@@ -64,7 +64,8 @@ startBtn.addEventListener('click', () => {
 ;(async function play() {
 	if (!document.fullscreenElement) {
 		for (const video of document.getElementsByTagName('video')) {
-			if (video.srcObject && !video.paused) {
+			if (video.srcObject && video.paused) {
+				console.log('play')
 				await video.play()
 			}
 		}
