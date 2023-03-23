@@ -42,22 +42,32 @@ startBtn.addEventListener('click', () => {
 // 	console.log('orientation change')
 // })
 
-const debugLogDiv = document.getElementById('debug-info-log') as HTMLDivElement
-function log(thing: any) {
-	debugLogDiv.innerText = `${debugLogDiv.innerText}\n${JSON.stringify(thing, undefined, 2)}`
-}
+// const debugLogDiv = document.getElementById('debug-info-log') as HTMLDivElement
+// function log(thing: any) {
+// 	debugLogDiv.innerText = `${debugLogDiv.innerText}\n${JSON.stringify(thing, undefined, 2)}`
+// }
 
-for (const video of document.getElementsByTagName('video')) {
-	video.addEventListener('fullscreenchange', async (ev) => {
-		log(ev)
-		if (!document.fullscreenElement) {
-			await video.play()
-		}
-	})
-}
+// for (const video of document.getElementsByTagName('video')) {
+// 	video.addEventListener('fullscreenchange', async (ev) => {
+// 		log(ev)
+// 		if (!document.fullscreenElement) {
+// 			await video.play()
+// 		}
+// 	})
+// }
 
-document.addEventListener('fullscreenchange', (ev) => {
-	log(ev)
-})
+// document.addEventListener('fullscreenchange', (ev) => {
+// 	log(ev)
+// })
 // log(1)
 // log(2)
+;(async function play() {
+	if (!document.fullscreenElement) {
+		for (const video of document.getElementsByTagName('video')) {
+			if (video.srcObject && !video.paused) {
+				await video.play()
+			}
+		}
+		requestAnimationFrame(play)
+	}
+})()
