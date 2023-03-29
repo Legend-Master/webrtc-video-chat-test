@@ -98,15 +98,11 @@ if (selected) {
 }
 
 function getVideoSettings(): MediaTrackConstraints {
-	// Really hacky way to prefer 4:3 aspect ratio (most mobile cameras are 4:3)
-	// This will give back correct original aspect ratio
-	// In Chrome (PC and Android (some resolutions will still give back 16:9 even when 4:3 is available))
-	// and Safari iPhone (14 pro max) with (4:3 or 16:9) at least
-	// Firefox doesn't support aspectRatio constraint yet
 	return {
 		frameRate: 60,
-		width: videoResolution * (16 / 9),
-		height: videoResolution,
+		width: RESOLUTION_NO_LIMIT,
+		height: RESOLUTION_NO_LIMIT,
+		// Prefer 4:3 for mobile cameras
 		aspectRatio: 4 / 3,
 	}
 }
@@ -133,7 +129,11 @@ export async function getUserMedia() {
 	try {
 		if (videoSelect.value === SCREEN_CAPTURE) {
 			return await navigator.mediaDevices.getDisplayMedia({
-				video: getVideoSettings(),
+				video: {
+					...getVideoSettings(),
+					width: screen.width * devicePixelRatio,
+					height: screen.height * devicePixelRatio,
+				},
 				audio: true,
 			})
 		} else {

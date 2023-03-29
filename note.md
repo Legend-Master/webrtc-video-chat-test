@@ -65,3 +65,7 @@ Common resolutions:
 - 720:	HD
 - 480:	2/3 HD
 - 360:	1/2 HD
+
+---
+
+Calling `getDisplayMedia` on Windows Chromium based browsers when system scale is not 1 without parameters will give back a lower quality stream (1920x1080 with 1.25 scale will give back 1536x864 (x1.25 will be the right number))
