@@ -1,3 +1,5 @@
+// @ts-ignore
+import './external/webrtcAdapter'
 import {
 	ref,
 	set,
