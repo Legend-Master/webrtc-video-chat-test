@@ -3,13 +3,19 @@ const PostHTML = require('posthtml')
 const { render } = require('posthtml-render')
 const { loadNodeIcon } = require('@iconify/utils/lib/loader/node-loader.cjs') // Parcel got some problems without the .cjs extension
 
+async function addXmlns(svg) {
+	const parsed = await PostHTML().process(svg)
+	parsed.tree[0].attrs['xmlns'] = 'http://www.w3.org/2000/svg'
+	return render(parsed.tree)
+}
+
 async function loadIcon(fullname, separator) {
 	const [prefix, name] = fullname.split(separator)
 	const svg = await loadNodeIcon(prefix, name)
 	if (!svg) {
 		throw Error(`Can't find an icon matching ${fullname}`)
 	}
-	return svg
+	return await addXmlns(svg)
 }
 
 module.exports = new Transformer({
@@ -52,7 +58,10 @@ module.exports = new Transformer({
 		} else if (asset.pipeline === 'iconify-icon') {
 			asset.bundleBehavior = 'inline'
 			asset.meta.inlineType = 'string'
-			asset.setCode(await loadIcon(await asset.getCode(), '/'))
+			const code = await loadIcon(await asset.getCode(), '/')
+			asset.setCode(
+				asset.query.get('dataurl') ? `data:image/svg+xml,${encodeURIComponent(code)}` : code
+			)
 		}
 		return [asset]
 	},
