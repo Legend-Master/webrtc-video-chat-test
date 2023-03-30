@@ -58,19 +58,21 @@ function log(thing: any) {
 // 	})
 // }
 
-document.addEventListener('webkitfullscreenchange', (ev) => {
-	const date = new Date()
-	const infoToLog: any = {
-		time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`,
-		target: ev.target,
-		fullscreen: Boolean(document.fullscreenElement),
-
-	}
-	for (const video of document.getElementsByTagName('video')) {
-		infoToLog[`${video.id} paused`] = video.paused
-	}
-	log(infoToLog)
-})
+for (const video of document.getElementsByTagName('video')) {
+	video.addEventListener('webkitfullscreenchange', (ev) => {
+		const date = new Date()
+		const infoToLog: any = {
+			time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`,
+			target: ev.target instanceof HTMLVideoElement ? ev.target.id : ev.target,
+			fullscreen: Boolean(document.fullscreenElement),
+			paused: video.paused,
+		}
+		// for (const video of document.getElementsByTagName('video')) {
+		// 	infoToLog[`${video.id} paused`] = video.paused
+		// }
+		log(infoToLog)
+	})
+}
 // log(1)
 // log({
 // 	a: 1
