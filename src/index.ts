@@ -101,7 +101,14 @@ for (const video of document.getElementsByTagName('video')) {
 		log(infoToLog)
 	})
 }
-// log(1)
-// log({
-// 	a: 1
-// })
+log(1)
+log({
+	a: 1,
+	wqe: 1,
+	aeqwe: 1,
+	dasda: 1,
+	das21: 1,
+	e21e: 1,
+	fwefq: 1,
+	e2332r1e: 1,
+})
