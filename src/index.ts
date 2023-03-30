@@ -72,43 +72,15 @@ for (const video of document.getElementsByTagName('video')) {
 		// }
 		log(infoToLog)
 	})
-	video.addEventListener('webkitenterfullscreen', (ev) => {
-		const date = new Date()
-		const infoToLog: any = {
-			enter: true,
-			time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`,
-			target: ev.target instanceof HTMLVideoElement ? ev.target.id : ev.target,
-			fullscreen: Boolean(document.fullscreenElement),
-			paused: video.paused,
-		}
-		// for (const video of document.getElementsByTagName('video')) {
-		// 	infoToLog[`${video.id} paused`] = video.paused
-		// }
-		log(infoToLog)
-	})
-	video.addEventListener('webkitexitfullscreen', (ev) => {
-		const date = new Date()
-		const infoToLog: any = {
-			exit: true,
-			time: `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}:${date.getMilliseconds()}`,
-			target: ev.target instanceof HTMLVideoElement ? ev.target.id : ev.target,
-			fullscreen: Boolean(document.fullscreenElement),
-			paused: video.paused,
-		}
-		// for (const video of document.getElementsByTagName('video')) {
-		// 	infoToLog[`${video.id} paused`] = video.paused
-		// }
-		log(infoToLog)
-	})
 }
-log(1)
-log({
-	a: 1,
-	wqe: 1,
-	aeqwe: 1,
-	dasda: 1,
-	das21: 1,
-	e21e: 1,
-	fwefq: 1,
-	e2332r1e: 1,
-})
+// log(1)
+// log({
+// 	a: 1,
+// 	wqe: 1,
+// 	aeqwe: 1,
+// 	dasda: 1,
+// 	das21: 1,
+// 	e21e: 1,
+// 	fwefq: 1,
+// 	e2332r1e: 1,
+// })
