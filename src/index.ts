@@ -42,10 +42,12 @@ startBtn.addEventListener('click', () => {
 // 	console.log('orientation change')
 // })
 
-// const debugLogDiv = document.getElementById('debug-info-log') as HTMLDivElement
-// function log(thing: any) {
-// 	debugLogDiv.innerText = `${debugLogDiv.innerText}\n${JSON.stringify(thing, undefined, 2)}`
-// }
+const debugLogDiv = document.getElementById('debug-info-log') as HTMLElement
+function log(thing: any) {
+	const logString = typeof thing === 'string' ? thing : JSON.stringify(thing, undefined, 4)
+	const preString = debugLogDiv.innerText ? `${debugLogDiv.innerText}\n` : debugLogDiv.innerText
+	debugLogDiv.innerText = `${preString}${logString}`
+}
 
 // for (const video of document.getElementsByTagName('video')) {
 // 	video.addEventListener('fullscreenchange', async (ev) => {
