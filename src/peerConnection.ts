@@ -1,3 +1,5 @@
+// @ts-ignore
+import './external/webrtcAdapter'
 import {
 	ref,
 	set,
@@ -18,6 +20,7 @@ import {
 	onResolutionChange,
 	onVideoStateChange,
 } from './selectDevice'
+import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
 
 type PeerType = 'offer' | 'answer'
 
@@ -210,22 +213,19 @@ async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 	// console.log(videoTrack.getCapabilities())
 	// console.log(videoTrack.getConstraints())
 	localVideo.srcObject = stream
+
+	const promises = []
 	for (const track of stream.getTracks()) {
 		const sender = senders.get(track.kind)
 		if (sender) {
-			sender.replaceTrack(track)
+			promises.push(sender.replaceTrack(track))
 			// newSenders.delete(track.kind)
 		} else {
-			const sender = pc.addTrack(track)
-			if (track.kind === 'video') {
-				sender.setParameters({
-					...sender.getParameters(),
-					degradationPreference: 'maintain-resolution',
-				})
-			}
-			senders.set(track.kind, sender)
+			senders.set(track.kind, pc.addTrack(track))
 		}
 	}
+	await Promise.all(promises)
+	await updateAllParameters(pc)
 	// for (const kind of newSenders) {
 	// 	pc.removeTrack(senders.get(kind)!)
 	// 	senders.delete(kind)
@@ -240,7 +240,7 @@ async function addMedia() {
 	}
 	onDeviceSelectChange(refresh)
 	onVideoStateChange(refresh)
-	onResolutionChange(refresh)
+	onResolutionChange(() => updateParameters(pc, updateResolution))
 }
 
 async function negotiate(this: RTCPeerConnection) {
