@@ -64,9 +64,14 @@ closeDialogOnClickOutside(addIceDialog)
 closeDialogOnClickOutside(exportIceDialog)
 
 configIce.addEventListener('click', () => {
-	openDialogModal(configIceDialog)
 	// Prevent bringing up mobile virtual keyboard
 	importIceInput.readOnly = true
+	openDialogModal(configIceDialog)
+	// Firefox mobile will bring up virtual keyboard if we don't do this immediately
+	// Chrome and Safari are the opposite...
+	if (navigator.userAgent.includes("Firefox")) {
+		importIceInput.readOnly = false
+	}
 	requestAnimationFrame(() => {
 		importIceInput.readOnly = false
 	})
