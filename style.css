@@ -37,6 +37,9 @@ video {
 video::-webkit-media-controls-timeline {
 	display: none;
 }
+video:not(.started) {
+	background-color: rgba(0, 0, 0, 0.8);
+}
 
 dialog {
 	padding: 0;
