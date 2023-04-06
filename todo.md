@@ -22,6 +22,7 @@
     - `mousedown`/`pointerdown` event has this problem
     - `click` event will breaks on mouse down inside then moving out and release (selecting text)
 - [ ] Don't allow duplicated ICE servers
+- [ ] Fix switching camera on Firefox mobile fails most of the time
 
 ## Build
 
@@ -37,4 +38,4 @@
 
 ## Experiment
 
-- [ ] Test custom video resolution
+- [x] Test custom video resolution
