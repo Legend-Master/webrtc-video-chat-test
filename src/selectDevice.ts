@@ -107,21 +107,6 @@ function getVideoSettings(): MediaTrackConstraints {
 	}
 }
 
-async function getMediaPermission() {
-	try {
-		const stream = await navigator.mediaDevices.getUserMedia({
-			video: true,
-			// audio: true,
-		})
-		for (const track of stream.getTracks()) {
-			track.stop()
-		}
-		return true
-	} catch {
-		return false
-	}
-}
-
 export async function getUserMedia() {
 	if (!videoState || !videoSelect.value) {
 		return
@@ -173,7 +158,17 @@ async function populateMediaSelection(hadPermission?: boolean) {
 		videoSelect.add(option)
 	}
 
-	if (hadPermission || (await getMediaPermission())) {
+	// Firefox mobile requires a running user media stream to call `enumerateDevices`
+	let stream
+	if (!hadPermission) {
+		try {
+			stream = await navigator.mediaDevices.getUserMedia({
+				video: true,
+				// audio: true,
+			})
+		} catch (e) {}
+	}
+	if (hadPermission || stream) {
 		for (const device of await navigator.mediaDevices.enumerateDevices()) {
 			if (device.kind === 'videoinput') {
 				const option = document.createElement('option')
@@ -187,6 +182,11 @@ async function populateMediaSelection(hadPermission?: boolean) {
 			// 	option.value = device.deviceId
 			// 	audioSelect.add(option)
 			// }
+		}
+		if (stream) {
+			for (const track of stream.getTracks()) {
+				track.stop()
+			}
 		}
 	}
 
