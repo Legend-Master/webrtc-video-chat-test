@@ -1,4 +1,7 @@
 {
+	"start_url": ".",
+	"name": "Webrtc Chat Test",
+	"display": "standalone",
 	"icons": [
 		{
 			"src": "favicon.svg",
