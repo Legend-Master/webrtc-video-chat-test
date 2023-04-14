@@ -7,7 +7,6 @@
             "url": "http://localhost:8080",
             // "pauseForSourceMap": false,
             "preLaunchTask": "parcel",
-            "webRoot": "${workspaceFolder}",
             "sourceMapPathOverrides": {
                 "/__parcel_source_root/*": "${webRoot}/*"
             }
