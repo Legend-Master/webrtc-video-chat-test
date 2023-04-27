@@ -68,4 +68,25 @@ Common resolutions:
 
 ---
 
-Calling `getDisplayMedia` on Windows Chromium based browsers when system scale is not 1 without parameters will give back a lower quality stream (1920x1080 with 1.25 scale will give back 1536x864 (x1.25 will be the right number))
+Some bugs about `getDisplayMedia` on Windows Chromium based browsers
+
+- When system scale is not 1 and calling without parameters, it will give back a lower quality stream (1920x1080 with 1.25 scale will give back 1536x864 (x1.25 will be the right number))
+
+- Calling `getSettings` on the returning video track immediately will give back the requested number or screen size (which has the scaling issue) (has a uppper limit of 16383) even when the actuall size retruned is smaller
+
+    For example, screen resolution is 1920x1080, run this and select a none fullscreen window/browser tab:
+    ```js
+    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true })
+	console.log(stream.getVideoTracks()[0].getSettings())
+    ```
+    This gives back 1536x864 on scale 1.25, 1920x1080 on scale 1, but the actuall stream's resolution is less than this
+
+    And running something like this gives back 16383x16383
+    ```js
+    const stream = await navigator.mediaDevices.getDisplayMedia({ video: { width: 100_000, height: 100_000 } })
+	console.log(stream.getVideoTracks()[0].getSettings())
+    ```
+
+    But waiting for a while, 30+ms on my computer, `getSettings` will now gives back the right resolution
+
+I reported this problem at https://crbug.com/1429161, but the maintainer said it's a low priority preblem, so I don't think it's gonna get fixed any time soon
