@@ -89,4 +89,31 @@ Some bugs about `getDisplayMedia` on Windows Chromium based browsers
 
     But waiting for a while, 30+ms on my computer, `getSettings` will now gives back the right resolution
 
-I reported this problem at https://crbug.com/1429161, but the maintainer said it's a low priority preblem, so I don't think it's gonna get fixed any time soon
+    I reported this problem at https://crbug.com/1429161, but the maintainer said it's a low priority preblem, so I don't think it's gonna get fixed any time soon
+
+- Trailing cursor (image of the cursor doesn't go away after moving the mouse)
+
+---
+
+My Android phone doesn't seem to support h264 encoding, `createOffer` gives back `mid='0'` in m section
+
+Code to force h264:
+```ts
+let codecs = RTCRtpSender.getCapabilities('video')!.codecs
+for (const [index, codec] of codecs.entries()) {
+    console.log(codec)
+    if (codec.mimeType.includes('H264')) {
+        for (const transceiver of pc.getTransceivers()) {
+            console.log(transceiver)
+            if (transceiver.sender.track?.kind === 'video') {
+                codecs.splice(index, 1)
+                codecs.unshift(codec)
+                codecs = codecs.filter(codec => !codec.mimeType.includes('VP'))
+                console.log(codecs)
+                transceiver.setCodecPreferences(codecs)
+            }
+        }
+        break
+    }
+}
+```
