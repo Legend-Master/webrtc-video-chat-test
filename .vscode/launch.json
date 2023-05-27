@@ -7,8 +7,8 @@
             "url": "http://localhost:8080",
             // "pauseForSourceMap": false,
             "preLaunchTask": "parcel",
-            "sourceMapPathOverrides": {
-                "/__parcel_source_root/*": "${webRoot}/*"
+            "pathMapping": {
+                "__parcel_source_root": "${webRoot}"
             }
         },
     ],
