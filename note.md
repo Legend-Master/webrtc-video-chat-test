@@ -87,9 +87,9 @@ Some bugs about `getDisplayMedia` on Windows Chromium based browsers
 	console.log(stream.getVideoTracks()[0].getSettings())
     ```
 
-    But waiting for a while, 30+ms on my computer, `getSettings` will now gives back the right resolution
+    But waiting for a while, 30+ms on my computer, `getSettings` will now gives back the right resolution (Looked at Chromium code later on, found it doesn't pass in those info at the begining, the settings will only updates when capture component delivers a frame, and someone already reported this: https://crbug.com/1401937)
 
-    I reported this problem at https://crbug.com/1429161, but the maintainer said it's a low priority preblem, so I don't think it's gonna get fixed any time soon
+    I reported this problem at https://crbug.com/1429161, ~~but the maintainer said it's a low priority preblem, so I don't think it's gonna get fixed any time soon~~ and did a fix at https://chromium-review.googlesource.com/c/chromium/src/+/4546769, if nothing goes wrong, should be landing on Chrome 115
 
 - Trailing cursor (image of the cursor doesn't go away after moving the mouse)
 
