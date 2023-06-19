@@ -69,7 +69,7 @@ configIce.addEventListener('click', () => {
 	openDialogModal(configIceDialog)
 	// Firefox mobile will bring up virtual keyboard if we don't do this immediately
 	// Chrome and Safari are the opposite...
-	if (navigator.userAgent.includes("Firefox")) {
+	if (navigator.userAgent.includes('Firefox')) {
 		importIceInput.readOnly = false
 	}
 	requestAnimationFrame(() => {
@@ -144,12 +144,42 @@ exportIceButton.addEventListener('click', () => {
 	params.append('servers', servers)
 	exportUrl.innerText = `${location.origin}${location.pathname}?${params}`
 })
-copyJson.addEventListener('click', () => {
-	navigator.clipboard.writeText(exportJson.innerText)
-})
-copyUrl.addEventListener('click', () => {
-	navigator.clipboard.writeText(exportUrl.innerText)
-})
+function addCopyButtonOnClick(targetElement: HTMLElement) {
+	return function (this: HTMLButtonElement) {
+		navigator.clipboard.writeText(targetElement.innerText)
+		if (this.classList.contains('success')) {
+			return
+		}
+		this.classList.add('success')
+		// On close dialog
+		let token: number
+		const animationCancelPromise = new Promise<void>((resolve) => {
+			this.addEventListener(
+				'animationcancel',
+				() => {
+					cancelAnimationFrame(token)
+					resolve()
+					this.classList.remove('success')
+				},
+				{ once: true }
+			)
+		})
+		// Reset on finished
+		token = requestAnimationFrame(() => {
+			token = requestAnimationFrame(async () => {
+				await Promise.any([
+					animationCancelPromise,
+					Promise.all(
+						this.firstElementChild!.getAnimations().map((animation) => animation.finished)
+					),
+				])
+				this.classList.remove('success')
+			})
+		})
+	}
+}
+copyJson.addEventListener('click', addCopyButtonOnClick(exportJson))
+copyUrl.addEventListener('click', addCopyButtonOnClick(exportUrl))
 
 function setIceFormValues(server?: IceServer) {
 	if (server) {
@@ -295,9 +325,9 @@ function readServerData(): IceServerData[] | undefined {
 				return servers as IceServerData[]
 			}
 			if ('server' in firstServer) {
-				return servers as typeof firstServer[]
+				return servers as (typeof firstServer)[]
 			} else {
-				return iceServersToData(servers as typeof firstServer[])
+				return iceServersToData(servers as (typeof firstServer)[])
 			}
 		} else {
 			let server = parsed as IceServer
