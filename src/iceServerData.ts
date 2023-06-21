@@ -145,37 +145,22 @@ exportIceButton.addEventListener('click', () => {
 	exportUrl.innerText = `${location.origin}${location.pathname}?${params}`
 })
 function addCopyButtonOnClick(targetElement: HTMLElement) {
-	return function (this: HTMLButtonElement) {
+	return async function (this: HTMLButtonElement) {
 		navigator.clipboard.writeText(targetElement.innerText)
 		if (this.classList.contains('success')) {
 			return
 		}
 		this.classList.add('success')
-		// On close dialog
-		let token: number
+		// Remove success class on any animation cancel event (most likely from closing the dialog)
+		// or after all animations have finished
 		const animationCancelPromise = new Promise<void>((resolve) => {
-			this.addEventListener(
-				'animationcancel',
-				() => {
-					cancelAnimationFrame(token)
-					resolve()
-					this.classList.remove('success')
-				},
-				{ once: true }
-			)
+			this.addEventListener('animationcancel', () => resolve(), { once: true })
 		})
-		// Reset on finished
-		token = requestAnimationFrame(() => {
-			token = requestAnimationFrame(async () => {
-				await Promise.any([
-					animationCancelPromise,
-					Promise.all(
-						this.firstElementChild!.getAnimations().map((animation) => animation.finished)
-					),
-				])
-				this.classList.remove('success')
-			})
-		})
+		await Promise.any([
+			animationCancelPromise,
+			Promise.all(this.firstElementChild!.getAnimations().map((animation) => animation.finished)),
+		])
+		this.classList.remove('success')
 	}
 }
 copyJson.addEventListener('click', addCopyButtonOnClick(exportJson))
