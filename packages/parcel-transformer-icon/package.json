@@ -6,9 +6,9 @@
 		"parcel": "2.x"
 	},
 	"dependencies": {
-		"@iconify/json": "^2.2.80",
-		"@iconify/utils": "^2.1.6",
-		"@parcel/plugin": "^2.9.2",
+		"@iconify/json": "^2.2.83",
+		"@iconify/utils": "^2.1.7",
+		"@parcel/plugin": "^2.9.3",
 		"posthtml": "^0.16.6",
 		"posthtml-render": "^3.0.0"
 	}
