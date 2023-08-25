@@ -44,13 +44,18 @@ welcomeDialog.addEventListener('submit', () => populateMediaSelection())
 export let videoState: boolean
 type StateChangeListener = (state: boolean) => void
 const videoStateChangeListeners: StateChangeListener[] = []
-function setVideoState(state: boolean) {
+export function setVideoState(state: boolean, shouldSave = false) {
+	if (videoState === state) {
+		return
+	}
 	videoState = state
 	videoToggle.innerHTML = videoState ? mdiVideo : mdiVideoOff
 	videoToggle.title = videoState ? 'Turn off camera' : 'Turn on camera'
-	videoState
-		? localStorage.removeItem(VIDEO_DISABLED_SAVE_KEY)
-		: localStorage.setItem(VIDEO_DISABLED_SAVE_KEY, '1')
+	if (shouldSave) {
+		videoState
+			? localStorage.removeItem(VIDEO_DISABLED_SAVE_KEY)
+			: localStorage.setItem(VIDEO_DISABLED_SAVE_KEY, '1')
+	}
 	for (const fn of videoStateChangeListeners) {
 		fn(videoState)
 	}
@@ -59,7 +64,7 @@ export function onVideoStateChange(fn: StateChangeListener) {
 	videoStateChangeListeners.push(fn)
 }
 videoToggle.addEventListener('click', () => {
-	setVideoState(!videoState)
+	setVideoState(!videoState, true)
 })
 setVideoState(!localStorage.getItem(VIDEO_DISABLED_SAVE_KEY))
 

@@ -19,6 +19,7 @@ import {
 	onDeviceSelectChange,
 	onResolutionChange,
 	onVideoStateChange,
+	setVideoState,
 } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
 
@@ -215,7 +216,18 @@ async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 	localVideo.srcObject = stream
 
 	const promises = []
-	for (const track of stream.getTracks()) {
+	const tracks = stream.getTracks()
+	const firstTrack = tracks[0]
+	if (firstTrack) {
+		firstTrack.addEventListener(
+			'ended',
+			() => {
+				setVideoState(false)
+			},
+			{ once: true }
+		)
+	}
+	for (const track of tracks) {
 		const sender = senders.get(track.kind)
 		if (sender) {
 			promises.push(sender.replaceTrack(track))
