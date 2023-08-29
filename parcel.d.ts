@@ -1,4 +1,1 @@
-declare module 'iconify-icon:*' {
-	const value: string
-	export default value
-}
+/// <reference types="parcel-resolver-iconify/missing-types" />

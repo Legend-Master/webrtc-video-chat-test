@@ -2,16 +2,16 @@
     "extends": "@parcel/config-default",
     "transformers": {
         "*.html": [
-            "parcel-transformer-icon",
+            "parcel-transformer-iconify",
             "...",
         ],
         "iconify-icon:*": [
-            "parcel-transformer-icon",
+            "parcel-transformer-iconify",
             "...",
         ],
     },
     "resolvers": [
-        "parcel-resolver-icon",
+        "parcel-resolver-iconify",
         "...",
     ]
 }
