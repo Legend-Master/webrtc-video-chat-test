@@ -246,19 +246,28 @@ function iceServersToData(servers: IceServer[]): IceServerData[] {
 function getDefaultServerData(): IceServerData[] {
 	const defaultServers = [
 		{
-			urls: 'stun:stun.syncthing.net',
-		},
-		{
-			urls: 'stun:stunserver.stunprotocol.org',
-		},
-		{
 			urls: 'stun:stun.l.google.com:19302',
+			enable: true,
 		},
 		{
 			urls: 'stun:stun.qq.com',
+			enable: true,
 		},
-	]
-	return iceServersToData(defaultServers)
+		{
+			urls: 'stun:stun.syncthing.net',
+			enable: false,
+		},
+		{
+			urls: 'stun:stunserver.stunprotocol.org',
+			enable: false,
+		},
+	] as const
+	return defaultServers.map((data) => {
+		return {
+			server: { urls: data.urls },
+			enabled: data.enable,
+		}
+	})
 }
 
 function generateLabel(server: IceServer) {
