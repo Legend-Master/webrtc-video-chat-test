@@ -164,6 +164,7 @@ body > div {
 
 #connection-state-indicator {
 	font-size: 1.5em;
+	margin: 0.5em 0;
 }
 
 #device-select-div > div {
@@ -470,4 +471,53 @@ because it's impossible to do transition/animation only on switching state away 
 	100% {
 		mask-image: var(--check-icon);
 	}
+}
+
+#share-url-popup {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+	z-index: 100;
+
+	width: max-content;
+	box-shadow: 0px -2px 10px 2px rgba(0, 0, 0, 0.15);
+	background-color: white;
+}
+
+@media (width < 500px) {
+	#share-url-popup {
+		width: 100vw;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	#share-url-popup {
+		transition: 0.3s;
+	}
+
+	/* Not using it directly on modal is because transition can't work with display none */
+	#share-url-popup[open].closed {
+		scale: unset;
+		translate: 0 3em;
+	}
+}
+
+#share-url-popup > div {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.5em;
+	margin: 1em;
+}
+
+#share-url-popup button {
+	display: grid;
+	align-items: center;
+	justify-items: center;
+	gap: 0.5em;
+}
+
+#share-url-popup svg {
+	font-size: 2em;
 }

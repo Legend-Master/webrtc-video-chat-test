@@ -22,6 +22,11 @@ import {
 	setVideoState,
 } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
+import { closeDialog, openDialogModal } from './styleHelper/dialog'
+
+const shareUrlPopup = document.getElementById('share-url-popup') as HTMLDialogElement
+const shareUrlButton = document.getElementById('share-url-button') as HTMLButtonElement
+const shareUrlServerButton = document.getElementById('share-url-server-button') as HTMLButtonElement
 
 type PeerType = 'offer' | 'answer'
 
@@ -67,50 +72,90 @@ const STATES = {
 	connectedLocalOffer: '🟡 Waiting for another peer for new channel',
 	remoteOffer: '🟡 Waiting for connection',
 	connectedRemoteOffer: '🟡 Waiting for connection for new channel',
+} as const
+
+async function share(url: string) {
+	// Firefox desktop and Android Webview doesn't support this yet
+	if ('share' in navigator) {
+		try {
+			await navigator.share({ title: url, url })
+		} catch (error) {
+			if (error instanceof DOMException && error.name === 'AbortError') {
+				return
+			}
+			throw error
+		}
+	} else {
+		// Fallback to copy to clipboard
+		// TODO: make it respond with an UI change to indicate copied
+		;(navigator as Navigator).clipboard.writeText(url)
+	}
+}
+shareUrlButton.addEventListener('click', () => {
+	share(location.toString())
+})
+shareUrlServerButton.addEventListener('click', () => {
+	const servers = JSON.stringify(getIceServers())
+	const params = new URLSearchParams(location.search)
+	params.append('servers', servers)
+	share(`${location.origin}${location.pathname}?${params}`)
+})
+
+function IndicateConnectionState(state: keyof typeof STATES) {
+	if (state === 'localOffer') {
+		if (!shareUrlPopup.open) {
+			openDialogModal(shareUrlPopup, true)
+		}
+	} else {
+		if (shareUrlPopup.open) {
+			closeDialog(shareUrlPopup)
+		}
+	}
+	stateIndicator.innerText = STATES[state]
 }
 
 function monitorConnectionState(this: RTCPeerConnection) {
 	switch (this.connectionState) {
 		case 'connected':
-			stateIndicator.innerText = STATES.connected
+			IndicateConnectionState('connected')
 			break
 		// case 'new':
 		case 'connecting':
-			stateIndicator.innerText = STATES.connecting
+			IndicateConnectionState('connecting')
 			break
 		case 'failed':
 		case 'closed':
 		case 'disconnected':
-			stateIndicator.innerText = STATES.disconnected
+			IndicateConnectionState('disconnected')
 			break
 	}
 }
 
-function monitoSignalingState(this: RTCPeerConnection) {
+function monitorSignalingState(this: RTCPeerConnection) {
 	switch (this.signalingState) {
 		case 'stable':
 			if (this.connectionState === 'connected') {
-				stateIndicator.innerText = STATES.connected
+				IndicateConnectionState('connected')
 			} else {
-				stateIndicator.innerText = STATES.stable
+				IndicateConnectionState('stable')
 			}
 			break
 		case 'have-local-offer':
 			if (this.connectionState === 'connected') {
-				stateIndicator.innerText = STATES.connectedLocalOffer
+				IndicateConnectionState('connectedLocalOffer')
 			} else {
-				stateIndicator.innerText = STATES.localOffer
+				IndicateConnectionState('localOffer')
 			}
 			break
 		case 'have-remote-offer':
 			if (this.connectionState === 'connected') {
-				stateIndicator.innerText = STATES.connectedRemoteOffer
+				IndicateConnectionState('connectedRemoteOffer')
 			} else {
-				stateIndicator.innerText = STATES.remoteOffer
+				IndicateConnectionState('remoteOffer')
 			}
 			break
 		case 'closed':
-			stateIndicator.innerText = STATES.disconnected
+			IndicateConnectionState('disconnected')
 			break
 	}
 }
@@ -120,7 +165,7 @@ export async function startPeerConnection() {
 	pc.addEventListener('track', onTrack)
 	pc.addEventListener('icecandidate', onIceCandidate)
 	pc.addEventListener('negotiationneeded', negotiate)
-	pc.addEventListener('signalingstatechange', monitoSignalingState)
+	pc.addEventListener('signalingstatechange', monitorSignalingState)
 	pc.addEventListener('connectionstatechange', monitorFirstConnected)
 	pc.addEventListener('connectionstatechange', monitorConnectionState)
 	await addMedia()
@@ -293,7 +338,6 @@ async function negotiate(this: RTCPeerConnection) {
 	registerUnsub(
 		onValue(remoteDescRef, async (snapshot) => {
 			if (!snapshot.exists()) {
-
 				// Another peer disconnected after we tried to connect to them
 
 				// Cancel purge on disconnect since

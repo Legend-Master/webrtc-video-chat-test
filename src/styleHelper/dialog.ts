@@ -15,8 +15,12 @@ export function closeDialog(dialog: HTMLDialogElement) {
 	}
 }
 
-export function openDialogModal(dialog: HTMLDialogElement) {
-	dialog.showModal()
+export function openDialogModal(dialog: HTMLDialogElement, nonModal = false) {
+	if (nonModal) {
+		dialog.show()
+	} else {
+		dialog.showModal()
+	}
 	dialog.classList.remove('closed')
 }
 

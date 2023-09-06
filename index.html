@@ -88,6 +88,20 @@
 				</div>
 			</div>
 		</dialog>
+		<dialog id="share-url-popup">
+			<div>
+				<button id="share-url-button" class="icon-button">
+					<!-- <iconify-icon icon="fluent-mdl2:share"></iconify-icon> -->
+					<iconify-icon icon="mdi:share"></iconify-icon>
+					Share
+				</button>
+				<button id="share-url-server-button" class="icon-button">
+					<!-- <iconify-icon icon="fluent-mdl2:share"></iconify-icon> -->
+					<iconify-icon icon="mdi:share"></iconify-icon>
+					Share With Servers
+				</button>
+			</div>
+		</dialog>
 		<div id="pc-control-div" class="hidden-after-call">
 			<button id="start-button">Start</button>
 			<button id="config-ice" class="icon-button" title="Config ICE servers">
@@ -95,7 +109,7 @@
 			</button>
 		</div>
 		<div class="shown-after-call" hidden>
-			<div id="connection-state-indicator">🟡</div>
+			<div id="connection-state-indicator">🟡 Connecting to server</div>
 		</div>
 		<div id="device-select-div">
 			<div>
