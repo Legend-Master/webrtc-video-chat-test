@@ -245,14 +245,16 @@ async function renegotiate() {
 	dataChannel.send(JSON.stringify(processDescription(desc)))
 }
 
-async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
+const senders = new Map<string, RTCRtpSender>()
+async function addMediaInternal() {
 	for (const [_, sender] of senders) {
 		sender.track?.stop()
 	}
 	// const newSenders = new Set(senders.keys())
 	const stream = await getUserMedia()
 	if (!stream) {
-		return senders
+		setVideoState(false)
+		return
 	}
 	// const videoTrack = stream.getVideoTracks()[0]!
 	// console.log(videoTrack.getSettings())
@@ -287,16 +289,13 @@ async function addMediaInternal(senders = new Map<string, RTCRtpSender>()) {
 	// 	pc.removeTrack(senders.get(kind)!)
 	// 	senders.delete(kind)
 	// }
-	return senders
+	return
 }
 
 async function addMedia() {
-	const senders = await addMediaInternal()
-	async function refresh() {
-		await addMediaInternal(senders)
-	}
-	onDeviceSelectChange(refresh)
-	onVideoStateChange(refresh)
+	await addMediaInternal()
+	onDeviceSelectChange(addMediaInternal)
+	onVideoStateChange(addMediaInternal)
 	onResolutionChange(() => updateParameters(pc, updateResolution))
 }
 
