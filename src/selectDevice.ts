@@ -113,7 +113,7 @@ function getVideoSettings(): MediaTrackConstraints {
 }
 
 export async function getUserMedia() {
-	if (!videoState || !videoSelect.value) {
+	if (!videoSelect.value) {
 		return
 	}
 	try {

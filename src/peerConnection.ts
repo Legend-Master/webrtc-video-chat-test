@@ -20,6 +20,7 @@ import {
 	onResolutionChange,
 	onVideoStateChange,
 	setVideoState,
+	videoState,
 } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
 import { closeDialog, openDialogModal } from './styleHelper/dialog'
@@ -177,11 +178,68 @@ export async function startPeerConnection() {
 	return pc
 }
 
+let blankVideoTrack:
+	| {
+			width: number
+			height: number
+			track: MediaStreamTrack
+	  }
+	| undefined
+
+function createBlankVideoTrack(width: number, height: number) {
+	if (blankVideoTrack && blankVideoTrack.width === width && blankVideoTrack.height === height) {
+		return blankVideoTrack.track
+	}
+
+	const canvas = document.createElement('canvas')
+	canvas.width = width
+	canvas.height = height
+
+	const context = canvas.getContext('2d')!
+	context.fillRect(0, 0, width, height)
+
+	const stream = canvas.captureStream()
+	blankVideoTrack = {
+		width,
+		height,
+		track: stream.getVideoTracks()[0]!,
+	}
+
+	return blankVideoTrack.track
+}
+
 function onTrack(this: RTCPeerConnection, ev: RTCTrackEvent) {
 	if (!remoteVideo.srcObject) {
 		remoteVideo.srcObject = new MediaStream()
 	}
-	;(remoteVideo.srcObject as MediaStream).addTrack(ev.track)
+	const track = ev.track
+	const srcObject = remoteVideo.srcObject as MediaStream
+	srcObject.addTrack(track)
+
+	// Replace remote video with a blank one on remote peer stops sharing
+	if (track.kind === 'video') {
+		// Firefox doesn't think of it as muted on remote peer track.stop()
+		// But Firefox doesn't turn black video on track.stop() anyway
+		// Seem to be fine to just leave it to default browser behavior
+		// TODO: Test how it works in Safari
+		track.addEventListener('mute', () => {
+			const { width, height } = track.getSettings()
+			if (!width || !height) {
+				console.warn(track, `should have both width and height, but it's not`)
+				return
+			}
+			const blankVideoTrack = createBlankVideoTrack(width, height)
+			srcObject.removeTrack(track)
+			srcObject.addTrack(blankVideoTrack)
+		})
+		track.addEventListener('unmute', () => {
+			if (blankVideoTrack) {
+				srcObject.removeTrack(blankVideoTrack.track)
+			}
+			srcObject.addTrack(track)
+		})
+	}
+
 	// Refresh audio control
 	remoteVideo.controls = false
 	remoteVideo.controls = true
@@ -250,7 +308,9 @@ async function addMediaInternal() {
 	for (const [_, sender] of senders) {
 		sender.track?.stop()
 	}
-	// const newSenders = new Set(senders.keys())
+	if (!videoState) {
+		return
+	}
 	const stream = await getUserMedia()
 	if (!stream) {
 		setVideoState(false)
@@ -266,30 +326,18 @@ async function addMediaInternal() {
 	const tracks = stream.getTracks()
 	const firstTrack = tracks[0]
 	if (firstTrack) {
-		firstTrack.addEventListener(
-			'ended',
-			() => {
-				setVideoState(false)
-			},
-			{ once: true }
-		)
+		firstTrack.addEventListener('ended', () => setVideoState(false), { once: true })
 	}
 	for (const track of tracks) {
 		const sender = senders.get(track.kind)
 		if (sender) {
 			promises.push(sender.replaceTrack(track))
-			// newSenders.delete(track.kind)
 		} else {
 			senders.set(track.kind, pc.addTrack(track))
 		}
 	}
 	await Promise.all(promises)
 	await updateAllParameters(pc)
-	// for (const kind of newSenders) {
-	// 	pc.removeTrack(senders.get(kind)!)
-	// 	senders.delete(kind)
-	// }
-	return
 }
 
 async function addMedia() {
