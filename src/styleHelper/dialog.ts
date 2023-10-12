@@ -5,13 +5,7 @@ export function closeDialog(dialog: HTMLDialogElement) {
 	if (shouldReduceMotion.matches) {
 		dialog.close()
 	} else {
-		dialog.addEventListener(
-			'transitionend',
-			() => {
-				dialog.close()
-			},
-			{ once: true }
-		)
+		dialog.addEventListener('transitionend', () => dialog.close(), { once: true })
 	}
 }
 

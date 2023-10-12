@@ -68,13 +68,6 @@ videoToggle.addEventListener('click', () => {
 })
 setVideoState(!localStorage.getItem(VIDEO_DISABLED_SAVE_KEY))
 
-export function onDeviceSelectChange(listener: EventListener) {
-	videoSelect.addEventListener('change', listener)
-}
-onDeviceSelectChange(() => {
-	localStorage.setItem(VIDEO_DEVICE_SAVE_KEY, videoSelect.value)
-})
-
 const RESOLUTION_NO_LIMIT = 100_000
 export let videoResolution = RESOLUTION_NO_LIMIT
 type ResolutionChangeListener = (resolution: number) => void
@@ -101,6 +94,13 @@ const selected = selectIndexByValue(resolutionSelect, savedResolution)
 if (selected) {
 	setResolution(savedResolution!)
 }
+
+export function onDeviceSelectChange(listener: EventListener) {
+	videoSelect.addEventListener('change', listener)
+}
+onDeviceSelectChange(() => {
+	localStorage.setItem(VIDEO_DEVICE_SAVE_KEY, videoSelect.value)
+})
 
 function getVideoSettings(): MediaTrackConstraints {
 	return {
