@@ -102,7 +102,22 @@ shareUrlServerButton.addEventListener('click', () => {
 	share(`${location.origin}${location.pathname}?${params}`)
 })
 
+async function playDisconnectSound() {
+	const stream = await fetch(new URL('/media/audio/disconnect.mp3', import.meta.url))
+	const ctx = new AudioContext()
+	const source = ctx.createBufferSource()
+	source.buffer = await ctx.decodeAudioData(await stream.arrayBuffer())
+	source.connect(ctx.destination)
+	source.start()
+}
+
+let currentConnectionState: keyof typeof STATES
 function IndicateConnectionState(state: keyof typeof STATES) {
+	if (currentConnectionState === state) {
+		return
+	}
+	currentConnectionState = state
+
 	if (state === 'localOffer') {
 		if (!shareUrlPopup.open) {
 			openDialogModal(shareUrlPopup, true)
@@ -111,6 +126,9 @@ function IndicateConnectionState(state: keyof typeof STATES) {
 		if (shareUrlPopup.open) {
 			closeDialog(shareUrlPopup)
 		}
+	}
+	if (state === 'disconnected') {
+		playDisconnectSound()
 	}
 	stateIndicator.innerText = STATES[state]
 }
