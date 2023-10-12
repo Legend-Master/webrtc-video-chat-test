@@ -72,8 +72,6 @@ Some bugs about `getDisplayMedia` on Windows Chromium based browsers
 
 - When system scale is not 1 and calling without parameters, it will give back a lower quality stream (1920x1080 with 1.25 scale will give back 1536x864 (x1.25 will be the right number))
 
-- Calling `getSettings` on the returning video track immediately will give back the requested number or screen size (which has the scaling issue) (has a uppper limit of 16383) even when the actuall size retruned is smaller
-
     For example, screen resolution is 1920x1080, run this and select a none fullscreen window/browser tab:
     ```js
     const stream = await navigator.mediaDevices.getDisplayMedia({ video: true })
@@ -81,7 +79,11 @@ Some bugs about `getDisplayMedia` on Windows Chromium based browsers
     ```
     This gives back 1536x864 on scale 1.25, 1920x1080 on scale 1, but the actuall stream's resolution is less than this
 
-    And running something like this gives back 16383x16383
+    I reported this problem at https://crbug.com/1429161, ~~but the maintainer said it's a low priority preblem, so I don't think it's gonna get fixed any time soon~~ and did a fix originally in https://crrev.com/c/4546769, but got reverted because it causes timeout on ChromeOS Crostini (an environment to run Linux apps on ChromeOS) for some unknown reasons, so splited it up as https://crrev.com/c/4583587 landed on Chrome 116 and https://crrev.com/c/4826746 on Chrome 118
+
+- Calling `getSettings` on the returning video track immediately will give back the requested number or screen size (which has the scaling issue) (has a uppper limit of 16383) even when the actuall size retruned is smaller
+
+    Running something like this gives back 16383x16383
     ```js
     const stream = await navigator.mediaDevices.getDisplayMedia({ video: { width: 100_000, height: 100_000 } })
 	console.log(stream.getVideoTracks()[0].getSettings())
@@ -89,9 +91,7 @@ Some bugs about `getDisplayMedia` on Windows Chromium based browsers
 
     But waiting for a while, 30+ms on my computer, `getSettings` will now gives back the right resolution (Looked at Chromium code later on, found it doesn't pass in those info at the begining, the settings will only updates when capture component delivers a frame, and someone already reported this: https://crbug.com/1401937)
 
-    I reported this problem at https://crbug.com/1429161, ~~but the maintainer said it's a low priority preblem, so I don't think it's gonna get fixed any time soon~~ and did a fix at https://chromium-review.googlesource.com/c/chromium/src/+/4546769, if nothing goes wrong, should be landing on Chrome 115
-
-- Trailing cursor (image of the cursor doesn't go away after moving the mouse)
+- ~~Trailing cursor (image of the cursor doesn't go away after moving the mouse)~~ should be fixed around Chrome 116
 
 ---
 
