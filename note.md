@@ -46,6 +46,10 @@ If we do an animation and close it after animation done, there're some problems 
 
 In the other hand, if we change the `display: none` to something else, then we lose the inert and top layer behavior
 
+> Chrome added some features to make this doable now: https://developer.chrome.com/blog/entry-exit-animations/
+> <br>
+> Waiting for other browsers to catch up
+
 ---
 
 Web bundlers are such a pain to deal with
