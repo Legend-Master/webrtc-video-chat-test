@@ -352,8 +352,8 @@ async function addMediaInternal() {
 	for (const [_, sender] of senders) {
 		sender.track?.stop()
 	}
+	sendIfDataChannelOpen(videoStateDataChannel, 'false')
 	if (!videoState) {
-		sendIfDataChannelOpen(videoStateDataChannel, 'false')
 		return
 	}
 	const stream = await getUserMedia()
