@@ -264,6 +264,9 @@ function onRemoteVideoStateChange(this: RTCDataChannel, ev: MessageEvent) {
 		}
 	} else {
 		const { width, height } = track.getSettings()
+		// Firefox returns on empty object here unless it's directly from getDisplayMedia/getUserMedia
+		// But Firefox doesn't turn black video on track.stop() anyway
+		// Seem to be fine to just leave it to default browser behavior
 		if (!width || !height) {
 			console.warn(track, `should have both width and height, but it's not`)
 			return
