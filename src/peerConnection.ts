@@ -32,17 +32,26 @@ const shareUrlServerButton = document.getElementById('share-url-server-button') 
 type PeerType = 'offer' | 'answer'
 
 const OFFER_PLACEHOLDER = ''
-const DATA_CHANNEL_ID = 0
+const RENEGOTIATE_CHANNEL_ID = 0
+const VIDEO_STATE_CHANNEL_ID = 1
 
 let pc: RTCPeerConnection
 let peerType: PeerType
-let dataChannel: RTCDataChannel
+let renegotiateDataChannel: RTCDataChannel
+let videoStateDataChannel: RTCDataChannel
 let firstConnected: boolean
 
 // The one who says "you go first"
 // https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation
 function isPolite() {
 	return peerType === 'answer'
+}
+
+function sendIfDataChannelOpen(channel: RTCDataChannel | undefined, message: string) {
+	if (!channel || channel.readyState !== 'open') {
+		return
+	}
+	channel.send(message)
 }
 
 const stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
@@ -187,12 +196,21 @@ export async function startPeerConnection() {
 	pc.addEventListener('signalingstatechange', monitorSignalingState)
 	pc.addEventListener('connectionstatechange', monitorFirstConnected)
 	pc.addEventListener('connectionstatechange', monitorConnectionState)
+
 	await addMedia()
-	dataChannel = pc.createDataChannel('renegotiate', {
+
+	renegotiateDataChannel = pc.createDataChannel('renegotiate', {
 		negotiated: true,
-		id: DATA_CHANNEL_ID,
+		id: RENEGOTIATE_CHANNEL_ID,
 	})
-	dataChannel.addEventListener('message', onDataChannelMessage)
+	renegotiateDataChannel.addEventListener('message', onDataChannelMessage)
+
+	videoStateDataChannel = pc.createDataChannel('video_state', {
+		negotiated: true,
+		id: VIDEO_STATE_CHANNEL_ID,
+	})
+	videoStateDataChannel.addEventListener('message', onRemoteVideoStateChange)
+
 	return pc
 }
 
@@ -203,6 +221,8 @@ let blankVideoTrack:
 			track: MediaStreamTrack
 	  }
 	| undefined
+
+let remoteVideoTrack: MediaStreamTrack | undefined
 
 function createBlankVideoTrack(width: number, height: number) {
 	if (blankVideoTrack && blankVideoTrack.width === width && blankVideoTrack.height === height) {
@@ -226,37 +246,40 @@ function createBlankVideoTrack(width: number, height: number) {
 	return blankVideoTrack.track
 }
 
+function onRemoteVideoStateChange(this: RTCDataChannel, ev: MessageEvent) {
+	const srcObject = remoteVideo.srcObject as MediaStream | null
+	if (!srcObject) {
+		return
+	}
+	const track = srcObject.getVideoTracks()[0]
+	if (!track) {
+		return
+	}
+	if (ev.data === 'true') {
+		if (remoteVideoTrack && track !== remoteVideoTrack) {
+			if (blankVideoTrack) {
+				srcObject.removeTrack(blankVideoTrack.track)
+			}
+			srcObject.addTrack(remoteVideoTrack)
+		}
+	} else {
+		const { width, height } = track.getSettings()
+		if (!width || !height) {
+			console.warn(track, `should have both width and height, but it's not`)
+			return
+		}
+		remoteVideoTrack = track
+		const blankVideoTrack = createBlankVideoTrack(width, height)
+		srcObject.removeTrack(track)
+		srcObject.addTrack(blankVideoTrack)
+	}
+}
+
 function onTrack(this: RTCPeerConnection, ev: RTCTrackEvent) {
 	if (!remoteVideo.srcObject) {
 		remoteVideo.srcObject = new MediaStream()
 	}
-	const track = ev.track
-	const srcObject = remoteVideo.srcObject as MediaStream
-	srcObject.addTrack(track)
-
-	// Replace remote video with a blank one on remote peer stops sharing
-	if (track.kind === 'video') {
-		// Firefox doesn't think of it as muted on remote peer track.stop()
-		// But Firefox doesn't turn black video on track.stop() anyway
-		// Seem to be fine to just leave it to default browser behavior
-		// TODO: Test how it works in Safari
-		track.addEventListener('mute', () => {
-			const { width, height } = track.getSettings()
-			if (!width || !height) {
-				console.warn(track, `should have both width and height, but it's not`)
-				return
-			}
-			const blankVideoTrack = createBlankVideoTrack(width, height)
-			srcObject.removeTrack(track)
-			srcObject.addTrack(blankVideoTrack)
-		})
-		track.addEventListener('unmute', () => {
-			if (blankVideoTrack) {
-				srcObject.removeTrack(blankVideoTrack.track)
-			}
-			srcObject.addTrack(track)
-		})
-	}
+	;(remoteVideo.srcObject as MediaStream).addTrack(ev.track)
 
 	// Refresh audio control
 	remoteVideo.controls = false
@@ -318,7 +341,7 @@ async function onDataChannelMessage(this: RTCDataChannel, ev: MessageEvent) {
 async function renegotiate() {
 	const desc = await pc.createOffer()
 	await pc.setLocalDescription(desc)
-	dataChannel.send(JSON.stringify(processDescription(desc)))
+	renegotiateDataChannel.send(JSON.stringify(processDescription(desc)))
 }
 
 const senders = new Map<string, RTCRtpSender>()
@@ -327,6 +350,7 @@ async function addMediaInternal() {
 		sender.track?.stop()
 	}
 	if (!videoState) {
+		sendIfDataChannelOpen(videoStateDataChannel, 'false')
 		return
 	}
 	const stream = await getUserMedia()
@@ -354,6 +378,7 @@ async function addMediaInternal() {
 			senders.set(track.kind, pc.addTrack(track))
 		}
 	}
+	sendIfDataChannelOpen(videoStateDataChannel, 'true')
 	await Promise.all(promises)
 	await updateAllParameters(pc)
 }
@@ -368,10 +393,10 @@ async function addMedia() {
 async function negotiate(this: RTCPeerConnection) {
 	// Only renegotiate through p2p data channel
 	if (peerType) {
-		if (dataChannel.readyState === 'open') {
+		if (renegotiateDataChannel.readyState === 'open') {
 			renegotiate()
 		} else {
-			dataChannel.onopen = renegotiate
+			renegotiateDataChannel.onopen = renegotiate
 		}
 		return
 	}
