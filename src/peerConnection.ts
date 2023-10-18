@@ -271,10 +271,12 @@ function onRemoteVideoStateChange(this: RTCDataChannel, ev: MessageEvent) {
 			console.warn(track, `should have both width and height, but it's not`)
 			return
 		}
-		remoteVideoTrack = track
 		const blankVideoTrack = createBlankVideoTrack(width, height)
-		srcObject.removeTrack(track)
-		srcObject.addTrack(blankVideoTrack)
+		if (track !== blankVideoTrack) {
+			remoteVideoTrack = track
+			srcObject.removeTrack(track)
+			srcObject.addTrack(blankVideoTrack)
+		}
 	}
 }
 
