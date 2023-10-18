@@ -56,7 +56,8 @@ function sendIfDataChannelOpen(channel: RTCDataChannel | undefined, message: str
 
 const stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
 
-const localVideo = document.getElementById('local-video') as HTMLVideoElement
+// const localVideo = document.getElementById('local-video') as HTMLVideoElement
+const localVideo = document.createElement('video')
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
 function localStreamControl(enable: boolean) {

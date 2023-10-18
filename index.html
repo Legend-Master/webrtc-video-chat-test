@@ -102,52 +102,49 @@
 				</button>
 			</div>
 		</dialog>
-		<div id="pc-control-div" class="hidden-after-call">
-			<button id="start-button">Start</button>
-			<button id="config-ice" class="icon-button" title="Config ICE servers">
-				<iconify-icon icon="mdi:cog"></iconify-icon>
-			</button>
-		</div>
-		<div class="shown-after-call" hidden>
-			<div id="connection-state-indicator">🟡 Connecting to server</div>
-		</div>
-		<div id="device-select-div">
-			<div>
-				<button id="toggle-video" class="icon-button" title="Turn off camera">
-					<iconify-icon icon="mdi:video"></iconify-icon>
+		<main>
+			<div id="pc-control-div" class="hidden-after-call">
+				<button id="start-button">Start</button>
+				<button id="config-ice" class="icon-button" title="Config ICE servers">
+					<iconify-icon icon="mdi:cog"></iconify-icon>
 				</button>
-				<select id="video-select" title="Select video source"></select>
 			</div>
-			<div>
-				<select id="video-resolution-select" title="Select video resolution constraint">
-					<option value="">No resolution limit</option>
-					<option value="1440">1440</option>
-					<option value="1080">1080</option>
-					<option value="720">720</option>
-					<option value="480">480</option>
-					<option value="360">360</option>
-				</select>
-				<!-- <select> -->
-				<!-- <option value="120">120 fps</option> -->
-				<!-- <option value="60">60 fps</option> -->
-				<!-- <option value="30">30 fps</option> -->
-				<!-- </select> -->
+			<div class="shown-after-call" hidden>
+				<div id="connection-state-indicator">🟡 Connecting to server</div>
 			</div>
-			<!-- <div> -->
-			<!-- <label for="audio-select">Select Microphone/Audio</label> -->
-			<!-- <select id="audio-select"></select> -->
-			<!-- </div> -->
-		</div>
-		<div class="video-container">
-			<div>
-				<video id="local-video" playsinline controls autoplay muted></video>
+			<div id="device-select-div">
+				<div>
+					<button id="toggle-video" class="icon-button" title="Turn off camera">
+						<iconify-icon icon="mdi:video"></iconify-icon>
+					</button>
+					<select id="video-select" title="Select video source"></select>
+				</div>
+				<div>
+					<select id="video-resolution-select" title="Select video resolution constraint">
+						<option value="">No resolution limit</option>
+						<option value="1440">1440</option>
+						<option value="1080">1080</option>
+						<option value="720">720</option>
+						<option value="480">480</option>
+						<option value="360">360</option>
+					</select>
+					<!-- <select> -->
+					<!-- <option value="120">120 fps</option> -->
+					<!-- <option value="60">60 fps</option> -->
+					<!-- <option value="30">30 fps</option> -->
+					<!-- </select> -->
+				</div>
+				<!-- <div> -->
+				<!-- <label for="audio-select">Select Microphone/Audio</label> -->
+				<!-- <select id="audio-select"></select> -->
+				<!-- </div> -->
 			</div>
-			<div>
+			<div class="video-container">
 				<video id="remote-video" playsinline controls autoplay></video>
 			</div>
-		</div>
-		<div>
+		</main>
+		<footer>
 			<a href="https://github.com/Legend-Master/webrtc-video-chat-test">View source on Github</a>
-		</div>
+		</footer>
 	</body>
 </html>
