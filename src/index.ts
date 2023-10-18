@@ -20,13 +20,22 @@ const shownAfterCall = document.getElementsByClassName(
 	'shown-after-call'
 ) as HTMLCollectionOf<HTMLElement>
 
-startBtn.addEventListener('click', () => {
+async function updateHideStyle() {
 	for (const el of hiddenAfterCall) {
 		el.hidden = true
 	}
 	for (const el of shownAfterCall) {
 		el.hidden = false
 	}
+}
+
+startBtn.addEventListener('click', () => {
+	if (document.startViewTransition) {
+		document.startViewTransition(updateHideStyle)
+	} else {
+		updateHideStyle()
+	}
+
 	createRoom()
 	startPeerConnection()
 })

@@ -564,3 +564,18 @@ because it's impossible to do transition/animation only on switching state away 
 #share-url-popup svg {
 	font-size: 2em;
 }
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0s;
+}
+
+.shown-after-call,
+.hidden-after-call {
+	view-transition-name: default-transition;
+}
+
+::view-transition-old(default-transition),
+::view-transition-new(default-transition) {
+	animation-duration: 0.3s;
+}
