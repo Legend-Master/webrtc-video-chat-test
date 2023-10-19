@@ -12,4 +12,5 @@
             }
         }
     ],
+    "css.lint.unknownAtRules": "ignore",
 }

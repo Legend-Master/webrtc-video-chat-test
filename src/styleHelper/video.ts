@@ -30,7 +30,15 @@ function onKeydown(this: HTMLVideoElement, ev: KeyboardEvent) {
 	}
 }
 
-for (const video of videos) {
+export function bindVideo(video?: HTMLVideoElement) {
+	if (!video) {
+		video = document.createElement('video')
+	}
 	video.addEventListener('loadeddata', onLoadeddata)
 	video.addEventListener('keydown', onKeydown)
+	return video
+}
+
+for (const video of videos) {
+	bindVideo(video)
 }
