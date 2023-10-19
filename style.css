@@ -447,6 +447,7 @@ because it's impossible to do transition/animation only on switching state away 
 #welcome-dialog > form {
 	padding: 2em 1em;
 	max-width: 450px;
+	text-align: center;
 }
 #welcome-dialog > form > h2 {
 	margin-top: 0;
