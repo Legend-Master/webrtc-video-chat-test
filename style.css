@@ -384,6 +384,7 @@ because it's impossible to do transition/animation only on switching state away 
 	left: 0;
 	right: 0;
 	padding: 0.5em;
+	padding-top: 2.5em;
 
 	/* Copied from https://source.chromium.org/chromium/chromium/src/+/main:third_party/blink/renderer/modules/media_controls/resources/mediaControls.css;drc=56bde68ea2dada26740ecdc696b1818cd49c964b;l=76 */
 	--gradient-steps: hsla(0, 0%, 0%, 0) 0%, hsla(0, 0%, 0%, 0.013) 8.1%, hsla(0, 0%, 0%, 0.049) 15.5%,
@@ -433,6 +434,13 @@ because it's impossible to do transition/animation only on switching state away 
 	#local-video-wrapper .controls-wrapper .icon-button:hover {
 		background-color: rgba(255, 255, 255, 0.1);
 	}
+}
+
+#local-video-wrapper.fullscreen .controls-wrapper {
+	font-size: 1.5em;
+	padding-left: 0;
+	padding-right: 0;
+	padding-bottom: 0;
 }
 
 #welcome-dialog > form {
