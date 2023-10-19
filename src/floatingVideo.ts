@@ -116,6 +116,9 @@ wrapper.addEventListener('pointerout', (ev) => {
 	if (ev.pointerType !== 'mouse') {
 		return
 	}
+	if (isFullscreen()) {
+		return
+	}
 	clearTimeout(hideControlsTimeout)
 	hideControls()
 })
