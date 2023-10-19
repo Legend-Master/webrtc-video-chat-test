@@ -412,7 +412,7 @@ because it's impossible to do transition/animation only on switching state away 
 #local-video-wrapper .controls-wrapper .icon-button {
 	color: hsl(0, 0%, 93%);
 	font-size: 2em;
-	padding: 0.25em;
+	padding: 0.4em;
 }
 
 #local-video-wrapper .controls-wrapper .icon-button:active::before,
@@ -432,10 +432,6 @@ because it's impossible to do transition/animation only on switching state away 
 
 #local-video-wrapper.fullscreen .controls-wrapper {
 	font-size: 1.5em;
-}
-
-#local-video-wrapper.fullscreen .controls-wrapper .icon-button {
-	padding: 0.4em;
 }
 
 #welcome-dialog > form {
