@@ -60,7 +60,7 @@ async function toggleFullscreen() {
 const fullscreenButton = createIconButton(mdiFullscreen)
 fullscreenButton.title = 'Full screen'
 fullscreenButton.addEventListener('click', toggleFullscreen)
-localVideo.addEventListener('dblclick', toggleFullscreen)
+wrapper.addEventListener('dblclick', toggleFullscreen)
 wrapper.addEventListener('fullscreenchange', updateFullscreenStyle)
 
 controlsWrapper.append(fullscreenButton)
