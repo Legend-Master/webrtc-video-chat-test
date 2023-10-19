@@ -85,9 +85,6 @@ wrapper.append(controlsWrapper)
 wrapper.append(localVideo)
 document.body.append(wrapper)
 
-let dragging = false
-let videoX = 0
-let videoY = 0
 let hideControlsTimeout: number | undefined
 
 function showControls() {
@@ -127,28 +124,54 @@ wrapper.addEventListener('pointermove', () => {
 	outOfIdle()
 })
 
+let dragging = false
+let videoX = -20
+let videoY = 20
+
+let dragInitialX = 0
+let dragInitialY = 0
+
+function clamp(num: number, min: number, max: number) {
+	return Math.min(max, Math.max(min, num))
+}
+
+const edgeWidth = 50
+
+function updatePosition() {
+	const { width, height } = wrapper.getBoundingClientRect()
+	videoX = clamp(videoX, -innerWidth + edgeWidth, width - edgeWidth)
+	videoY = clamp(videoY, -height + edgeWidth, innerHeight - edgeWidth)
+	wrapper.style.translate = `${videoX}px ${videoY}px`
+}
+updatePosition()
+window.addEventListener('resize', updatePosition)
+
+// 0, 0 is top right
+function moveTo(x: number, y: number) {
+	videoX = x - dragInitialX
+	videoY = y - dragInitialY
+	updatePosition()
+}
+
 function onPointerMove(ev: PointerEvent) {
 	if (document.fullscreenElement === wrapper) {
 		return
 	}
-	videoX += ev.movementX
-	videoY += ev.movementY
-	wrapper.style.translate = `${videoX}px ${videoY}px`
-
+	moveTo(ev.clientX, ev.clientY)
 	// ev.preventDefault()
 }
 
 // Dragging control
 wrapper.addEventListener('pointerdown', (ev) => {
-	// if (localVideo.controls) {
-	// 	return
-	// }
-
+	// Primary button only
+	if (ev.button !== 0) {
+		return
+	}
 	dragging = true
+	dragInitialX = ev.clientX - videoX
+	dragInitialY = ev.clientY - videoY
 	window.removeEventListener('pointermove', onPointerMove)
 	window.addEventListener('pointermove', onPointerMove)
-
-	// ev.preventDefault()
 })
 window.addEventListener('pointerup', () => {
 	dragging = false

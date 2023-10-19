@@ -345,8 +345,8 @@ because it's impossible to do transition/animation only on switching state away 
 
 #local-video-wrapper {
 	position: fixed;
-	top: 1em;
-	right: 1em;
+	top: 0;
+	right: 0;
 
 	display: grid;
 	align-items: stretch;
