@@ -4,6 +4,15 @@ window.addEventListener('keydown', (ev) => {
 	if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey || ev.repeat) {
 		return
 	}
+	if (
+		document.activeElement instanceof HTMLInputElement ||
+		document.activeElement instanceof HTMLTextAreaElement
+	) {
+		return
+	}
+	if (!remoteVideo.srcObject) {
+		return
+	}
 	if (ev.key === 'f') {
 		if (document.fullscreenElement === remoteVideo) {
 			document.exitFullscreen()
@@ -11,9 +20,6 @@ window.addEventListener('keydown', (ev) => {
 			remoteVideo.requestFullscreen()
 		}
 	} else if (ev.key === 'i') {
-		if (!remoteVideo.srcObject) {
-			return
-		}
 		// Firefox and Android Webview (kinda irrelevant) doesn't have these
 		if (typeof remoteVideo.requestFullscreen !== 'function') {
 			return
