@@ -173,6 +173,8 @@ wrapper.addEventListener('pointerdown', (ev) => {
 	dragging = true
 	dragInitialX = ev.clientX - videoX
 	dragInitialY = ev.clientY - videoY
+
+	ev.preventDefault()
 })
 window.addEventListener('pointerup', () => {
 	dragging = false
