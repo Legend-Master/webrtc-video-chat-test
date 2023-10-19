@@ -38,10 +38,12 @@ function isFullscreen() {
 function updateFullscreenStyle() {
 	if (isFullscreen()) {
 		fullscreenButton.innerHTML = mdiFullscreenExit
+		fullscreenButton.title = 'Full screen'
 		wrapper.style.translate = ''
 		wrapper.classList.add('fullscreen')
 	} else {
 		fullscreenButton.innerHTML = mdiFullscreen
+		fullscreenButton.title = 'Exit full screen'
 		wrapper.style.translate = `${videoX}px ${videoY}px`
 		wrapper.classList.remove('fullscreen')
 	}
@@ -56,16 +58,17 @@ async function toggleFullscreen() {
 }
 
 const fullscreenButton = createIconButton(mdiFullscreen)
+fullscreenButton.title = 'Full screen'
 fullscreenButton.addEventListener('click', toggleFullscreen)
 localVideo.addEventListener('dblclick', toggleFullscreen)
 wrapper.addEventListener('fullscreenchange', updateFullscreenStyle)
-
-const pipButton = createIconButton(mdiPip)
 
 controlsWrapper.append(fullscreenButton)
 
 // Firefox and Android Webview (kinda irrelevant) doesn't support PiP API yet
 if (localVideo.requestPictureInPicture) {
+	const pipButton = createIconButton(mdiPip)
+	pipButton.title = 'Enter picture-in-picture'
 	pipButton.addEventListener('click', () => {
 		localVideo.requestPictureInPicture()
 	})
