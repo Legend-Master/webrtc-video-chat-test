@@ -46,14 +46,49 @@ function updateFullscreenStyle() {
 		fullscreenButton.title = 'Exit full screen'
 		wrapper.style.translate = `${videoX}px ${videoY}px`
 		wrapper.classList.remove('fullscreen')
+		try {
+			screen.orientation.unlock()
+		} catch {}
 	}
+}
+
+declare global {
+	interface ScreenOrientation {
+		/** [MDN Reference](https://developer.mozilla.org/docs/Web/API/ScreenOrientation/lock) */
+		lock: (
+			orientation:
+				| 'any'
+				| 'natural'
+				| 'landscape'
+				| 'portrait'
+				| 'portrait-primary'
+				| 'portrait-secondary'
+				| 'landscape-primary'
+				| 'landscape-secondary'
+		) => Promise<void>
+	}
+}
+
+// This API is on Chrome Android only
+async function fullscreenAutoRotate() {
+	if (!screen.orientation.lock) {
+		return
+	}
+	try {
+		if (localVideo.videoWidth < localVideo.videoHeight) {
+			await screen.orientation.lock('portrait')
+		} else {
+			await screen.orientation.lock('landscape')
+		}
+	} catch {}
+	// Throw expected on Chrome desktop
 }
 
 async function toggleFullscreen() {
 	if (isFullscreen()) {
 		await document.exitFullscreen()
 	} else {
-		await wrapper.requestFullscreen()
+		await Promise.all([fullscreenAutoRotate(), wrapper.requestFullscreen()])
 	}
 }
 
