@@ -171,6 +171,7 @@ function clamp(num: number, min: number, max: number) {
 
 const edgeWidth = 50
 
+// 0, 0 is top right
 function updatePosition() {
 	if (isFullscreen()) {
 		wrapper.style.translate = ''
@@ -186,7 +187,6 @@ function updatePosition() {
 updatePosition()
 window.addEventListener('resize', updatePosition)
 
-// 0, 0 is top right
 function moveTo(x: number, y: number) {
 	videoX = x - dragInitialX
 	videoY = y - dragInitialY
@@ -204,7 +204,6 @@ window.addEventListener('pointermove', (ev) => {
 	wrapper.classList.add('dragging')
 })
 
-// Dragging control
 wrapper.addEventListener('pointerdown', (ev) => {
 	// Primary button only
 	if (ev.button !== 0) {

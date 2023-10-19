@@ -36,10 +36,6 @@ select {
 	display: none !important;
 }
 
-video {
-	width: 100%;
-	/* max-height: 80vh; */
-}
 video::-webkit-media-controls-timeline {
 	display: none;
 }
@@ -134,7 +130,6 @@ code {
 }
 
 main {
-	/* height: 100vh; */
 	height: 100vh;
 	height: 100svh;
 
@@ -191,9 +186,6 @@ footer {
 	justify-content: center;
 	flex-wrap: wrap;
 	gap: 1em;
-
-	/* margin-top: 1em; */
-	/* margin-bottom: 1em; */
 }
 
 #device-select-div > div {
@@ -318,14 +310,10 @@ because it's impossible to do transition/animation only on switching state away 
 
 .video-container {
 	margin-bottom: 1em;
-	/* margin: 1em 0; */
-	/* margin-left: 1vw; */
-	/* margin-right: 1vw; */
 
-	display: grid;
+	display: flex;
 	justify-content: center;
 	align-items: stretch;
-	grid-template-rows: minmax(0, auto);
 	/* Doesn't work on Firefox without this */
 	overflow: hidden;
 
