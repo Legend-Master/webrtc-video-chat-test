@@ -7,6 +7,7 @@ import './styleHelper/video'
 import './iceServerData'
 import './selectDevice'
 import './peerConnection'
+import './keyBoardControls'
 
 import { createRoom } from './util/room'
 import { startPeerConnection } from './peerConnection'
