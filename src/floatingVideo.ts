@@ -153,13 +153,16 @@ function moveTo(x: number, y: number) {
 	updatePosition()
 }
 
-function onPointerMove(ev: PointerEvent) {
+window.addEventListener('pointermove', (ev) => {
+	if (!dragging) {
+		return
+	}
 	if (document.fullscreenElement === wrapper) {
 		return
 	}
 	moveTo(ev.clientX, ev.clientY)
-	// ev.preventDefault()
-}
+	wrapper.classList.add('dragging')
+})
 
 // Dragging control
 wrapper.addEventListener('pointerdown', (ev) => {
@@ -170,10 +173,8 @@ wrapper.addEventListener('pointerdown', (ev) => {
 	dragging = true
 	dragInitialX = ev.clientX - videoX
 	dragInitialY = ev.clientY - videoY
-	window.removeEventListener('pointermove', onPointerMove)
-	window.addEventListener('pointermove', onPointerMove)
 })
 window.addEventListener('pointerup', () => {
 	dragging = false
-	window.removeEventListener('pointermove', onPointerMove)
+	wrapper.classList.remove('dragging')
 })

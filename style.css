@@ -411,7 +411,8 @@ because it's impossible to do transition/animation only on switching state away 
 	}
 }
 
-#local-video-wrapper .controls-wrapper.hide {
+#local-video-wrapper .controls-wrapper.hide,
+#local-video-wrapper.dragging .controls-wrapper {
 	display: none;
 	opacity: 0;
 }
