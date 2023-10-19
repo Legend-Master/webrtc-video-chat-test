@@ -39,17 +39,16 @@ function updateFullscreenStyle() {
 	if (isFullscreen()) {
 		fullscreenButton.innerHTML = mdiFullscreenExit
 		fullscreenButton.title = 'Full screen'
-		wrapper.style.translate = ''
 		wrapper.classList.add('fullscreen')
 	} else {
 		fullscreenButton.innerHTML = mdiFullscreen
 		fullscreenButton.title = 'Exit full screen'
-		wrapper.style.translate = `${videoX}px ${videoY}px`
 		wrapper.classList.remove('fullscreen')
 		try {
 			screen.orientation.unlock()
 		} catch {}
 	}
+	updatePosition()
 }
 
 declare global {
@@ -173,9 +172,15 @@ function clamp(num: number, min: number, max: number) {
 const edgeWidth = 50
 
 function updatePosition() {
-	const { width, height } = wrapper.getBoundingClientRect()
-	videoX = clamp(videoX, -innerWidth + edgeWidth, width - edgeWidth)
-	videoY = clamp(videoY, -height + edgeWidth, innerHeight - edgeWidth)
+	if (isFullscreen()) {
+		wrapper.style.translate = ''
+		return
+	}
+	if (!wrapper.hidden) {
+		const { width, height } = wrapper.getBoundingClientRect()
+		videoX = clamp(videoX, -innerWidth + edgeWidth, width - edgeWidth)
+		videoY = clamp(videoY, -height + edgeWidth, innerHeight - edgeWidth)
+	}
 	wrapper.style.translate = `${videoX}px ${videoY}px`
 }
 updatePosition()
