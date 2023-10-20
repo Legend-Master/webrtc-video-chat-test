@@ -340,7 +340,7 @@ because it's impossible to do transition/animation only on switching state away 
 	top: 0;
 	right: 0;
 
-	display: grid;
+	display: flex;
 	align-items: stretch;
 
 	box-shadow: 0 0 8px var(--half-transparent);
