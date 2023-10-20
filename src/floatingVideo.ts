@@ -26,10 +26,10 @@ localVideo.playsinline = true
 const wrapper = document.createElement('div')
 wrapper.id = 'local-video-wrapper'
 wrapper.hidden = true
+wrapper.classList.add('hide-controls')
 
 const controlsWrapper = document.createElement('div')
 controlsWrapper.classList.add('controls-wrapper')
-controlsWrapper.classList.add('hide')
 
 function isFullscreen() {
 	return document.fullscreenElement === wrapper
@@ -120,43 +120,36 @@ document.body.append(wrapper)
 let hideControlsTimeout: number | undefined
 let keyboardFocusedControl = false
 let controlsHovered = false
+let dragging = false
 
 function showControls() {
-	controlsWrapper.classList.remove('hide')
+	wrapper.classList.remove('hide-controls')
 }
 
 function hideControls() {
-	if (keyboardFocusedControl || controlsHovered) {
+	if (keyboardFocusedControl || controlsHovered || dragging) {
 		return
 	}
-	controlsWrapper.classList.add('hide')
+	clearTimeout(hideControlsTimeout)
+	wrapper.classList.add('hide-controls')
 }
 
 function isControlsHidden() {
-	return controlsWrapper.classList.contains('hide')
-}
-
-function hideControlsOnIdle() {
-	clearTimeout(hideControlsTimeout)
-	if (!controlsHovered) {
-		hideControls()
-		wrapper.style.cursor = 'none'
-	}
-}
-
-function outOfIdle() {
-	showControls()
-	wrapper.style.cursor = ''
-	// Schedule new hide timeout
-	refreshHideOnIdle()
+	return wrapper.classList.contains('hide-controls')
 }
 
 function refreshHideOnIdle() {
 	clearTimeout(hideControlsTimeout)
-	hideControlsTimeout = setTimeout(hideControlsOnIdle, 2000)
+	hideControlsTimeout = setTimeout(hideControls, 2000)
+}
+
+function outOfIdle() {
+	showControls()
+	refreshHideOnIdle()
 }
 
 wrapper.addEventListener('pointerenter', (ev) => {
+	// We handle touch screens in pointerup
 	if (ev.pointerType !== 'mouse') {
 		return
 	}
@@ -165,7 +158,7 @@ wrapper.addEventListener('pointerenter', (ev) => {
 })
 
 wrapper.addEventListener('pointerleave', (ev) => {
-	// We use time out for touch screens
+	// We handle touch screens in pointerup
 	if (ev.pointerType !== 'mouse') {
 		return
 	}
@@ -177,6 +170,10 @@ wrapper.addEventListener('pointerleave', (ev) => {
 })
 
 wrapper.addEventListener('pointermove', (ev) => {
+	// We handle touch screens in pointerup
+	if (ev.pointerType !== 'mouse') {
+		return
+	}
 	// How???
 	if (ev.movementX === 0 && ev.movementY === 0) {
 		return
@@ -186,7 +183,11 @@ wrapper.addEventListener('pointermove', (ev) => {
 
 let resetPointerEventTimeout: number
 wrapper.addEventListener('pointerup', (ev) => {
+	// Handle touch screen only
 	if (ev.pointerType === 'mouse') {
+		return
+	}
+	if (dragging) {
 		return
 	}
 	if (isControlsHidden()) {
@@ -202,7 +203,7 @@ wrapper.addEventListener('pointerup', (ev) => {
 		if (controlsHovered) {
 			refreshHideOnIdle()
 		} else {
-			hideControlsOnIdle()
+			hideControls()
 		}
 	}
 })
@@ -246,7 +247,7 @@ window.addEventListener('keydown', (ev) => {
 	hasKeyboardEvent = true
 })
 
-let dragging = false
+let pointerDown = false
 let videoX = -20
 let videoY = 20
 
@@ -282,7 +283,7 @@ function moveTo(x: number, y: number) {
 }
 
 window.addEventListener('pointermove', (ev) => {
-	if (!dragging) {
+	if (!pointerDown) {
 		return
 	}
 	if (document.fullscreenElement === wrapper) {
@@ -292,8 +293,13 @@ window.addEventListener('pointermove', (ev) => {
 	if (ev.movementX === 0 && ev.movementY === 0) {
 		return
 	}
+
 	moveTo(ev.clientX, ev.clientY)
-	wrapper.classList.add('dragging')
+
+	if (!dragging) {
+		dragging = true
+		wrapper.classList.add('dragging')
+	}
 })
 
 wrapper.addEventListener('pointerdown', (ev) => {
@@ -301,7 +307,8 @@ wrapper.addEventListener('pointerdown', (ev) => {
 	if (!ev.isPrimary) {
 		return
 	}
-	dragging = true
+
+	pointerDown = true
 	dragInitialX = ev.clientX - videoX
 	dragInitialY = ev.clientY - videoY
 
@@ -309,9 +316,15 @@ wrapper.addEventListener('pointerdown', (ev) => {
 })
 
 window.addEventListener('pointerup', () => {
-	if (!dragging) {
+	if (!pointerDown) {
 		return
 	}
-	dragging = false
-	wrapper.classList.remove('dragging')
+
+	pointerDown = false
+
+	if (dragging) {
+		dragging = false
+		wrapper.classList.remove('dragging')
+		refreshHideOnIdle()
+	}
 })

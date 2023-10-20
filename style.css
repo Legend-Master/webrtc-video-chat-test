@@ -405,7 +405,11 @@ because it's impossible to do transition/animation only on switching state away 
 	}
 }
 
-#local-video-wrapper .controls-wrapper.hide,
+#local-video-wrapper.hide-controls {
+	cursor: none;
+}
+
+#local-video-wrapper.hide-controls .controls-wrapper,
 #local-video-wrapper.dragging .controls-wrapper {
 	pointer-events: none;
 	opacity: 0;
