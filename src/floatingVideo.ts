@@ -113,8 +113,12 @@ if (localVideo.requestPictureInPicture) {
 	controlsWrapper.append(pipButton)
 }
 
+const stashDecor = document.createElement('div')
+stashDecor.classList.add('stash-decor')
+
 wrapper.append(controlsWrapper)
 wrapper.append(localVideo)
+wrapper.append(stashDecor)
 document.body.append(wrapper)
 
 let hideControlsTimeout: number | undefined
@@ -181,7 +185,7 @@ wrapper.addEventListener('pointermove', (ev) => {
 	outOfIdle()
 })
 
-let resetPointerEventTimeout: number
+let resetPointerEventTimeout: number | undefined
 wrapper.addEventListener('pointerup', (ev) => {
 	// Handle touch screen only
 	if (ev.pointerType === 'mouse') {
@@ -258,28 +262,86 @@ function clamp(num: number, min: number, max: number) {
 	return Math.min(max, Math.max(min, num))
 }
 
-const edgeWidth = 50
+const edgeHeight = 100
+
+const screenWidthQuery = window.matchMedia('(max-width: 500px)')
+let stashSnapRange: number
+function updateStashSnapRange() {
+	stashSnapRange = screenWidthQuery.matches ? 70 : 100
+}
+screenWidthQuery.addEventListener('change', updateStashSnapRange)
+updateStashSnapRange()
+
+// Cache size on drag, not perfect, but good enough
+let originalWidth: number | undefined
+let originalHeight: number | undefined
+
+type StashSide = 'left' | 'right'
+let stashed: StashSide | undefined
 
 // 0, 0 is top right
-function updatePosition() {
+function updatePosition(userMove = false): void {
 	if (isFullscreen()) {
 		wrapper.style.translate = ''
 		return
 	}
 	if (!wrapper.hidden) {
-		const { width, height } = wrapper.getBoundingClientRect()
-		videoX = clamp(videoX, -innerWidth + edgeWidth, width - edgeWidth)
-		videoY = clamp(videoY, -height + edgeWidth, innerHeight - edgeWidth)
+		let width: number
+		let height: number
+		if (originalWidth && originalHeight) {
+			width = originalWidth
+			height = originalHeight
+		} else {
+			const rect = wrapper.getBoundingClientRect()
+			width = rect.width
+			height = rect.height
+		}
+		// Use document.body.clientWidth instead of innerWidth for counting scrollbar width
+		const leftSnapLimit = -document.body.clientWidth + stashSnapRange
+		const rightSnapLimit = width - stashSnapRange
+		if (userMove) {
+			if (videoX <= leftSnapLimit) {
+				stash('left')
+			} else if (videoX >= rightSnapLimit) {
+				stash('right')
+			} else {
+				unStash()
+			}
+		} else {
+			if (stashed) {
+				videoX = stashed === 'left' ? leftSnapLimit : rightSnapLimit
+			}
+		}
+		videoX = clamp(videoX, leftSnapLimit, rightSnapLimit)
+		videoY = clamp(videoY, -height + edgeHeight, innerHeight - edgeHeight)
 	}
 	wrapper.style.translate = `${videoX}px ${videoY}px`
 }
 updatePosition()
-window.addEventListener('resize', updatePosition)
+window.addEventListener('resize', () => updatePosition())
+
+function stash(side: StashSide) {
+	if (stashed) {
+		return
+	}
+	localVideo.pause()
+	wrapper.classList.add('stash')
+	stashed = side
+}
+
+function unStash() {
+	if (!stashed) {
+		return
+	}
+	localVideo.play()
+	wrapper.classList.remove('stash')
+	stashed = undefined
+}
 
 function moveTo(x: number, y: number) {
 	videoX = x - dragInitialX
 	videoY = y - dragInitialY
-	updatePosition()
+	updatePosition(true)
 }
 
 window.addEventListener('pointermove', (ev) => {
@@ -294,12 +356,18 @@ window.addEventListener('pointermove', (ev) => {
 		return
 	}
 
-	moveTo(ev.clientX, ev.clientY)
-
 	if (!dragging) {
 		dragging = true
 		wrapper.classList.add('dragging')
+
+		if (!stashed) {
+			const { width, height } = wrapper.getBoundingClientRect()
+			originalWidth = width
+			originalHeight = height
+		}
 	}
+
+	moveTo(ev.clientX, ev.clientY)
 })
 
 wrapper.addEventListener('pointerdown', (ev) => {

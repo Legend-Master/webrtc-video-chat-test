@@ -348,6 +348,8 @@ because it's impossible to do transition/animation only on switching state away 
 	z-index: var(--local-video-z-index);
 
 	touch-action: none;
+
+	transition: scale 200ms;
 }
 
 #local-video-wrapper:not(.fullscreen) #local-video {
@@ -405,7 +407,7 @@ because it's impossible to do transition/animation only on switching state away 
 	}
 }
 
-#local-video-wrapper.hide-controls {
+#local-video-wrapper.hide-controls:not(.stash) {
 	cursor: none;
 }
 
@@ -415,7 +417,8 @@ because it's impossible to do transition/animation only on switching state away 
 	opacity: 0;
 }
 
-#local-video-wrapper.dragging .controls-wrapper {
+#local-video-wrapper.dragging .controls-wrapper,
+#local-video-wrapper.stash .controls-wrapper {
 	display: none;
 }
 
@@ -442,6 +445,44 @@ because it's impossible to do transition/animation only on switching state away 
 
 #local-video-wrapper.fullscreen .controls-wrapper {
 	font-size: 1.5em;
+}
+
+#local-video-wrapper.stash {
+	scale: 0.6;
+}
+
+#local-video-wrapper .stash-decor {
+	position: absolute;
+	inset: 0;
+	background-color: var(--button-normal-color-light);
+
+	opacity: 0;
+	transition: 200ms;
+}
+#local-video-wrapper .stash-decor::before,
+#local-video-wrapper .stash-decor::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 3em;
+	background-color: gray;
+	mask-size: contain;
+	mask-repeat: no-repeat;
+	mask-position: center;
+}
+#local-video-wrapper .stash-decor::before {
+	content: '';
+	left: 0;
+	mask-image: url(iconify-icon:mdi/chevron-left);
+}
+#local-video-wrapper .stash-decor::after {
+	right: 0;
+	mask-image: url(iconify-icon:mdi/chevron-right);
+}
+
+#local-video-wrapper.stash .stash-decor {
+	opacity: 1;
 }
 
 #welcome-dialog > form {
