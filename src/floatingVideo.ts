@@ -156,9 +156,7 @@ function refreshHideOnIdle() {
 	hideControlsTimeout = setTimeout(hideControlsOnIdle, 2000)
 }
 
-let resetPointerEventTimeout: number
 wrapper.addEventListener('pointerenter', (ev) => {
-	// Delay a bit for touch screen to not instantly click on control buttons (e.g. fullscreen button)
 	if (ev.pointerType !== 'mouse') {
 		return
 	}
@@ -186,11 +184,13 @@ wrapper.addEventListener('pointermove', (ev) => {
 	outOfIdle()
 })
 
+let resetPointerEventTimeout: number
 wrapper.addEventListener('pointerup', (ev) => {
 	if (ev.pointerType === 'mouse') {
 		return
 	}
 	if (isControlsHidden()) {
+		// Delay a bit for touch screen to not instantly click on control buttons (e.g. fullscreen button)
 		controlsWrapper.style.pointerEvents = 'none'
 		clearTimeout(resetPointerEventTimeout)
 		resetPointerEventTimeout = setTimeout(() => {
