@@ -376,17 +376,27 @@ because it's impossible to do transition/animation only on switching state away 
 	bottom: 0;
 	left: 0;
 	right: 0;
-	padding-top: 2.5em;
-
-	background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.67)) repeat-x bottom;
 
 	display: flex;
 	flex-direction: row-reverse;
 
 	z-index: inherit;
 
+	transition: display 200ms, opacity 200ms;
 	/* Chrome only, progressive enhancement */
-	transition: display 200ms allow-discrete, opacity 200ms allow-discrete;
+	transition-behavior: allow-discrete !important;
+}
+
+#local-video-wrapper .controls-wrapper::after {
+	content: '';
+	position: absolute;
+	top: -2.5em;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.67)) repeat-x bottom;
+	pointer-events: none;
+	z-index: -1;
 }
 
 /* Chrome only, progressive enhancement */
@@ -398,8 +408,12 @@ because it's impossible to do transition/animation only on switching state away 
 
 #local-video-wrapper .controls-wrapper.hide,
 #local-video-wrapper.dragging .controls-wrapper {
-	display: none;
+	pointer-events: none;
 	opacity: 0;
+}
+
+#local-video-wrapper.dragging .controls-wrapper {
+	display: none;
 }
 
 #local-video-wrapper .controls-wrapper .icon-button {
