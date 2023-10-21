@@ -24,6 +24,7 @@ import {
 } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
 import { closeDialog, openDialogModal } from './styleHelper/dialog'
+import { localVideo, showLocalVideo } from './floatingVideo'
 
 const shareUrlPopup = document.getElementById('share-url-popup') as HTMLDialogElement
 const shareUrlButton = document.getElementById('share-url-button') as HTMLButtonElement
@@ -55,22 +56,7 @@ function sendIfDataChannelOpen(channel: RTCDataChannel | undefined, message: str
 }
 
 const stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
-
-const localVideo = document.getElementById('local-video') as HTMLVideoElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
-
-function localStreamControl(enable: boolean) {
-	return () => {
-		const stream = localVideo.srcObject
-		if (stream instanceof MediaStream) {
-			for (const track of stream.getTracks()) {
-				track.enabled = enable
-			}
-		}
-	}
-}
-localVideo.addEventListener('pause', localStreamControl(false))
-localVideo.addEventListener('play', localStreamControl(true))
 
 const STATES = {
 	connected: '🟢 Connected',
@@ -368,6 +354,7 @@ async function addMediaInternal() {
 	// console.log(videoTrack.getCapabilities())
 	// console.log(videoTrack.getConstraints())
 	localVideo.srcObject = stream
+	showLocalVideo()
 
 	const promises = []
 	const tracks = stream.getTracks()

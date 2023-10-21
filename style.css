@@ -1,6 +1,5 @@
 :root {
 	font-family: Arial, sans-serif;
-	text-align: center;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
 
 	--button-normal-color: hsl(204, 85%, 40%);
@@ -11,12 +10,19 @@
 	--button-hover-color-light: hsl(204, 85%, 93%);
 
 	--half-transparent: rgba(0, 0, 0, 0.5);
+
+	--popup-z-index: 100;
+	--local-video-z-index: 200;
 }
 
 *,
 ::before,
 ::after {
 	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
 }
 
 button,
@@ -30,10 +36,6 @@ select {
 	display: none !important;
 }
 
-video {
-	width: 100%;
-	max-height: 80vh;
-}
 video::-webkit-media-controls-timeline {
 	display: none;
 }
@@ -127,17 +129,25 @@ code {
 	text-align: start;
 }
 
-.flex-container,
-body > div {
+main {
+	height: 100vh;
+	height: 100svh;
+
+	display: grid;
+	grid-template-rows: min-content min-content auto;
+	gap: 1em;
+}
+
+footer {
+	margin: 1em 0;
+	text-align: center;
+}
+
+.flex-container {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
 	gap: 1em;
-}
-
-body > div {
-	margin-top: 1em;
-	margin-bottom: 1em;
 }
 
 .flex-center {
@@ -149,14 +159,16 @@ body > div {
 	display: grid;
 	grid-template-columns: 1fr auto 1fr;
 	align-items: center;
+	gap: 1em;
+
+	margin-top: 1.75em;
+	margin-bottom: 0.75em;
 }
 #pc-control-div > button {
 	font-size: 1.5em;
 }
 #start-button {
 	grid-column-start: 2;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
 }
 #config-ice {
 	justify-self: left;
@@ -164,7 +176,16 @@ body > div {
 
 #connection-state-indicator {
 	font-size: 1.5em;
-	margin: 0.5em 0;
+	margin-top: 1em;
+	margin-bottom: 0.5em;
+	text-align: center;
+}
+
+#device-select-div {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 1em;
 }
 
 #device-select-div > div {
@@ -288,18 +309,36 @@ because it's impossible to do transition/animation only on switching state away 
 }
 
 .video-container {
-	margin-left: 1vw;
-	margin-right: 1vw;
+	margin-bottom: 1em;
+
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	/* Doesn't work on Firefox without this */
+	overflow: hidden;
+
+	/* max-height: 70vh; */
+	/* background-color: rgba(0, 0, 0, 0.8); */
 }
 
-.video-container > div {
-	flex-grow: 1;
-	width: 400px;
+.video-container video {
+	max-width: 100%;
+}
+
+.video-container video:not(.started) {
+	/* width: 100%; */
+	/* height: 100%; */
+	/* max-width: 100%; */
+	/* max-width: 1200px; */
+	/* max-height: 100%; */
+	aspect-ratio: 16 / 9;
+	/* margin: auto; */
 }
 
 #welcome-dialog > form {
 	padding: 2em 1em;
 	max-width: 450px;
+	text-align: center;
 }
 #welcome-dialog > form > h2 {
 	margin-top: 0;
@@ -479,7 +518,7 @@ because it's impossible to do transition/animation only on switching state away 
 	left: 0;
 	right: 0;
 	margin: auto;
-	z-index: 100;
+	z-index: var(--popup-z-index);
 
 	width: max-content;
 	box-shadow: 0px -2px 10px 2px rgba(0, 0, 0, 0.15);
@@ -520,4 +559,19 @@ because it's impossible to do transition/animation only on switching state away 
 
 #share-url-popup svg {
 	font-size: 2em;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0s;
+}
+
+.shown-after-call,
+.hidden-after-call {
+	view-transition-name: default-transition;
+}
+
+::view-transition-old(default-transition),
+::view-transition-new(default-transition) {
+	animation-duration: 0.3s;
 }

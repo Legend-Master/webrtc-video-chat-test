@@ -9,7 +9,11 @@
             "preLaunchTask": "parcel",
             "pathMapping": {
                 "__parcel_source_root": "${webRoot}"
-            }
+            },
+            "runtimeArgs": [
+                // GPU/Chromium bug: https://https://crbug.com/1366924
+                "--disable_direct_composition=1"
+            ]
         },
     ],
 }
