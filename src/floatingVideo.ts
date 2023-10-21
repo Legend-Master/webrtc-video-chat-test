@@ -31,6 +31,38 @@ wrapper.classList.add('hide-controls')
 const controlsWrapper = document.createElement('div')
 controlsWrapper.classList.add('controls-wrapper')
 
+const fullscreenButton = createIconButton(mdiFullscreen)
+fullscreenButton.title = 'Full screen'
+fullscreenButton.addEventListener('click', toggleFullscreen)
+wrapper.addEventListener('fullscreenchange', updateFullscreenStyle)
+controlsWrapper.append(fullscreenButton)
+
+// Firefox and Android Webview (kinda irrelevant) doesn't support PiP API yet
+if (localVideo.requestPictureInPicture) {
+	const pipButton = createIconButton(mdiPip)
+	pipButton.title = 'Enter picture-in-picture'
+	pipButton.addEventListener('click', () => {
+		localVideo.requestPictureInPicture()
+	})
+	localVideo.addEventListener('enterpictureinpicture', () => {
+		wrapper.classList.add('picture-in-picture')
+	})
+	localVideo.addEventListener('leavepictureinpicture', () => {
+		wrapper.classList.remove('picture-in-picture')
+	})
+	controlsWrapper.append(pipButton)
+}
+
+const stashDecor = document.createElement('div')
+stashDecor.classList.add('stash-decor')
+
+wrapper.append(controlsWrapper)
+wrapper.append(localVideo)
+wrapper.append(stashDecor)
+document.body.append(wrapper)
+
+//#region fullscreen control
+
 function isFullscreen() {
 	return document.fullscreenElement === wrapper
 }
@@ -91,35 +123,9 @@ async function toggleFullscreen() {
 	}
 }
 
-const fullscreenButton = createIconButton(mdiFullscreen)
-fullscreenButton.title = 'Full screen'
-fullscreenButton.addEventListener('click', toggleFullscreen)
-wrapper.addEventListener('fullscreenchange', updateFullscreenStyle)
-controlsWrapper.append(fullscreenButton)
+//#endregion
 
-// Firefox and Android Webview (kinda irrelevant) doesn't support PiP API yet
-if (localVideo.requestPictureInPicture) {
-	const pipButton = createIconButton(mdiPip)
-	pipButton.title = 'Enter picture-in-picture'
-	pipButton.addEventListener('click', () => {
-		localVideo.requestPictureInPicture()
-	})
-	localVideo.addEventListener('enterpictureinpicture', () => {
-		wrapper.classList.add('picture-in-picture')
-	})
-	localVideo.addEventListener('leavepictureinpicture', () => {
-		wrapper.classList.remove('picture-in-picture')
-	})
-	controlsWrapper.append(pipButton)
-}
-
-const stashDecor = document.createElement('div')
-stashDecor.classList.add('stash-decor')
-
-wrapper.append(controlsWrapper)
-wrapper.append(localVideo)
-wrapper.append(stashDecor)
-document.body.append(wrapper)
+//#region show/hide controls
 
 let hideControlsTimeout: number | undefined
 let keyboardFocusedControl = false
@@ -222,6 +228,7 @@ controlsWrapper.addEventListener('pointerleave', () => {
 
 // Don't know any better way to detect if it's from a tab or click
 // Inspired by https://github.com/WICG/focus-visible
+
 let hasKeyboardEvent = false
 
 controlsWrapper.addEventListener('focusin', (ev) => {
@@ -250,6 +257,10 @@ window.addEventListener('keydown', (ev) => {
 	}
 	hasKeyboardEvent = true
 })
+
+//#endregion
+
+//#region dragging
 
 let pointerDown = false
 let videoX = -20
@@ -396,3 +407,5 @@ window.addEventListener('pointerup', () => {
 		refreshHideOnIdle()
 	}
 })
+
+//#endregion
