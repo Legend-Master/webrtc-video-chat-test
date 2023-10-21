@@ -6,6 +6,8 @@ import mdiFullscreen from 'iconify-icon:mdi/fullscreen'
 import mdiFullscreenExit from 'iconify-icon:mdi/fullscreen-exit'
 import mdiPip from 'iconify-icon:mdi/picture-in-picture-bottom-right'
 
+import './floatingVideo.css'
+
 export const localVideo = bindVideo()
 
 export function showLocalVideo() {
