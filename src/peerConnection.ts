@@ -23,12 +23,8 @@ import {
 	videoState,
 } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
-import { closeDialog, openDialogModal } from './styleHelper/dialog'
 import { localVideo, showLocalVideo } from './floatingVideo'
-
-const shareUrlPopup = document.getElementById('share-url-popup') as HTMLDialogElement
-const shareUrlButton = document.getElementById('share-url-button') as HTMLButtonElement
-const shareUrlServerButton = document.getElementById('share-url-server-button') as HTMLButtonElement
+import { closeShareDialog, isShareDialogOpen, openShareDialog } from './shareDialog'
 
 type PeerType = 'offer' | 'answer'
 
@@ -70,33 +66,6 @@ const STATES = {
 	connectedRemoteOffer: '🟡 Waiting for connection for new channel',
 } as const
 
-async function share(url: string) {
-	// Firefox desktop and Android Webview doesn't support this yet
-	if ('share' in navigator) {
-		try {
-			await navigator.share({ title: url, url })
-		} catch (error) {
-			if (error instanceof DOMException && error.name === 'AbortError') {
-				return
-			}
-			throw error
-		}
-	} else {
-		// Fallback to copy to clipboard
-		// TODO: make it respond with an UI change to indicate copied
-		;(navigator as Navigator).clipboard.writeText(url)
-	}
-}
-shareUrlButton.addEventListener('click', () => {
-	share(location.toString())
-})
-shareUrlServerButton.addEventListener('click', () => {
-	const servers = JSON.stringify(getIceServers())
-	const params = new URLSearchParams(location.search)
-	params.append('servers', servers)
-	share(`${location.origin}${location.pathname}?${params}`)
-})
-
 async function playDisconnectSound() {
 	const stream = await fetch(new URL('/media/audio/disconnect.mp3', import.meta.url))
 	const ctx = new AudioContext()
@@ -114,12 +83,12 @@ function IndicateConnectionState(state: keyof typeof STATES) {
 	currentConnectionState = state
 
 	if (state === 'localOffer') {
-		if (!shareUrlPopup.open) {
-			openDialogModal(shareUrlPopup, true)
+		if (!isShareDialogOpen()) {
+			openShareDialog()
 		}
 	} else {
-		if (shareUrlPopup.open) {
-			closeDialog(shareUrlPopup)
+		if (isShareDialogOpen()) {
+			closeShareDialog()
 		}
 	}
 	if (state === 'disconnected') {
