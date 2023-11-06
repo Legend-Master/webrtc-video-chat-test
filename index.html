@@ -103,13 +103,23 @@
 			</div>
 		</dialog>
 		<main>
+			<div class="title hidden-after-call">
+				<img src="./public/favicon.svg" alt="Logo" />
+				<h1>WebRTC Chat Test</h1>
+			</div>
+			<div id="room-edit-container" class="hidden-after-call">
+				<label>
+					Room ID:
+					<input type="text" id="room-input" placeholder="Leave blank for random" />
+				</label>
+			</div>
 			<div id="pc-control-div" class="hidden-after-call">
 				<button id="start-button">Start</button>
 				<button id="config-ice" class="icon-button" title="Config ICE servers">
 					<iconify-icon icon="mdi:cog"></iconify-icon>
 				</button>
 			</div>
-			<div class="shown-after-call" hidden>
+			<div class="shown-after-call">
 				<div id="connection-state-indicator">🟡 Connecting to server</div>
 			</div>
 			<div id="device-select-div">
@@ -139,11 +149,11 @@
 				<!-- <select id="audio-select"></select> -->
 				<!-- </div> -->
 			</div>
-			<div class="video-container">
-				<video id="remote-video" playsinline controls autoplay></video>
+			<div class="video-container shown-after-call">
+				<video id="remote-video" playsinline autoplay></video>
 			</div>
 		</main>
-		<footer>
+		<footer class="hidden-after-call">
 			<a href="https://github.com/Legend-Master/webrtc-video-chat-test">View source on Github</a>
 		</footer>
 	</body>

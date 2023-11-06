@@ -16,16 +16,29 @@ export function createRoom() {
 	if (!roomId) {
 		const id = push(ref(db, DB_PATH)).key
 		if (id) {
-			setRoom(id)
-			history.pushState(null, '', `?room=${roomId}`)
+			setRoom(id, true)
 		} else {
-			throw new Error("Can't get a new unique room id");
+			throw new Error("Can't get a new unique room id")
 		}
 	}
 	return roomId
 }
 
-function setRoom(id: string) {
+export function setRoom(id: string, pushHistory = false) {
 	roomId = id
 	room = `${DB_PATH}/${roomId}`
+
+	const url = new URL(location.href)
+
+	if (roomId === '') {
+		url.searchParams.delete('room')
+	} else {
+		url.searchParams.set('room', roomId)
+	}
+
+	if (pushHistory) {
+		history.pushState(null, '', url)
+	} else {
+		history.replaceState(null, '', url)
+	}
 }

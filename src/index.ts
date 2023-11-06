@@ -4,30 +4,20 @@ import './styleHelper/touchResponse'
 import './styleHelper/dialog'
 import './styleHelper/video'
 
+import './roomEdit'
 import './iceServerData'
 import './selectDevice'
 import './peerConnection'
 import './keyBoardControls'
+import './remoteVideo'
 
 import { createRoom } from './util/room'
 import { startPeerConnection } from './peerConnection'
 
 const startBtn = document.getElementById('start-button') as HTMLButtonElement
 
-const hiddenAfterCall = document.getElementsByClassName(
-	'hidden-after-call'
-) as HTMLCollectionOf<HTMLElement>
-const shownAfterCall = document.getElementsByClassName(
-	'shown-after-call'
-) as HTMLCollectionOf<HTMLElement>
-
 async function updateHideStyle() {
-	for (const el of hiddenAfterCall) {
-		el.hidden = true
-	}
-	for (const el of shownAfterCall) {
-		el.hidden = false
-	}
+	document.documentElement.classList.add('call-started')
 }
 
 startBtn.addEventListener('click', () => {
@@ -37,6 +27,6 @@ startBtn.addEventListener('click', () => {
 		updateHideStyle()
 	}
 
-	createRoom()
-	startPeerConnection()
+	// createRoom()
+	// startPeerConnection()
 })

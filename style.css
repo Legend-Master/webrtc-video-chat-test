@@ -129,18 +129,79 @@ code {
 	text-align: start;
 }
 
-main {
+:root:not(.call-started) body {
 	height: 100vh;
 	height: 100svh;
 
+	display: grid;
+	grid-template-rows: 2fr 1fr;
+}
+
+:root:not(.call-started) main {
+	background-color: #ffffff;
+	width: 100%;
+	max-width: 90vw;
+	margin: 10px auto;
+	box-shadow: 0 0 3px var(--half-transparent);
+	border-radius: 1em;
+
+	display: grid;
+	justify-content: center;
+	align-content: center;
+}
+
+main .title {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1em;
+}
+
+main .title img {
+	width: 48px;
+	height: 48px;
+}
+
+main .title h1 {
+	font-size: 1.5em;
+	color: #202124;
+}
+
+#room-edit-container {
+	display: grid;
+	justify-content: center;
+}
+
+#room-edit-container label {
+	display: grid;
+    align-items: center;
+	grid-template-columns: auto auto;
+	width: 300px;
+}
+
+main {
 	display: grid;
 	grid-template-rows: min-content min-content auto;
 	gap: 1em;
 }
 
+:root.call-started main {
+	height: 100vh;
+	height: 100svh;
+}
+
 footer {
 	margin: 1em 0;
 	text-align: center;
+	align-self: self-end;
+}
+
+:root:not(.call-started) .shown-after-call {
+	display: none !important;
+}
+
+:root.call-started .hidden-after-call {
+	display: none !important;
 }
 
 .flex-container {
@@ -569,17 +630,47 @@ because it's impossible to do transition/animation only on switching state away 
 	font-size: 2em;
 }
 
-::view-transition-old(root),
+/* ::view-transition-old(root),
 ::view-transition-new(root) {
 	animation-duration: 0s;
-}
+} */
 
-.shown-after-call,
+/* .shown-after-call,
 .hidden-after-call {
 	view-transition-name: default-transition;
-}
+} */
+/* #device-select-div {
+	view-transition-name: default-transition;
+} */
 
-::view-transition-old(default-transition),
+/* ::view-transition-old(default-transition),
 ::view-transition-new(default-transition) {
 	animation-duration: 0.3s;
+} */
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes fade-out {
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes scale-up {
+	to {
+		scale: 1.5;
+	}
+}
+
+::view-transition-old(root) {
+	animation: 90ms cubic-bezier(0.4, 0, 1, 1) both fade-out,
+		300ms cubic-bezier(0.4, 0, 0.2, 1) both scale-up;
+}
+
+::view-transition-new(root) {
+	animation: 210ms cubic-bezier(0, 0, 0.2, 1) 90ms both fade-in
 }
