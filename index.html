@@ -102,62 +102,67 @@
 				</button>
 			</div>
 		</dialog>
-		<main>
-			<div class="title hidden-after-call">
-				<img src="./public/favicon.svg" alt="Logo" />
-				<h1>WebRTC Chat Test</h1>
-			</div>
-			<div id="room-edit-container" class="hidden-after-call">
-				<label>
-					Room ID:
-					<input type="text" id="room-input" placeholder="Leave blank for random" />
-				</label>
-			</div>
-			<div id="pc-control-div" class="hidden-after-call">
-				<button id="start-button">Start</button>
-				<button id="config-ice" class="icon-button" title="Config ICE servers">
-					<iconify-icon icon="mdi:cog"></iconify-icon>
-				</button>
-			</div>
-			<div class="shown-after-call">
-				<div id="connection-state-indicator">🟡 Connecting to server</div>
-			</div>
-			<div id="device-select-div">
-				<div>
-					<button id="toggle-video" class="icon-button" title="Turn off camera">
-						<iconify-icon icon="mdi:video"></iconify-icon>
+		<div id="root">
+			<main>
+				<!-- <div class="title hidden-after-call">
+					<div>
+						<img src="./public/favicon.svg" alt="Logo" />
+						<h1>WebRTC Chat Test</h1>
+					</div>
+					<h5>Click start to join a random room or choose one your own</h5>
+				</div> -->
+				<div id="pc-control-div" class="hidden-after-call">
+					<button id="start-button">Start</button>
+					<button id="config-ice" class="icon-button" title="Config ICE servers">
+						<iconify-icon icon="mdi:cog"></iconify-icon>
 					</button>
-					<select id="video-select" title="Select video source"></select>
 				</div>
-				<div>
-					<select id="video-resolution-select" title="Select video resolution constraint">
-						<option value="">No resolution limit</option>
-						<option value="1440">1440</option>
-						<option value="1080">1080</option>
-						<option value="720">720</option>
-						<option value="480">480</option>
-						<option value="360">360</option>
-					</select>
-					<!-- <select> -->
-					<!-- <option value="120">120 fps</option> -->
-					<!-- <option value="60">60 fps</option> -->
-					<!-- <option value="30">30 fps</option> -->
-					<!-- </select> -->
+				<div id="room-edit-container" class="hidden-after-call">
+					<label>
+						Room
+						<input type="text" id="room-input" placeholder="Leave blank for random" />
+					</label>
 				</div>
-				<!-- <div> -->
-				<!-- <label for="audio-select">Select Microphone/Audio</label> -->
-				<!-- <select id="audio-select"></select> -->
-				<!-- </div> -->
-			</div>
-			<div class="video-container shown-after-call">
-				<video id="remote-video" playsinline autoplay></video>
-			</div>
-		</main>
-		<footer class="hidden-after-call">
-			<a href="https://github.com/Legend-Master/webrtc-video-chat-test">
-				<iconify-icon icon="mdi:github"></iconify-icon>
-				View source on Github
-			</a>
-		</footer>
+				<div class="shown-after-call">
+					<div id="connection-state-indicator">🟡 Connecting to server</div>
+				</div>
+				<div id="device-select-div">
+					<div>
+						<button id="toggle-video" class="icon-button" title="Turn off camera">
+							<iconify-icon icon="mdi:video"></iconify-icon>
+						</button>
+						<select id="video-select" title="Select video source"></select>
+					</div>
+					<div>
+						<select id="video-resolution-select" title="Select video resolution constraint">
+							<option value="">No resolution limit</option>
+							<option value="1440">1440</option>
+							<option value="1080">1080</option>
+							<option value="720">720</option>
+							<option value="480">480</option>
+							<option value="360">360</option>
+						</select>
+						<!-- <select> -->
+						<!-- <option value="120">120 fps</option> -->
+						<!-- <option value="60">60 fps</option> -->
+						<!-- <option value="30">30 fps</option> -->
+						<!-- </select> -->
+					</div>
+					<!-- <div> -->
+					<!-- <label for="audio-select">Select Microphone/Audio</label> -->
+					<!-- <select id="audio-select"></select> -->
+					<!-- </div> -->
+				</div>
+				<div class="video-container">
+					<video id="remote-video" playsinline autoplay></video>
+				</div>
+			</main>
+			<footer class="hidden-after-call">
+				<a href="https://github.com/Legend-Master/webrtc-video-chat-test">
+					<iconify-icon icon="mdi:github"></iconify-icon>
+					View source on Github
+				</a>
+			</footer>
+		</div>
 	</body>
 </html>
