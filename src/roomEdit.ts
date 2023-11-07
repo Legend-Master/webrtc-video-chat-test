@@ -7,5 +7,13 @@ if (roomInput.value === '') {
 }
 
 roomInput.addEventListener('change', () => {
-    setRoom(roomInput.value)
+	if (roomInput.reportValidity()) {
+		setRoom(roomInput.value)
+	} else {
+        roomInput.setCustomValidity(`Only letter, number, '-', '_' are allowed`)
+    }
+})
+
+roomInput.addEventListener('input', () => {
+    roomInput.setCustomValidity('')
 })

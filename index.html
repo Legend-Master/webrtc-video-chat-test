@@ -120,7 +120,12 @@
 				<div id="room-edit-container" class="hidden-after-call">
 					<label>
 						Room
-						<input type="text" id="room-input" placeholder="Leave blank for random" />
+						<input
+							type="text"
+							id="room-input"
+							pattern="[\-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz]+"
+							placeholder="Leave blank for random"
+						/>
 					</label>
 				</div>
 				<div class="shown-after-call">
