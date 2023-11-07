@@ -570,16 +570,23 @@ because it's impossible to do transition/animation only on switching state away 
 }
 
 ::view-transition-old(root),
-::view-transition-new(root) {
-	animation-duration: 0s;
+::view-transition-new(root),
+::view-transition-old(device-select),
+::view-transition-new(device-select),
+::view-transition-old(video-container),
+::view-transition-new(video-container) {
+	animation: none;
 }
 
-.shown-after-call,
-.hidden-after-call {
-	view-transition-name: default-transition;
+#pc-control-div,
+#connection-state-indicator {
+	view-transition-name: title;
 }
 
-::view-transition-old(default-transition),
-::view-transition-new(default-transition) {
-	animation-duration: 0.3s;
+#device-select-div {
+	view-transition-name: device-select;
+}
+
+#remote-video {
+	view-transition-name: video-container;
 }
