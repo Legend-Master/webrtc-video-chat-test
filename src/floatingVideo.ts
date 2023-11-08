@@ -72,11 +72,11 @@ function isFullscreen() {
 function updateFullscreenStyle() {
 	if (isFullscreen()) {
 		fullscreenButton.innerHTML = mdiFullscreenExit
-		fullscreenButton.title = 'Full screen'
+		fullscreenButton.title = 'Exit full screen'
 		wrapper.classList.add('fullscreen')
 	} else {
 		fullscreenButton.innerHTML = mdiFullscreen
-		fullscreenButton.title = 'Exit full screen'
+		fullscreenButton.title = 'Full screen'
 		wrapper.classList.remove('fullscreen')
 		try {
 			screen.orientation.unlock()
