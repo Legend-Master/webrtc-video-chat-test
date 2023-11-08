@@ -27,9 +27,14 @@
 		<dialog id="welcome-dialog">
 			<form method="dialog">
 				<h2 title="Deny this will make some of features unavailable">
-					This site requires video permission to work
+					This site needs camera permission for these reasons
 				</h2>
-				<button id="request-permission" type="submit">request permission</button>
+				<ul>
+					<li>Enable WebRTC discovery through all network adapters</li>
+					<li>Show all available cameras</li>
+					<li>And of course if you want to share your camera</li>
+				</ul>
+				<button id="request-permission" type="submit">Request permission</button>
 			</form>
 		</dialog>
 		<dialog id="config-ice-dialog">

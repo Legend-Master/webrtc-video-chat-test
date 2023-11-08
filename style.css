@@ -346,11 +346,19 @@ because it's impossible to do transition/animation only on switching state away 
 #welcome-dialog > form {
 	padding: 2em 1em;
 	max-width: 450px;
-	text-align: center;
+
+	display: grid;
+	justify-items: center;
+	gap: 1em;
+	line-height: 1.5;
 }
 #welcome-dialog > form > h2 {
-	margin-top: 0;
-	margin-bottom: 1.5em;
+	text-align: center;
+	margin: 0;
+}
+#welcome-dialog > form ul {
+	display: grid;
+	gap: 0.25em;
 }
 
 #config-ice-dialog {
