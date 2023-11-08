@@ -27,9 +27,14 @@
 		<dialog id="welcome-dialog">
 			<form method="dialog">
 				<h2 title="Deny this will make some of features unavailable">
-					This site requires video permission to work
+					This site needs camera permission for these reasons
 				</h2>
-				<button id="request-permission" type="submit">request permission</button>
+				<ul>
+					<li>Enable WebRTC discovery through all network adapters</li>
+					<li>Show all available cameras</li>
+					<li>And of course if you want to share your camera</li>
+				</ul>
+				<button id="request-permission" type="submit">Request permission</button>
 			</form>
 		</dialog>
 		<dialog id="config-ice-dialog">
@@ -90,15 +95,25 @@
 		</dialog>
 		<dialog id="share-url-popup">
 			<div>
-				<button id="share-url-button" class="icon-button">
-					<!-- <iconify-icon icon="fluent-mdl2:share"></iconify-icon> -->
+				<div class="url-and-button">
+					<input id="share-url-input" type="text" readonly />
+					<button id="share-copy-url-button" class="icon-button copy-button" title="Copy URL">
+						<span></span>
+					</button>
+				</div>
+				<div class="options">
+					<label title="Make receiver use the same ICE servers as yours">
+						<input type="checkbox" id="share-url-servers-toggle" />
+						With ICE servers
+					</label>
+					<label title="Make receiver start the call automatically without sharing the screen">
+						<input type="checkbox" id="share-url-auto-start-toggle" />
+						Auto start
+					</label>
+				</div>
+				<button id="share-url-button" autofocus>
 					<iconify-icon icon="mdi:share"></iconify-icon>
-					Share
-				</button>
-				<button id="share-url-server-button" class="icon-button">
-					<!-- <iconify-icon icon="fluent-mdl2:share"></iconify-icon> -->
-					<iconify-icon icon="mdi:share"></iconify-icon>
-					Share With Servers
+					Share link
 				</button>
 			</div>
 		</dialog>

@@ -346,11 +346,19 @@ because it's impossible to do transition/animation only on switching state away 
 #welcome-dialog > form {
 	padding: 2em 1em;
 	max-width: 450px;
-	text-align: center;
+
+	display: grid;
+	justify-items: center;
+	gap: 1em;
+	line-height: 1.5;
 }
 #welcome-dialog > form > h2 {
-	margin-top: 0;
-	margin-bottom: 1.5em;
+	text-align: center;
+	margin: 0;
+}
+#welcome-dialog > form ul {
+	display: grid;
+	gap: 0.25em;
 }
 
 #config-ice-dialog {
@@ -466,107 +474,6 @@ because it's impossible to do transition/animation only on switching state away 
 
 .export-container button {
 	font-size: 1.3em;
-}
-
-.copy-button > span {
-	--copy-icon: url(iconify-icon:mdi/content-copy);
-	--check-icon: url(iconify-icon:mdi/check);
-	width: 1em;
-	height: 1em;
-	background-color: currentColor;
-	mask-image: var(--copy-icon);
-	mask-repeat: no-repeat;
-	mask-size: 100% 100%;
-}
-
-.copy-button.success > span {
-	animation: zoom-fade linear, swap-icon step-end, zoom-fade linear, swap-icon step-end;
-	animation-duration: 200ms;
-	animation-fill-mode: forwards;
-	animation-delay: 0s, 0s, 2s, 2s;
-	animation-direction: normal, normal, reverse, reverse;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.copy-button.success > span {
-		animation-duration: 0s;
-	}
-}
-
-@keyframes zoom-fade {
-	0% {
-		scale: 100%;
-		opacity: 1;
-	}
-	50% {
-		scale: 60%;
-		opacity: 0.6;
-	}
-	100% {
-		scale: 100%;
-		opacity: 1;
-	}
-}
-
-@keyframes swap-icon {
-	0% {
-		mask-image: var(--copy-icon);
-	}
-	50% {
-		mask-image: var(--check-icon);
-	}
-	100% {
-		mask-image: var(--check-icon);
-	}
-}
-
-#share-url-popup {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	margin: auto;
-	z-index: var(--popup-z-index);
-
-	width: max-content;
-	box-shadow: 0px -2px 10px 2px rgba(0, 0, 0, 0.15);
-	background-color: white;
-}
-
-@media (width < 500px) {
-	#share-url-popup {
-		width: 100vw;
-	}
-}
-
-@media (prefers-reduced-motion: no-preference) {
-	#share-url-popup {
-		transition: 0.3s;
-	}
-
-	/* Not using it directly on modal is because transition can't work with display none */
-	#share-url-popup[open].closed {
-		scale: unset;
-		translate: 0 3em;
-	}
-}
-
-#share-url-popup > div {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 0.5em;
-	margin: 1em;
-}
-
-#share-url-popup button {
-	display: grid;
-	align-items: center;
-	justify-items: center;
-	gap: 0.5em;
-}
-
-#share-url-popup svg {
-	font-size: 2em;
 }
 
 ::view-transition-old(root),
