@@ -41,7 +41,7 @@ shareUrlButton.addEventListener('click', () => {
 
 shareUrlServerButton.addEventListener('click', () => {
 	const servers = JSON.stringify(getIceServers())
-	const params = new URLSearchParams(location.search)
-	params.append('servers', servers)
-	share(`${location.origin}${location.pathname}?${params}`)
+	const url = new URL(location.href)
+	url.searchParams.append('servers', servers)
+	share(url.toString())
 })

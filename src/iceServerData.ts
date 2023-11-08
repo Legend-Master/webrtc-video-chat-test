@@ -140,9 +140,9 @@ exportIceButton.addEventListener('click', () => {
 	const servers = JSON.stringify(getIceServers())
 	exportJson.innerText = servers
 
-	const params = new URLSearchParams(location.search)
-	params.append('servers', servers)
-	exportUrl.innerText = `${location.origin}${location.pathname}?${params}`
+	const url = new URL(location.href)
+	url.searchParams.append('servers', servers)
+	exportUrl.innerText = url.toString()
 })
 function addCopyButtonOnClick(targetElement: HTMLElement) {
 	return async function (this: HTMLButtonElement) {
