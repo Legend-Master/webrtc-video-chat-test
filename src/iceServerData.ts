@@ -3,6 +3,7 @@ import { createIconButton } from './styleHelper/iconButton'
 
 import mdiPencil from 'iconify-icon:mdi/pencil'
 import mdiDelete from 'iconify-icon:mdi/delete'
+import { attachCopyButton } from './styleHelper/copyButton'
 
 type IceServer = Omit<RTCIceServer, 'urls'> & {
 	urls: string
@@ -141,30 +142,11 @@ exportIceButton.addEventListener('click', () => {
 	exportJson.innerText = servers
 
 	const url = new URL(location.href)
-	url.searchParams.append('servers', servers)
+	url.searchParams.set('servers', servers)
 	exportUrl.innerText = url.toString()
 })
-function addCopyButtonOnClick(targetElement: HTMLElement) {
-	return async function (this: HTMLButtonElement) {
-		navigator.clipboard.writeText(targetElement.innerText)
-		if (this.classList.contains('success')) {
-			return
-		}
-		this.classList.add('success')
-		// Remove success class on any animation cancel event (most likely from closing the dialog)
-		// or after all animations have finished
-		const animationCancelPromise = new Promise<void>((resolve) => {
-			this.addEventListener('animationcancel', () => resolve(), { once: true })
-		})
-		await Promise.any([
-			animationCancelPromise,
-			Promise.all(this.firstElementChild!.getAnimations().map((animation) => animation.finished)),
-		])
-		this.classList.remove('success')
-	}
-}
-copyJson.addEventListener('click', addCopyButtonOnClick(exportJson))
-copyUrl.addEventListener('click', addCopyButtonOnClick(exportUrl))
+attachCopyButton(copyJson, () => exportJson.innerText)
+attachCopyButton(copyUrl, () => exportUrl.innerText)
 
 function setIceFormValues(server?: IceServer) {
 	if (server) {

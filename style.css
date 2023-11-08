@@ -476,58 +476,6 @@ because it's impossible to do transition/animation only on switching state away 
 	font-size: 1.3em;
 }
 
-.copy-button > span {
-	--copy-icon: url(iconify-icon:mdi/content-copy);
-	--check-icon: url(iconify-icon:mdi/check);
-	width: 1em;
-	height: 1em;
-	background-color: currentColor;
-	mask-image: var(--copy-icon);
-	mask-repeat: no-repeat;
-	mask-size: 100% 100%;
-}
-
-.copy-button.success > span {
-	animation: zoom-fade linear, swap-icon step-end, zoom-fade linear, swap-icon step-end;
-	animation-duration: 200ms;
-	animation-fill-mode: forwards;
-	animation-delay: 0s, 0s, 2s, 2s;
-	animation-direction: normal, normal, reverse, reverse;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.copy-button.success > span {
-		animation-duration: 0s;
-	}
-}
-
-@keyframes zoom-fade {
-	0% {
-		scale: 100%;
-		opacity: 1;
-	}
-	50% {
-		scale: 60%;
-		opacity: 0.6;
-	}
-	100% {
-		scale: 100%;
-		opacity: 1;
-	}
-}
-
-@keyframes swap-icon {
-	0% {
-		mask-image: var(--copy-icon);
-	}
-	50% {
-		mask-image: var(--check-icon);
-	}
-	100% {
-		mask-image: var(--check-icon);
-	}
-}
-
 #share-url-popup {
 	position: fixed;
 	bottom: 0;
