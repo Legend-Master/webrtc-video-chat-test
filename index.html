@@ -95,15 +95,25 @@
 		</dialog>
 		<dialog id="share-url-popup">
 			<div>
-				<button id="share-url-button" class="icon-button">
-					<!-- <iconify-icon icon="fluent-mdl2:share"></iconify-icon> -->
+				<div class="url-and-button">
+					<input id="share-url-input" type="text" readonly />
+					<button id="share-copy-url-button" class="icon-button copy-button" title="Copy URL">
+						<span></span>
+					</button>
+				</div>
+				<div class="options">
+					<label title="Make receiver use the same ICE servers as yours">
+						<input type="checkbox" id="share-url-servers-toggle" />
+						With ICE servers
+					</label>
+					<label title="Make receiver start the call automatically without sharing the screen">
+						<input type="checkbox" id="share-url-auto-start-toggle" />
+						Auto start
+					</label>
+				</div>
+				<button id="share-url-button" autofocus>
 					<iconify-icon icon="mdi:share"></iconify-icon>
-					Share
-				</button>
-				<button id="share-url-server-button" class="icon-button">
-					<!-- <iconify-icon icon="fluent-mdl2:share"></iconify-icon> -->
-					<iconify-icon icon="mdi:share"></iconify-icon>
-					Share With Servers
+					Share link
 				</button>
 			</div>
 		</dialog>

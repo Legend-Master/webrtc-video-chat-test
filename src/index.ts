@@ -11,6 +11,7 @@ import './keyBoardControls'
 
 import { createRoom } from './util/room'
 import { startPeerConnection } from './peerConnection'
+import { setVideoState, welcomeDone } from './selectDevice'
 
 const startBtn = document.getElementById('start-button') as HTMLButtonElement
 
@@ -30,7 +31,7 @@ async function updateHideStyle() {
 	}
 }
 
-startBtn.addEventListener('click', () => {
+function start() {
 	if (document.startViewTransition) {
 		document.startViewTransition(updateHideStyle)
 	} else {
@@ -39,4 +40,16 @@ startBtn.addEventListener('click', () => {
 
 	createRoom()
 	startPeerConnection()
-})
+}
+startBtn.addEventListener('click', start)
+
+async function handleAutoStart() {
+	const searchParams = new URLSearchParams(location.search)
+	const shouldAutoStart = searchParams.get('auto-start') === 'true'
+	if (shouldAutoStart) {
+		setVideoState(false)
+		await welcomeDone
+		start()
+	}
+}
+handleAutoStart()

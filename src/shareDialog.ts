@@ -1,20 +1,36 @@
 import { getIceServers } from './iceServerData'
 import { closeDialog, openDialogModal } from './styleHelper/dialog'
+import { attachCopyButton } from './styleHelper/copyButton'
+
+import './shareDialog.css'
 
 const shareUrlPopup = document.getElementById('share-url-popup') as HTMLDialogElement
+const shareUrlInput = document.getElementById('share-url-input') as HTMLInputElement
+const copyUrlButton = document.getElementById('share-copy-url-button') as HTMLButtonElement
+const serversToggle = document.getElementById('share-url-servers-toggle') as HTMLInputElement
+const autoStartToggle = document.getElementById('share-url-auto-start-toggle') as HTMLInputElement
 const shareUrlButton = document.getElementById('share-url-button') as HTMLButtonElement
-const shareUrlServerButton = document.getElementById('share-url-server-button') as HTMLButtonElement
+
+let link = ''
+
+attachCopyButton(copyUrlButton, () => link)
+serversToggle.addEventListener('change', updateShareLink)
+autoStartToggle.addEventListener('change', updateShareLink)
+shareUrlButton.addEventListener('click', () => {
+	share(link)
+})
 
 export function openShareDialog() {
-    openDialogModal(shareUrlPopup, true)
+	updateShareLink()
+	openDialogModal(shareUrlPopup, true)
 }
 
 export function closeShareDialog() {
-    closeDialog(shareUrlPopup)
+	closeDialog(shareUrlPopup)
 }
 
 export function isShareDialogOpen() {
-    return shareUrlPopup.open
+	return shareUrlPopup.open
 }
 
 async function share(url: string) {
@@ -35,13 +51,20 @@ async function share(url: string) {
 	}
 }
 
-shareUrlButton.addEventListener('click', () => {
-	share(location.toString())
-})
-
-shareUrlServerButton.addEventListener('click', () => {
-	const servers = JSON.stringify(getIceServers())
+function updateShareLink() {
 	const url = new URL(location.href)
-	url.searchParams.append('servers', servers)
-	share(url.toString())
-})
+	for (const [key, value] of url.searchParams) {
+		if (key !== 'room') {
+			url.searchParams.delete(key)
+		}
+	}
+	if (serversToggle.checked) {
+		const servers = JSON.stringify(getIceServers())
+		url.searchParams.set('servers', servers)
+	}
+	if (autoStartToggle.checked) {
+		url.searchParams.set('auto-start', 'true')
+	}
+	link = url.toString()
+	shareUrlInput.value = link
+}

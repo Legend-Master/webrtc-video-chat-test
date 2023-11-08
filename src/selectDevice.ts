@@ -19,27 +19,28 @@ const videoSelect = document.getElementById('video-select') as HTMLSelectElement
 const resolutionSelect = document.getElementById('video-resolution-select') as HTMLSelectElement
 // const audioSelect = document.getElementById('audio-select') as HTMLSelectElement
 
-;(async function () {
-	let shouldPopulate = true
-	let hasPermission = false
+export const welcomeDone = new Promise<void>(async (resolve) => {
+	let state: PermissionState | undefined
 	try {
 		// Firefox doesn't have camera query
-		// Lower version Safari and Android WebView doesn't have navigator.permissions
+		// Android WebView and lower version Safari doesn't have navigator.permissions
 		const status = await navigator.permissions.query({ name: 'camera' as PermissionName })
-		if (status.state === 'prompt') {
-			openDialogModal(welcomeDialog)
-			shouldPopulate = false
-		}
-		hasPermission = status.state === 'granted'
+		state = status.state
 	} catch {}
-	if (shouldPopulate) {
-		await populateMediaSelection(hasPermission)
+	if (state === 'prompt') {
+		openDialogModal(welcomeDialog)
+		welcomeDialog.addEventListener('submit', async () => {
+			await populateMediaSelection()
+			resolve()
+		})
+	} else {
+		await populateMediaSelection(state === 'granted')
+		resolve()
 	}
-})()
+})
 welcomeDialog.addEventListener('cancel', (ev) => {
 	ev.preventDefault()
 })
-welcomeDialog.addEventListener('submit', () => populateMediaSelection())
 
 export let videoState: boolean
 type StateChangeListener = (state: boolean) => void
