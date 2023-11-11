@@ -1,4 +1,8 @@
-// From webrtc-adapter: https://github.com/webrtcHacks/adapter (BSD-3-Clause license)
+/**
+ * @license
+ * webrtc-adapter: https://github.com/webrtcHacks/adapter/blob/28c9f9471cb3df75cbb978c6f840e3315731790f/src/js/common_shim.js#L292
+ * BSD 3-Clause
+ */
 
 /* shims RTCConnectionState by pretending it is the same as iceConnectionState.
  * See https://bugs.chromium.org/p/webrtc/issues/detail?id=6145#c12
@@ -40,7 +44,6 @@ function shimConnectionState(window) {
 		enumerable: true,
 		configurable: true,
 	})
-
 	;['setLocalDescription', 'setRemoteDescription'].forEach((method) => {
 		const origMethod = proto[method]
 		proto[method] = function () {
