@@ -349,6 +349,7 @@ async function addMedia() {
 	onDeviceSelectChange(addMediaInternal)
 	onVideoStateChange(addMediaInternal)
 	onResolutionChange(() => updateParameters(pc, updateResolution))
+	localVideo.addEventListener('resize', () => updateParameters(pc, updateResolution))
 }
 
 async function negotiate(this: RTCPeerConnection) {
