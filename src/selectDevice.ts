@@ -113,20 +113,38 @@ function getVideoSettings(): MediaTrackConstraints {
 	}
 }
 
+// Bug: https://crbug.com/1429161
+// Fixes landed in 116 and 118: https://crrev.com/c/4583587, https://crrev.com/c/4826746
+function shouldWorkAroundChromeBug() {
+	if (!navigator.userAgentData) {
+		// Older version Chrome/Chromium
+		return navigator.userAgent.includes('Chrome')
+	}
+	for (const { brand, version } of navigator.userAgentData.brands) {
+		if (brand === 'Google Chrome' || brand === 'Chromium') {
+			return Number(version) < 118
+		}
+	}
+	return false
+}
+
 export async function getUserMedia() {
 	if (!videoSelect.value) {
 		return
 	}
 	try {
 		if (videoSelect.value === SCREEN_CAPTURE) {
-			return await navigator.mediaDevices.getDisplayMedia({
+			const options = {
 				video: {
 					...getVideoSettings(),
-					width: screen.width * devicePixelRatio,
-					height: screen.height * devicePixelRatio,
 				},
 				audio: true,
-			})
+			} satisfies DisplayMediaStreamOptions
+			if (shouldWorkAroundChromeBug()) {
+				options.video.width = screen.width * devicePixelRatio
+				options.video.height = screen.height * devicePixelRatio
+			}
+			return await navigator.mediaDevices.getDisplayMedia(options)
 		} else {
 			return await navigator.mediaDevices.getUserMedia({
 				video: {
