@@ -1,6 +1,9 @@
 import { getIceServers } from './iceServerData'
 import { closeDialog, openDialogModal } from './styleHelper/dialog'
 import { attachCopyButton } from './styleHelper/copyButton'
+import { createIcon } from './styleHelper/icon'
+
+import mdiShare from 'iconify-icon:mdi/share'
 
 import './shareDialog.css'
 
@@ -9,16 +12,39 @@ const shareUrlInput = document.getElementById('share-url-input') as HTMLInputEle
 const copyUrlButton = document.getElementById('share-copy-url-button') as HTMLButtonElement
 const serversToggle = document.getElementById('share-url-servers-toggle') as HTMLInputElement
 const autoStartToggle = document.getElementById('share-url-auto-start-toggle') as HTMLInputElement
-const shareUrlButton = document.getElementById('share-url-button') as HTMLButtonElement
 
 let link = ''
 
 attachCopyButton(copyUrlButton, () => link)
 serversToggle.addEventListener('change', updateShareLink)
 autoStartToggle.addEventListener('change', updateShareLink)
-shareUrlButton.addEventListener('click', () => {
-	share(link)
-})
+
+// Firefox desktop and Android Webview doesn't support this yet
+if ('share' in navigator) {
+	const shareUrlButton = document.createElement('button')
+	shareUrlButton.id = 'share-url-button'
+
+	const icon = createIcon(mdiShare)
+	shareUrlButton.append(icon)
+
+	const text = document.createElement('span')
+	text.innerText = 'Share link'
+	shareUrlButton.append(text)
+
+	shareUrlButton.addEventListener('click', async () => {
+		try {
+			await navigator.share({ title: link, url: link })
+		} catch (error) {
+			if (error instanceof DOMException && error.name === 'AbortError') {
+				return
+			}
+			throw error
+		}
+	})
+
+	const wrapper = shareUrlPopup.firstElementChild as HTMLDivElement
+	wrapper.append(shareUrlButton)
+}
 
 export function openShareDialog() {
 	updateShareLink()
@@ -31,24 +57,6 @@ export function closeShareDialog() {
 
 export function isShareDialogOpen() {
 	return shareUrlPopup.open
-}
-
-async function share(url: string) {
-	// Firefox desktop and Android Webview doesn't support this yet
-	if ('share' in navigator) {
-		try {
-			await navigator.share({ title: url, url })
-		} catch (error) {
-			if (error instanceof DOMException && error.name === 'AbortError') {
-				return
-			}
-			throw error
-		}
-	} else {
-		// Fallback to copy to clipboard
-		// TODO: make it respond with an UI change to indicate copied
-		;(navigator as Navigator).clipboard.writeText(url)
-	}
 }
 
 function updateShareLink() {
