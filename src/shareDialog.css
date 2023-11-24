@@ -19,11 +19,10 @@
 
 @media (prefers-reduced-motion: no-preference) {
 	#share-url-popup {
-		transition: 0.3s;
+		transition-duration: 0.3s;
 	}
 
-	/* Not using it directly on modal is because transition can't work with display none */
-	#share-url-popup[open].closed {
+	#share-url-popup.closed {
 		scale: unset;
 		translate: 0 3em;
 	}

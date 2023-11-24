@@ -1,8 +1,9 @@
 const shouldReduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+const supportsDiscreteTransition = CSS.supports('transition-behavior', 'allow-discrete')
 
 export function closeDialog(dialog: HTMLDialogElement) {
 	dialog.classList.add('closed')
-	if (shouldReduceMotion.matches) {
+	if (shouldReduceMotion.matches || supportsDiscreteTransition) {
 		dialog.close()
 	} else {
 		dialog.addEventListener('transitionend', () => dialog.close(), { once: true })

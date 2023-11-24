@@ -13,7 +13,7 @@
 - [ ] Pop a notification (maybe toast) on copy
 - [ ] Make add/edit ICE form nicer to use
     - Use radio buttons to select stun/turn(s)?
-- [ ] Make dialogs behave like closed when playing closing animation
+- [x] Make dialogs behave like closed when playing closing animation
 - [ ] Make Android back button work with dialogs
 
 ## Fix

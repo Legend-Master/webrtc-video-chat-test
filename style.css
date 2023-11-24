@@ -55,20 +55,19 @@ dialog::backdrop {
 	background-color: rgba(0, 0, 0, 0.2);
 }
 @media (prefers-reduced-motion: no-preference) {
-	dialog {
-		transition: 0.2s;
-	}
+	dialog,
 	dialog::backdrop {
-		transition: 0.2s;
+		transition-property: all, display, overlay;
+		transition-duration: 0.2s;
+		transition-behavior: allow-discrete !important;
 	}
-	/* Not using it directly on modal is because transition can't work with display none */
-	/* :modal is not supported on firefox yet, use open attribute for now */
-	dialog[open].closed {
+	dialog.closed,
+	dialog.closed::backdrop {
+		opacity: 0;
+		pointer-events: none;
+	}
+	dialog.closed {
 		scale: 95%;
-		opacity: 0;
-	}
-	dialog[open].closed::backdrop {
-		opacity: 0;
 	}
 }
 
