@@ -137,6 +137,7 @@ export async function getUserMedia() {
 			const options = {
 				video: {
 					...getVideoSettings(),
+					displaySurface: 'monitor',
 				},
 				audio: true,
 			} satisfies DisplayMediaStreamOptions
