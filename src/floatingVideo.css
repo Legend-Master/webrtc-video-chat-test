@@ -63,13 +63,6 @@
 	z-index: -1;
 }
 
-/* Chrome only, progressive enhancement */
-@starting-style {
-	#local-video-wrapper .controls-wrapper {
-		opacity: 0;
-	}
-}
-
 #local-video-wrapper.hide-controls:not(.stash) {
 	cursor: none;
 }

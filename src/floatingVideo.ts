@@ -8,6 +8,19 @@ import mdiPip from 'iconify-icon:mdi/picture-in-picture-bottom-right'
 
 import './floatingVideo.css'
 
+// Temp fix for Chrome 117+ to prevent crashing on reload
+// https://crbug.com/1508254
+const styleTag = document.createElement('style')
+styleTag.innerText = `
+/* Chrome only, progressive enhancement */
+@starting-style {
+	#local-video-wrapper .controls-wrapper {
+		opacity: 0;
+	}
+}
+`
+document.head.append(styleTag)
+
 export const localVideo = bindVideo()
 
 export function showLocalVideo() {
