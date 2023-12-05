@@ -22,6 +22,7 @@ onVideoStateChange((state) => {
 
 localVideo.id = 'local-video'
 localVideo.autoplay = true
+localVideo.muted = true
 // @ts-ignore
 localVideo.playsinline = true
 
