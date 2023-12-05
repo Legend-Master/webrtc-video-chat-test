@@ -61,4 +61,5 @@ for (const dialog of dialogs) {
 	dialog.classList.add('closed')
 	dialog.addEventListener('cancel', closeProxy, { capture: true })
 	dialog.addEventListener('submit', closeProxy, { capture: true })
+	dialog.addEventListener('close', () => dialog.classList.add('closed'))
 }
