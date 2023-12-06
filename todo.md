@@ -14,7 +14,7 @@
 - [ ] Make add/edit ICE form nicer to use
     - Use radio buttons to select stun/turn(s)?
 - [x] Make dialogs behave like closed when playing closing animation
-- [ ] Make Android back button work with dialogs
+- [x] Make Android back button work with dialogs
 
 ## Fix
 
