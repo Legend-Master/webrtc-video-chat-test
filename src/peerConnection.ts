@@ -27,14 +27,52 @@ import { closeShareDialog, isShareDialogOpen, openShareDialog } from './shareDia
 
 type PeerType = 'offer' | 'answer'
 
+const peerConnections = new Set<PeerConnection>()
+
+let stream: MediaStream | undefined
+
+async function changeUserMedia() {
+	if (stream) {
+		for (const track of stream?.getTracks()) {
+			track.stop()
+		}
+		for (const peerConnection of peerConnections) {
+			peerConnection.onStreamStop()
+		}
+	}
+
+	if (!videoState) {
+		return
+	}
+	stream = await getUserMedia()
+	if (!stream) {
+		setVideoState(false)
+		return
+	}
+	// const videoTrack = stream.getVideoTracks()[0]!
+	// console.log(videoTrack.getSettings())
+	// console.log(videoTrack.getCapabilities())
+	// console.log(videoTrack.getConstraints())
+	localVideo.srcObject = stream
+	showLocalVideo()
+
+	for (const peerConnection of peerConnections) {
+		peerConnection.onNewStream()
+	}
+}
+
 export async function startPeerConnection() {
-	return new PeerConnection()
+	await changeUserMedia()
+	onDeviceSelectChange(changeUserMedia)
+	onVideoStateChange(changeUserMedia)
+
+	peerConnections.add(new PeerConnection())
 }
 
 class PeerConnection {
-	OFFER_PLACEHOLDER = ''
-	RENEGOTIATE_CHANNEL_ID = 0
-	VIDEO_STATE_CHANNEL_ID = 1
+	static OFFER_PLACEHOLDER = ''
+	static RENEGOTIATE_CHANNEL_ID = 0
+	static VIDEO_STATE_CHANNEL_ID = 1
 
 	pc: RTCPeerConnection
 	peerType: PeerType | undefined
@@ -47,23 +85,24 @@ class PeerConnection {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
 		this.pc.addEventListener('track', this.onTrack)
 		this.pc.addEventListener('icecandidate', this.onIceCandidate)
+		this.pc.addEventListener('negotiationneeded', this.negotiate)
 		this.pc.addEventListener('signalingstatechange', this.monitorSignalingState)
 		this.pc.addEventListener('connectionstatechange', this.monitorFirstConnected)
 		this.pc.addEventListener('connectionstatechange', this.monitorConnectionState)
 
 		this.renegotiateDataChannel = this.pc.createDataChannel('renegotiate', {
 			negotiated: true,
-			id: this.RENEGOTIATE_CHANNEL_ID,
+			id: PeerConnection.RENEGOTIATE_CHANNEL_ID,
 		})
 		this.renegotiateDataChannel.addEventListener('message', this.onRenegotiateChannelMessage)
 
 		this.videoStateDataChannel = this.pc.createDataChannel('video_state', {
 			negotiated: true,
-			id: this.VIDEO_STATE_CHANNEL_ID,
+			id: PeerConnection.VIDEO_STATE_CHANNEL_ID,
 		})
 		this.videoStateDataChannel.addEventListener('message', this.onRemoteVideoStateChange)
 
-		this.addMedia()
+		this.registerUserMedia()
 	}
 
 	// The one who says "you go first"
@@ -311,26 +350,18 @@ class PeerConnection {
 	}
 
 	senders = new Map<string, RTCRtpSender>()
-	addMediaInternal = async () => {
+
+	onStreamStop() {
 		for (const [_, sender] of this.senders) {
 			sender.track?.stop()
 		}
 		this.sendIfDataChannelOpen(this.videoStateDataChannel, 'false')
-		if (!videoState) {
-			return
-		}
-		const stream = await getUserMedia()
-		if (!stream) {
-			setVideoState(false)
-			return
-		}
-		// const videoTrack = stream.getVideoTracks()[0]!
-		// console.log(videoTrack.getSettings())
-		// console.log(videoTrack.getCapabilities())
-		// console.log(videoTrack.getConstraints())
-		localVideo.srcObject = stream
-		showLocalVideo()
+	}
 
+	async onNewStream() {
+		if (!stream) {
+			return
+		}
 		const promises = []
 		const tracks = stream.getTracks()
 		const firstTrack = tracks[0]
@@ -350,15 +381,10 @@ class PeerConnection {
 		await updateAllParameters(this.pc)
 	}
 
-	async addMedia() {
-		await this.addMediaInternal()
-		onDeviceSelectChange(this.addMediaInternal)
-		onVideoStateChange(this.addMediaInternal)
+	async registerUserMedia() {
+		await this.onNewStream()
 		onResolutionChange(() => updateParameters(this.pc, updateResolution))
 		localVideo.addEventListener('resize', () => updateParameters(this.pc, updateResolution))
-
-		this.pc.addEventListener('negotiationneeded', this.negotiate)
-		await this.negotiate()
 	}
 
 	negotiate = async () => {
@@ -379,9 +405,9 @@ class PeerConnection {
 		// Get if we're 'offer' or 'answer' side first
 		const offerDescRef = ref(db, `${room}/offer/desc`)
 		const result = await runTransaction(offerDescRef, (data) => {
-			if (!data && data !== this.OFFER_PLACEHOLDER) {
+			if (!data && data !== PeerConnection.OFFER_PLACEHOLDER) {
 				// Mark as used, and we're the 'offer' side
-				return this.OFFER_PLACEHOLDER
+				return PeerConnection.OFFER_PLACEHOLDER
 			}
 		})
 		function getPeerType(isOffer: boolean): PeerType {
@@ -426,7 +452,7 @@ class PeerConnection {
 					return
 				}
 				const val = snapshot.val()
-				if (val === this.OFFER_PLACEHOLDER) {
+				if (val === PeerConnection.OFFER_PLACEHOLDER) {
 					return
 				}
 
