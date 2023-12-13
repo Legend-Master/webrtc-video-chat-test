@@ -36,8 +36,7 @@ onVideoStateChange((state) => {
 localVideo.id = 'local-video'
 localVideo.autoplay = true
 localVideo.muted = true
-// @ts-ignore
-localVideo.playsinline = true
+localVideo.playsInline = true
 
 const wrapper = document.createElement('div')
 wrapper.id = 'local-video-wrapper'
