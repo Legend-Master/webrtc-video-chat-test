@@ -7,6 +7,9 @@ import {
 	onChildAdded,
 	runTransaction,
 	onDisconnect,
+	startAfter,
+	query,
+	endBefore,
 } from 'firebase/database'
 import { db } from './util/firebaseInit'
 import { updateBandwidthRestriction } from './util/sdpInject'
@@ -61,12 +64,29 @@ async function changeUserMedia() {
 	}
 }
 
+async function createUserOnRealtimeDatabase() {
+	const userIdRef = push(ref(db, room), { online: true })
+	await Promise.all([userIdRef, onDisconnect(userIdRef).remove()])
+	return userIdRef.key!
+}
+
 export async function startPeerConnection() {
 	await changeUserMedia()
 	onDeviceSelectChange(changeUserMedia)
 	onVideoStateChange(changeUserMedia)
 
-	peerConnections.add(new PeerConnection())
+	const key = await createUserOnRealtimeDatabase()
+	const userPath = `${room}/${key}`
+	onChildAdded(query(ref(db, room), startAfter(null, key)), (snapshot) => {
+		peerConnections.add(new PeerConnection(`${userPath}/${snapshot.key}`))
+	})
+	onChildAdded(
+		query(ref(db, room), endBefore(null, key)),
+		(snapshot) => {
+			peerConnections.add(new PeerConnection(`${room}/${snapshot.key}/${key}`))
+		},
+		{ onlyOnce: true }
+	)
 }
 
 class PeerConnection {
@@ -81,7 +101,7 @@ class PeerConnection {
 	firstConnected = false
 	isFirstNegotiation = true
 
-	constructor() {
+	constructor(private userPath: string) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
 		this.pc.addEventListener('track', this.onTrack)
 		this.pc.addEventListener('icecandidate', this.onIceCandidate)
@@ -295,7 +315,7 @@ class PeerConnection {
 		if (ev.candidate) {
 			const candidateInit = ev.candidate.toJSON()
 			if (this.peerType) {
-				await set(push(ref(db, `${room}/${this.peerType}/ice`)), candidateInit)
+				await set(push(ref(db, `${this.userPath}/${this.peerType}/ice`)), candidateInit)
 			}
 		}
 	}
@@ -399,11 +419,11 @@ class PeerConnection {
 		}
 		this.isFirstNegotiation = false
 
-		const onDisconnectRef = onDisconnect(ref(db, `${room}`))
-		await onDisconnectRef.remove()
+		// const onDisconnectRef = onDisconnect(ref(db, `${this.userPath}`))
+		// await onDisconnectRef.remove()
 
 		// Get if we're 'offer' or 'answer' side first
-		const offerDescRef = ref(db, `${room}/offer/desc`)
+		const offerDescRef = ref(db, `${this.userPath}/offer/desc`)
 		const result = await runTransaction(offerDescRef, (data) => {
 			if (!data && data !== PeerConnection.OFFER_PLACEHOLDER) {
 				// Mark as used, and we're the 'offer' side
@@ -422,7 +442,7 @@ class PeerConnection {
 			await set(offerDescRef, this.processDescription(offer))
 		}
 
-		const remoteDescRef = ref(db, `${room}/${remotePeerType}/desc`)
+		const remoteDescRef = ref(db, `${this.userPath}/${remotePeerType}/desc`)
 		registerUnsub(
 			onValue(remoteDescRef, async (snapshot) => {
 				if (!snapshot.exists()) {
@@ -437,7 +457,7 @@ class PeerConnection {
 					// If not connected: cleanup and prompt user to restart
 
 					if (this.pc.remoteDescription) {
-						onDisconnectRef.cancel()
+						// onDisconnectRef.cancel()
 						if (!this.firstConnected) {
 							// Cleanup
 							unsubscribeAll()
@@ -461,11 +481,11 @@ class PeerConnection {
 				if (this.peerType === 'answer') {
 					const answer = await this.pc.createAnswer()
 					await this.pc.setLocalDescription(answer)
-					await set(ref(db, `${room}/answer/desc`), this.processDescription(answer))
+					await set(ref(db, `${this.userPath}/answer/desc`), this.processDescription(answer))
 				}
 
 				registerUnsub(
-					onChildAdded(ref(db, `${room}/${remotePeerType}/ice`), async (snapshot) => {
+					onChildAdded(ref(db, `${this.userPath}/${remotePeerType}/ice`), async (snapshot) => {
 						if (snapshot.exists()) {
 							await this.pc.addIceCandidate(snapshot.val())
 						}
