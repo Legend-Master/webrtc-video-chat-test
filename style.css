@@ -331,7 +331,8 @@ because it's impossible to do transition/animation only on switching state away 
 	max-width: 100%;
 }
 
-#remote-video-container > div:only-child {
+/* Only non-hidden child */
+#remote-video-container > div.only-child {
 	aspect-ratio: 16 / 9;
 }
 #remote-video-container video {

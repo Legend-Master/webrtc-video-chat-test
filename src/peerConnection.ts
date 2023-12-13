@@ -30,6 +30,7 @@ import { closeShareDialog, isShareDialogOpen, openShareDialog } from './shareDia
 import { bindVideo } from './styleHelper/video'
 
 const remoteVideoContainer = document.getElementById('remote-video-container') as HTMLDivElement
+const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 const stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
 
 type PeerType = 'offer' | 'answer'
@@ -92,11 +93,30 @@ export async function startPeerConnection() {
 		{ onlyOnce: true }
 	)
 
-	stateIndicator.innerText = "🟡 Waiting for another peer"
+	stateIndicator.innerText = '🟡 Waiting for another peer'
 	openShareDialog()
 }
 
 let isFirstVideo = true
+const visibleVideoWrappers = new Set<HTMLElement>()
+function updateVideoLayout(el: HTMLElement) {
+	if (el.hidden) {
+		visibleVideoWrappers.delete(el)
+		if (visibleVideoWrappers.size === 1) {
+			for (const wrapper of visibleVideoWrappers) {
+				wrapper.classList.add('only-child')
+			}
+		}
+	} else {
+		visibleVideoWrappers.add(el)
+		if (visibleVideoWrappers.size === 2) {
+			for (const wrapper of visibleVideoWrappers) {
+				wrapper.classList.remove('only-child')
+			}
+		}
+	}
+}
+updateVideoLayout(remoteVideo.parentElement as HTMLDivElement)
 
 class PeerConnection {
 	private static OFFER_PLACEHOLDER = ''
@@ -137,11 +157,11 @@ class PeerConnection {
 		this.isFirstVideo = isFirstVideo
 		isFirstVideo = false
 		if (this.isFirstVideo) {
-			this.remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
+			this.remoteVideo = remoteVideo
 			this.remoteVideoWrapper = this.remoteVideo.parentElement as HTMLDivElement
 		} else {
 			this.remoteVideoWrapper = document.createElement('div')
-			this.remoteVideoWrapper.hidden = true
+			this.updateRemoveVideoVisibility(false)
 			this.remoteVideo = bindVideo()
 			this.remoteVideo.controls = true
 			this.remoteVideo.autoplay = true
@@ -150,6 +170,11 @@ class PeerConnection {
 			remoteVideoContainer.append(this.remoteVideoWrapper)
 		}
 		this.registerUserMedia()
+	}
+
+	private updateRemoveVideoVisibility(visible: boolean) {
+		this.remoteVideoWrapper.hidden = !visible
+		updateVideoLayout(this.remoteVideoWrapper)
 	}
 
 	// The one who says "you go first"
@@ -201,7 +226,7 @@ class PeerConnection {
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
 			if (!this.isFirstVideo) {
-				this.remoteVideoWrapper.hidden = true
+				this.updateRemoveVideoVisibility(false)
 			}
 		}
 		stateIndicator.innerText = PeerConnection.STATES[state]
@@ -301,9 +326,9 @@ class PeerConnection {
 
 	private onRemoteVideoStateChange = (ev: MessageEvent) => {
 		if (ev.data === 'true') {
-			this.remoteVideoWrapper.hidden = false
+			this.updateRemoveVideoVisibility(true)
 		} else if (this.getShownRemoteVideoCount() > 1) {
-			this.remoteVideoWrapper.hidden = true
+			this.updateRemoveVideoVisibility(false)
 		}
 		const srcObject = this.remoteVideo.srcObject as MediaStream | null
 		if (!srcObject) {
@@ -340,7 +365,7 @@ class PeerConnection {
 
 	private onTrack = (ev: RTCTrackEvent) => {
 		if (!this.remoteVideo.srcObject) {
-			this.remoteVideoWrapper.hidden = false
+			this.updateRemoveVideoVisibility(true)
 			this.remoteVideo.srcObject = new MediaStream()
 		}
 		;(this.remoteVideo.srcObject as MediaStream).addTrack(ev.track)
