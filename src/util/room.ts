@@ -1,7 +1,7 @@
 import { push, ref } from 'firebase/database'
 import { db } from './firebaseInit'
 
-const DB_PATH = 'room'
+const DB_PATH = 'multi-room'
 
 export let roomId: string
 export let room: string
