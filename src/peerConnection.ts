@@ -107,6 +107,7 @@ class PeerConnection {
 	private isFirstNegotiation = true
 	private isFirstVideo = true
 	private remoteVideo: HTMLVideoElement
+	private remoteVideoWrapper: HTMLDivElement
 
 	constructor(private userPath: string) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
@@ -133,13 +134,16 @@ class PeerConnection {
 		isFirstVideo = false
 		if (this.isFirstVideo) {
 			this.remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
+			this.remoteVideoWrapper = this.remoteVideo.parentElement as HTMLDivElement
 		} else {
+			this.remoteVideoWrapper = document.createElement('div')
+			this.remoteVideoWrapper.hidden = true
 			this.remoteVideo = bindVideo()
 			this.remoteVideo.controls = true
 			this.remoteVideo.autoplay = true
 			this.remoteVideo.playsInline = true
-			this.remoteVideo.hidden = true
-			remoteVideoContainer.append(this.remoteVideo)
+			this.remoteVideoWrapper.append(this.remoteVideo)
+			remoteVideoContainer.append(this.remoteVideoWrapper)
 		}
 		this.registerUserMedia()
 	}
@@ -199,7 +203,7 @@ class PeerConnection {
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
 			if (!this.isFirstVideo) {
-				this.remoteVideo.hidden = true
+				this.remoteVideoWrapper.hidden = true
 			}
 		}
 		this.stateIndicator.innerText = PeerConnection.STATES[state]
@@ -290,7 +294,7 @@ class PeerConnection {
 	private getShownRemoteVideoCount() {
 		let count = 0
 		for (const childElement of remoteVideoContainer.children) {
-			if (childElement instanceof HTMLVideoElement && !childElement.hidden) {
+			if (childElement instanceof HTMLDivElement && !childElement.hidden) {
 				count += 1
 			}
 		}
@@ -298,8 +302,10 @@ class PeerConnection {
 	}
 
 	private onRemoteVideoStateChange = (ev: MessageEvent) => {
-		if (this.getShownRemoteVideoCount() > 1) {
-			this.remoteVideo.hidden = ev.data !== 'true'
+		if (ev.data === 'true') {
+			this.remoteVideoWrapper.hidden = false
+		} else if (this.getShownRemoteVideoCount() > 1) {
+			this.remoteVideoWrapper.hidden = true
 		}
 		const srcObject = this.remoteVideo.srcObject as MediaStream | null
 		if (!srcObject) {
@@ -336,7 +342,7 @@ class PeerConnection {
 
 	private onTrack = (ev: RTCTrackEvent) => {
 		if (!this.remoteVideo.srcObject) {
-			this.remoteVideo.hidden = false
+			this.remoteVideoWrapper.hidden = false
 			this.remoteVideo.srcObject = new MediaStream()
 		}
 		;(this.remoteVideo.srcObject as MediaStream).addTrack(ev.track)
