@@ -27,6 +27,9 @@ import {
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
 import { localVideo, showLocalVideo } from './floatingVideo'
 import { closeShareDialog, isShareDialogOpen, openShareDialog } from './shareDialog'
+import { bindVideo } from './styleHelper/video'
+
+const remoteVideoContainer = document.getElementById('remote-video-container') as HTMLDivElement
 
 type PeerType = 'offer' | 'answer'
 
@@ -89,10 +92,12 @@ export async function startPeerConnection() {
 	)
 }
 
+let isFirstVideo = true
+
 class PeerConnection {
-	static OFFER_PLACEHOLDER = ''
-	static RENEGOTIATE_CHANNEL_ID = 0
-	static VIDEO_STATE_CHANNEL_ID = 1
+	private static OFFER_PLACEHOLDER = ''
+	private static RENEGOTIATE_CHANNEL_ID = 0
+	private static VIDEO_STATE_CHANNEL_ID = 1
 
 	private pc: RTCPeerConnection
 	private peerType: PeerType | undefined
@@ -100,6 +105,8 @@ class PeerConnection {
 	private videoStateDataChannel: RTCDataChannel
 	private firstConnected = false
 	private isFirstNegotiation = true
+	private isFirstVideo = true
+	private remoteVideo: HTMLVideoElement
 
 	constructor(private userPath: string) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
@@ -122,6 +129,18 @@ class PeerConnection {
 		})
 		this.videoStateDataChannel.addEventListener('message', this.onRemoteVideoStateChange)
 
+		this.isFirstVideo = isFirstVideo
+		isFirstVideo = false
+		if (this.isFirstVideo) {
+			this.remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
+		} else {
+			this.remoteVideo = bindVideo()
+			this.remoteVideo.controls = true
+			this.remoteVideo.autoplay = true
+			this.remoteVideo.playsInline = true
+			this.remoteVideo.hidden = true
+			remoteVideoContainer.append(this.remoteVideo)
+		}
 		this.registerUserMedia()
 	}
 
@@ -139,9 +158,8 @@ class PeerConnection {
 	}
 
 	private stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
-	private remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
-	static STATES = {
+	private static STATES = {
 		connected: '🟢 Connected',
 		connecting: '🟡 Connecting',
 		disconnected: '🔴 Disconnected',
@@ -180,6 +198,9 @@ class PeerConnection {
 		}
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
+			if (!this.isFirstVideo) {
+				this.remoteVideo.hidden = true
+			}
 		}
 		this.stateIndicator.innerText = PeerConnection.STATES[state]
 	}
@@ -238,9 +259,9 @@ class PeerConnection {
 		  }
 		| undefined
 
-		private remoteVideoTrack: MediaStreamTrack | undefined
+	private remoteVideoTrack: MediaStreamTrack | undefined
 
-		private createBlankVideoTrack(width: number, height: number) {
+	private createBlankVideoTrack(width: number, height: number) {
 		if (
 			this.blankVideoTrack &&
 			this.blankVideoTrack.width === width &&
@@ -266,7 +287,20 @@ class PeerConnection {
 		return this.blankVideoTrack.track
 	}
 
+	private getShownRemoteVideoCount() {
+		let count = 0
+		for (const childElement of remoteVideoContainer.children) {
+			if (childElement instanceof HTMLVideoElement && !childElement.hidden) {
+				count += 1
+			}
+		}
+		return count
+	}
+
 	private onRemoteVideoStateChange = (ev: MessageEvent) => {
+		if (this.getShownRemoteVideoCount() > 1) {
+			this.remoteVideo.hidden = ev.data !== 'true'
+		}
 		const srcObject = this.remoteVideo.srcObject as MediaStream | null
 		if (!srcObject) {
 			return
@@ -302,6 +336,7 @@ class PeerConnection {
 
 	private onTrack = (ev: RTCTrackEvent) => {
 		if (!this.remoteVideo.srcObject) {
+			this.remoteVideo.hidden = false
 			this.remoteVideo.srcObject = new MediaStream()
 		}
 		;(this.remoteVideo.srcObject as MediaStream).addTrack(ev.track)
