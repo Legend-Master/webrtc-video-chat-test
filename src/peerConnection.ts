@@ -30,6 +30,7 @@ import { closeShareDialog, isShareDialogOpen, openShareDialog } from './shareDia
 import { bindVideo } from './styleHelper/video'
 
 const remoteVideoContainer = document.getElementById('remote-video-container') as HTMLDivElement
+const stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
 
 type PeerType = 'offer' | 'answer'
 
@@ -90,6 +91,9 @@ export async function startPeerConnection() {
 		},
 		{ onlyOnce: true }
 	)
+
+	stateIndicator.innerText = "🟡 Waiting for another peer"
+	openShareDialog()
 }
 
 let isFirstVideo = true
@@ -161,8 +165,6 @@ class PeerConnection {
 		channel.send(message)
 	}
 
-	private stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
-
 	private static STATES = {
 		connected: '🟢 Connected',
 		connecting: '🟡 Connecting',
@@ -191,11 +193,7 @@ class PeerConnection {
 		}
 		this.currentConnectionState = state
 
-		if (state === 'localOffer') {
-			if (!isShareDialogOpen()) {
-				openShareDialog()
-			}
-		} else {
+		if (state !== 'localOffer') {
 			if (isShareDialogOpen()) {
 				closeShareDialog()
 			}
@@ -206,7 +204,7 @@ class PeerConnection {
 				this.remoteVideoWrapper.hidden = true
 			}
 		}
-		this.stateIndicator.innerText = PeerConnection.STATES[state]
+		stateIndicator.innerText = PeerConnection.STATES[state]
 	}
 
 	private monitorConnectionState = () => {
