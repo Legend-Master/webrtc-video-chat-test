@@ -10,11 +10,11 @@ import {
 	startAfter,
 	query,
 	endBefore,
+	Unsubscribe,
 } from 'firebase/database'
 import { db } from './util/firebaseInit'
 import { updateBandwidthRestriction } from './util/sdpInject'
 import { room } from './util/room'
-import { registerUnsub, unsubscribeAll } from './util/unsubscribeAll'
 import { getIceServers } from './iceServerData'
 import {
 	getUserMedia,
@@ -94,12 +94,12 @@ class PeerConnection {
 	static RENEGOTIATE_CHANNEL_ID = 0
 	static VIDEO_STATE_CHANNEL_ID = 1
 
-	pc: RTCPeerConnection
-	peerType: PeerType | undefined
-	renegotiateDataChannel: RTCDataChannel
-	videoStateDataChannel: RTCDataChannel
-	firstConnected = false
-	isFirstNegotiation = true
+	private pc: RTCPeerConnection
+	private peerType: PeerType | undefined
+	private renegotiateDataChannel: RTCDataChannel
+	private videoStateDataChannel: RTCDataChannel
+	private firstConnected = false
+	private isFirstNegotiation = true
 
 	constructor(private userPath: string) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
@@ -127,19 +127,19 @@ class PeerConnection {
 
 	// The one who says "you go first"
 	// https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation
-	isPolite() {
+	private isPolite() {
 		return this.peerType === 'answer'
 	}
 
-	sendIfDataChannelOpen(channel: RTCDataChannel | undefined, message: string) {
+	private sendIfDataChannelOpen(channel: RTCDataChannel | undefined, message: string) {
 		if (!channel || channel.readyState !== 'open') {
 			return
 		}
 		channel.send(message)
 	}
 
-	stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
-	remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
+	private stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
+	private remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
 
 	static STATES = {
 		connected: '🟢 Connected',
@@ -153,7 +153,7 @@ class PeerConnection {
 		connectedRemoteOffer: '🟡 Waiting for connection for new channel',
 	} as const
 
-	async playDisconnectSound() {
+	private async playDisconnectSound() {
 		const stream = await fetch(new URL('/media/audio/disconnect.mp3', import.meta.url))
 		const ctx = new AudioContext()
 		const source = ctx.createBufferSource()
@@ -162,8 +162,8 @@ class PeerConnection {
 		source.start()
 	}
 
-	currentConnectionState: keyof typeof PeerConnection.STATES | undefined
-	indicateConnectionState(state: keyof typeof PeerConnection.STATES) {
+	private currentConnectionState: keyof typeof PeerConnection.STATES | undefined
+	private indicateConnectionState(state: keyof typeof PeerConnection.STATES) {
 		if (this.currentConnectionState === state) {
 			return
 		}
@@ -184,7 +184,7 @@ class PeerConnection {
 		this.stateIndicator.innerText = PeerConnection.STATES[state]
 	}
 
-	monitorConnectionState = () => {
+	private monitorConnectionState = () => {
 		switch (this.pc.connectionState) {
 			case 'connected':
 				this.indicateConnectionState('connected')
@@ -201,7 +201,7 @@ class PeerConnection {
 		}
 	}
 
-	monitorSignalingState = () => {
+	private monitorSignalingState = () => {
 		switch (this.pc.signalingState) {
 			case 'stable':
 				if (this.pc.connectionState === 'connected') {
@@ -230,7 +230,7 @@ class PeerConnection {
 		}
 	}
 
-	blankVideoTrack:
+	private blankVideoTrack:
 		| {
 				width: number
 				height: number
@@ -238,9 +238,9 @@ class PeerConnection {
 		  }
 		| undefined
 
-	remoteVideoTrack: MediaStreamTrack | undefined
+		private remoteVideoTrack: MediaStreamTrack | undefined
 
-	createBlankVideoTrack(width: number, height: number) {
+		private createBlankVideoTrack(width: number, height: number) {
 		if (
 			this.blankVideoTrack &&
 			this.blankVideoTrack.width === width &&
@@ -266,7 +266,7 @@ class PeerConnection {
 		return this.blankVideoTrack.track
 	}
 
-	onRemoteVideoStateChange = (ev: MessageEvent) => {
+	private onRemoteVideoStateChange = (ev: MessageEvent) => {
 		const srcObject = this.remoteVideo.srcObject as MediaStream | null
 		if (!srcObject) {
 			return
@@ -300,7 +300,7 @@ class PeerConnection {
 		}
 	}
 
-	onTrack = (ev: RTCTrackEvent) => {
+	private onTrack = (ev: RTCTrackEvent) => {
 		if (!this.remoteVideo.srcObject) {
 			this.remoteVideo.srcObject = new MediaStream()
 		}
@@ -311,7 +311,7 @@ class PeerConnection {
 		this.remoteVideo.controls = true
 	}
 
-	onIceCandidate = async (ev: RTCPeerConnectionIceEvent) => {
+	private onIceCandidate = async (ev: RTCPeerConnectionIceEvent) => {
 		if (ev.candidate) {
 			const candidateInit = ev.candidate.toJSON()
 			if (this.peerType) {
@@ -320,7 +320,7 @@ class PeerConnection {
 		}
 	}
 
-	monitorFirstConnected = () => {
+	private monitorFirstConnected = () => {
 		if (this.pc.connectionState === 'connected') {
 			this.firstConnected = true
 			this.pc.removeEventListener('connectionstatechange', this.monitorFirstConnected)
@@ -331,7 +331,7 @@ class PeerConnection {
 	 * Generate a new {@link RTCSessionDescriptionInit},
 	 * Won't mutate the given description (desc)
 	 */
-	processDescription(desc: RTCSessionDescription | RTCSessionDescriptionInit) {
+	private processDescription(desc: RTCSessionDescription | RTCSessionDescriptionInit) {
 		if (desc instanceof RTCSessionDescription) {
 			desc = desc.toJSON()
 		} else {
@@ -341,12 +341,12 @@ class PeerConnection {
 		return desc
 	}
 
-	updateSdpInfo(desc: RTCSessionDescriptionInit) {
+	private updateSdpInfo(desc: RTCSessionDescriptionInit) {
 		desc.sdp = updateBandwidthRestriction(desc.sdp!)
 		return desc
 	}
 
-	onRenegotiateChannelMessage = async (ev: MessageEvent) => {
+	private onRenegotiateChannelMessage = async (ev: MessageEvent) => {
 		const desc = JSON.parse(ev.data) as RTCSessionDescriptionInit
 		if (desc.type === 'offer' && this.pc.signalingState === 'have-local-offer') {
 			if (this.isPolite()) {
@@ -363,13 +363,13 @@ class PeerConnection {
 		}
 	}
 
-	renegotiate = async () => {
+	private renegotiate = async () => {
 		const desc = await this.pc.createOffer()
 		await this.pc.setLocalDescription(desc)
 		this.renegotiateDataChannel.send(JSON.stringify(this.processDescription(desc)))
 	}
 
-	senders = new Map<string, RTCRtpSender>()
+	private senders = new Map<string, RTCRtpSender>()
 
 	onStreamStop() {
 		for (const [_, sender] of this.senders) {
@@ -401,13 +401,13 @@ class PeerConnection {
 		await updateAllParameters(this.pc)
 	}
 
-	async registerUserMedia() {
+	private async registerUserMedia() {
 		await this.onNewStream()
 		onResolutionChange(() => updateParameters(this.pc, updateResolution))
 		localVideo.addEventListener('resize', () => updateParameters(this.pc, updateResolution))
 	}
 
-	negotiate = async () => {
+	private negotiate = async () => {
 		// Only renegotiate through p2p data channel
 		if (!this.isFirstNegotiation) {
 			if (this.renegotiateDataChannel.readyState === 'open') {
@@ -443,7 +443,7 @@ class PeerConnection {
 		}
 
 		const remoteDescRef = ref(db, `${this.userPath}/${remotePeerType}/desc`)
-		registerUnsub(
+		this.registerUnsub(
 			onValue(remoteDescRef, async (snapshot) => {
 				if (!snapshot.exists()) {
 					// Another peer disconnected after we tried to connect to them
@@ -460,10 +460,9 @@ class PeerConnection {
 						// onDisconnectRef.cancel()
 						if (!this.firstConnected) {
 							// Cleanup
-							unsubscribeAll()
-							this.pc.close()
-							alert('Another peer disconnected before connection established')
-							window.location.reload()
+							this.destroy()
+							// alert('Another peer disconnected before connection established')
+							// window.location.reload()
 						}
 					}
 					return
@@ -484,7 +483,7 @@ class PeerConnection {
 					await set(ref(db, `${this.userPath}/answer/desc`), this.processDescription(answer))
 				}
 
-				registerUnsub(
+				this.registerUnsub(
 					onChildAdded(ref(db, `${this.userPath}/${remotePeerType}/ice`), async (snapshot) => {
 						if (snapshot.exists()) {
 							await this.pc.addIceCandidate(snapshot.val())
@@ -493,5 +492,25 @@ class PeerConnection {
 				)
 			})
 		)
+	}
+
+	destroy() {
+		peerConnections.delete(this)
+		this.unsubscribeAll()
+		this.pc.close()
+	}
+
+	private unsubFunctions = new Set<Unsubscribe>()
+
+	private registerUnsub(fn: Unsubscribe) {
+		this.unsubFunctions.add(fn)
+		return fn
+	}
+
+	private unsubscribeAll() {
+		for (const fn of this.unsubFunctions) {
+			fn()
+		}
+		this.unsubFunctions.clear()
 	}
 }
