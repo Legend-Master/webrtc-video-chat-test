@@ -106,10 +106,6 @@ onDeviceSelectChange(() => {
 function getVideoSettings(): MediaTrackConstraints {
 	return {
 		frameRate: 60,
-		width: RESOLUTION_NO_LIMIT,
-		height: RESOLUTION_NO_LIMIT,
-		// Prefer 4:3 for mobile cameras
-		aspectRatio: 4 / 3,
 	}
 }
 
@@ -150,6 +146,10 @@ export async function getUserMedia() {
 			return await navigator.mediaDevices.getUserMedia({
 				video: {
 					...getVideoSettings(),
+					width: RESOLUTION_NO_LIMIT,
+					height: RESOLUTION_NO_LIMIT,
+					// Prefer 4:3 for mobile cameras
+					aspectRatio: 4 / 3,
 					deviceId: videoSelect.value,
 				},
 			})
