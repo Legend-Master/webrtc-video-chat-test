@@ -6,116 +6,25 @@ import {
 	push,
 	onChildAdded,
 	runTransaction,
-	onDisconnect,
-	startAfter,
-	query,
-	endBefore,
 	Unsubscribe,
 } from 'firebase/database'
 import { db } from './util/firebaseInit'
 import { updateBandwidthRestriction } from './util/sdpInject'
-import { room } from './util/room'
 import { getIceServers } from './iceServerData'
-import {
-	getUserMedia,
-	onDeviceSelectChange,
-	onResolutionChange,
-	onVideoStateChange,
-	setVideoState,
-	videoState,
-} from './selectDevice'
+import { onResolutionChange } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
-import { localVideo, showLocalVideo } from './floatingVideo'
-import { closeShareDialog, isShareDialogOpen, openShareDialog } from './shareDialog'
+import { localVideo } from './floatingVideo'
+import { closeShareDialog, isShareDialogOpen } from './shareDialog'
 import { bindVideo } from './styleHelper/video'
+import { stream } from './peerConnectionsManager'
+import { peerConnections } from './peerConnectionsManager'
+import { getActivePeerConnections } from './peerConnectionsManager'
+import { stateIndicator } from './peerConnectionsManager'
 
 const remoteVideoContainer = document.getElementById('remote-video-container') as HTMLDivElement
 const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
-const stateIndicator = document.getElementById('connection-state-indicator') as HTMLDivElement
 
 type PeerType = 'offer' | 'answer'
-
-const peerConnections = new Set<PeerConnection>()
-
-let stream: MediaStream | undefined
-
-function stopUserMedia() {
-	if (!stream) {
-		return
-	}
-	for (const track of stream?.getTracks()) {
-		track.stop()
-	}
-	for (const peerConnection of peerConnections) {
-		peerConnection.onStreamStop()
-	}
-	stream = undefined
-}
-
-async function startUserMedia() {
-	if (!videoState) {
-		return
-	}
-	stream = await getUserMedia()
-	if (!stream) {
-		setVideoState(false)
-		return
-	}
-	// const videoTrack = stream.getVideoTracks()[0]!
-	// console.log(videoTrack.getSettings())
-	// console.log(videoTrack.getCapabilities())
-	// console.log(videoTrack.getConstraints())
-	localVideo.srcObject = stream
-	showLocalVideo()
-
-	const firstTrack = stream.getTracks()[0]
-	if (firstTrack) {
-		firstTrack.addEventListener('ended', () => setVideoState(false), { once: true })
-	}
-
-	const promises = []
-	for (const peerConnection of peerConnections) {
-		promises.push(peerConnection.onNewStream())
-	}
-	await Promise.all(promises)
-}
-
-async function changeUserMedia() {
-	stopUserMedia()
-	await startUserMedia()
-}
-
-async function createUserOnRealtimeDatabase() {
-	const userIdRef = push(ref(db, room), { online: true })
-	await Promise.all([userIdRef, onDisconnect(userIdRef).remove()])
-	return userIdRef.key!
-}
-
-export async function startPeerConnection() {
-	await startUserMedia()
-	onDeviceSelectChange(changeUserMedia)
-	onVideoStateChange(changeUserMedia)
-
-	const key = await createUserOnRealtimeDatabase()
-	const userPath = `${room}/${key}`
-	onChildAdded(query(ref(db, room), startAfter(null, key)), (snapshot) => {
-		peerConnections.add(new PeerConnection(`${userPath}/${snapshot.key}`))
-	})
-	onChildAdded(
-		query(ref(db, room), endBefore(null, key)),
-		(snapshot) => {
-			peerConnections.add(new PeerConnection(`${room}/${snapshot.key}/${key}`))
-		},
-		{ onlyOnce: true }
-	)
-
-	stateIndicator.innerText = '🟡 Waiting for another peer'
-	openShareDialog()
-}
-
-function getActivePeerConnections() {
-	return peerConnections.size
-}
 
 let isFirstVideo = true
 const visibleVideoWrappers = new Set<HTMLElement>()
@@ -138,7 +47,7 @@ function updateVideoLayout(el: HTMLElement) {
 }
 updateVideoLayout(remoteVideo.parentElement as HTMLDivElement)
 
-class PeerConnection {
+export class PeerConnection {
 	private static OFFER_PLACEHOLDER = ''
 	private static RENEGOTIATE_CHANNEL_ID = 0
 	private static VIDEO_STATE_CHANNEL_ID = 1
