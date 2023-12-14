@@ -113,6 +113,10 @@ export async function startPeerConnection() {
 	openShareDialog()
 }
 
+function getActivePeerConnections() {
+	return peerConnections.size
+}
+
 let isFirstVideo = true
 const visibleVideoWrappers = new Set<HTMLElement>()
 function updateVideoLayout(el: HTMLElement) {
@@ -243,6 +247,10 @@ class PeerConnection {
 			this.playDisconnectSound()
 			if (!this.isFirstVideo) {
 				this.updateRemoveVideoVisibility(false)
+			}
+			// Change the indicator to disconnected only when we're the only connection left
+			if (getActivePeerConnections() !== 1) {
+				return
 			}
 		}
 		stateIndicator.innerText = PeerConnection.STATES[state]
