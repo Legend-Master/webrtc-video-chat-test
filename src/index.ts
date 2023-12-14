@@ -10,7 +10,7 @@ import './peerConnection'
 import './keyBoardControls'
 
 import { createRoom } from './util/room'
-import { startPeerConnection } from './peerConnection'
+import { startPeerConnection } from './peerConnectionsManager'
 import { setVideoState, welcomeDone } from './selectDevice'
 
 const startBtn = document.getElementById('start-button') as HTMLButtonElement
