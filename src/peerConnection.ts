@@ -50,6 +50,7 @@ async function changeUserMedia() {
 	}
 
 	if (!videoState) {
+		stream = undefined
 		return
 	}
 	stream = await getUserMedia()
