@@ -97,7 +97,7 @@ function stopUserMedia() {
 	if (!stream) {
 		return
 	}
-	for (const track of stream?.getTracks()) {
+	for (const track of stream.getTracks()) {
 		track.stop()
 	}
 	for (const peerConnection of peerConnections) {

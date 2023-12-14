@@ -52,6 +52,18 @@ export class PeerConnection {
 	private static RENEGOTIATE_CHANNEL_ID = 0
 	private static VIDEO_STATE_CHANNEL_ID = 1
 
+	private static STATES = {
+		connected: '🟢 Connected',
+		connecting: '🟡 Connecting',
+		disconnected: '🔴 Disconnected',
+
+		stable: '🟡 Waiting for connection',
+		localOffer: '🟡 Waiting for another peer',
+		connectedLocalOffer: '🟡 Waiting for another peer for new channel',
+		remoteOffer: '🟡 Waiting for connection',
+		connectedRemoteOffer: '🟡 Waiting for connection for new channel',
+	} as const
+
 	private pc: RTCPeerConnection
 	private peerType: PeerType | undefined
 	private renegotiateDataChannel: RTCDataChannel
@@ -118,18 +130,6 @@ export class PeerConnection {
 		}
 		channel.send(message)
 	}
-
-	private static STATES = {
-		connected: '🟢 Connected',
-		connecting: '🟡 Connecting',
-		disconnected: '🔴 Disconnected',
-
-		stable: '🟡 Waiting for connection',
-		localOffer: '🟡 Waiting for another peer',
-		connectedLocalOffer: '🟡 Waiting for another peer for new channel',
-		remoteOffer: '🟡 Waiting for connection',
-		connectedRemoteOffer: '🟡 Waiting for connection for new channel',
-	} as const
 
 	private async playDisconnectSound() {
 		const stream = await fetch(new URL('/media/audio/disconnect.mp3', import.meta.url))
