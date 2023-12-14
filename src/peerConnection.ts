@@ -39,18 +39,21 @@ const peerConnections = new Set<PeerConnection>()
 
 let stream: MediaStream | undefined
 
-async function changeUserMedia() {
-	if (stream) {
-		for (const track of stream?.getTracks()) {
-			track.stop()
-		}
-		for (const peerConnection of peerConnections) {
-			peerConnection.onStreamStop()
-		}
+function stopUserMedia() {
+	if (!stream) {
+		return
 	}
+	for (const track of stream?.getTracks()) {
+		track.stop()
+	}
+	for (const peerConnection of peerConnections) {
+		peerConnection.onStreamStop()
+	}
+	stream = undefined
+}
 
+async function startUserMedia() {
 	if (!videoState) {
-		stream = undefined
 		return
 	}
 	stream = await getUserMedia()
@@ -65,9 +68,21 @@ async function changeUserMedia() {
 	localVideo.srcObject = stream
 	showLocalVideo()
 
-	for (const peerConnection of peerConnections) {
-		peerConnection.onNewStream()
+	const firstTrack = stream.getTracks()[0]
+	if (firstTrack) {
+		firstTrack.addEventListener('ended', () => setVideoState(false), { once: true })
 	}
+
+	const promises = []
+	for (const peerConnection of peerConnections) {
+		promises.push(peerConnection.onNewStream())
+	}
+	await Promise.all(promises)
+}
+
+async function changeUserMedia() {
+	stopUserMedia()
+	await startUserMedia()
 }
 
 async function createUserOnRealtimeDatabase() {
@@ -77,7 +92,7 @@ async function createUserOnRealtimeDatabase() {
 }
 
 export async function startPeerConnection() {
-	await changeUserMedia()
+	await startUserMedia()
 	onDeviceSelectChange(changeUserMedia)
 	onVideoStateChange(changeUserMedia)
 
@@ -449,10 +464,6 @@ class PeerConnection {
 		}
 		const promises = []
 		const tracks = stream.getTracks()
-		const firstTrack = tracks[0]
-		if (firstTrack) {
-			firstTrack.addEventListener('ended', () => setVideoState(false), { once: true })
-		}
 		for (const track of tracks) {
 			const sender = this.senders.get(track.kind)
 			if (sender) {
