@@ -32,6 +32,7 @@ export class CustomVideo extends HTMLElement {
 	connectedCallback() {
 		this.tabIndex = 0
 		this.addEventListener('keydown', () => setLastFocusVideo(this))
+		this.setVideoStarted(false)
 
 		this.video = bindVideo()
 
@@ -322,8 +323,10 @@ export class CustomVideo extends HTMLElement {
 		this.videoStarted = started
 		if (started) {
 			this.classList.add('started')
+			this.inert = false
 		} else {
 			this.classList.remove('started')
+			this.inert = true
 		}
 	}
 }

@@ -41,11 +41,15 @@ custom-video .controls-wrapper::after {
 	z-index: -1;
 }
 
-custom-video.hide-controls {
+custom-video:not(.started) .controls-wrapper {
+    opacity: 0.5;
+}
+
+custom-video.started.hide-controls {
 	cursor: none;
 }
 
-custom-video.hide-controls .controls-wrapper {
+custom-video.started.hide-controls .controls-wrapper {
 	pointer-events: none;
 	opacity: 0;
 }
@@ -84,8 +88,8 @@ custom-video .audio-controls {
     display: flex;
 }
 
-custom-video .audio-button {
-}
+/* custom-video .audio-button {
+} */
 
-custom-video .audio-slider {
-}
+/* custom-video .audio-slider {
+} */
