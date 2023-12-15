@@ -156,7 +156,8 @@ export class CustomVideo extends HTMLElement {
 		if (this.isFullscreen()) {
 			await document.exitFullscreen()
 		} else {
-			await Promise.all([this.fullscreenAutoRotate(), this.requestFullscreen()])
+			await this.requestFullscreen()
+			await this.fullscreenAutoRotate()
 		}
 	}
 
