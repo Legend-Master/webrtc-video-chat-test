@@ -15,14 +15,14 @@ import { onResolutionChange } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
 import { localVideo } from './floatingVideo'
 import { closeShareDialog, isShareDialogOpen } from './shareDialog'
-import { bindVideo } from './styleHelper/video'
 import { stream } from './peerConnectionsManager'
 import { peerConnections } from './peerConnectionsManager'
 import { getActivePeerConnections } from './peerConnectionsManager'
 import { stateIndicator } from './peerConnectionsManager'
+import { CustomVideo } from './custom-video'
 
 const remoteVideoContainer = document.getElementById('remote-video-container') as HTMLDivElement
-const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
+const remoteVideo = document.getElementById('remote-video') as CustomVideo
 
 type PeerType = 'offer' | 'answer'
 
@@ -71,7 +71,7 @@ export class PeerConnection {
 	private firstConnected = false
 	private isFirstNegotiation = true
 	private isFirstVideo = true
-	private remoteVideo: HTMLVideoElement
+	private remoteVideo: CustomVideo
 	private remoteVideoWrapper: HTMLDivElement
 
 	constructor(private userPath: string) {
@@ -103,10 +103,7 @@ export class PeerConnection {
 		} else {
 			this.remoteVideoWrapper = document.createElement('div')
 			this.updateRemoveVideoVisibility(false)
-			this.remoteVideo = bindVideo()
-			this.remoteVideo.controls = true
-			this.remoteVideo.autoplay = true
-			this.remoteVideo.playsInline = true
+			this.remoteVideo = document.createElement('custom-video')
 			this.remoteVideoWrapper.append(this.remoteVideo)
 			remoteVideoContainer.append(this.remoteVideoWrapper)
 		}
@@ -263,7 +260,7 @@ export class PeerConnection {
 		} else if (this.getShownRemoteVideoCount() > 1) {
 			this.updateRemoveVideoVisibility(false)
 		}
-		const srcObject = this.remoteVideo.srcObject as MediaStream | null
+		const srcObject = this.remoteVideo.getVideoSrcObject()
 		if (!srcObject) {
 			return
 		}
@@ -297,15 +294,13 @@ export class PeerConnection {
 	}
 
 	private onTrack = (ev: RTCTrackEvent) => {
-		if (!this.remoteVideo.srcObject) {
+		let srcObject = this.remoteVideo.getVideoSrcObject()
+		if (!srcObject) {
 			this.updateRemoveVideoVisibility(true)
-			this.remoteVideo.srcObject = new MediaStream()
+			srcObject = new MediaStream()
+			this.remoteVideo.setVideoSrcObject(srcObject)
 		}
-		;(this.remoteVideo.srcObject as MediaStream).addTrack(ev.track)
-
-		// Refresh audio control
-		this.remoteVideo.controls = false
-		this.remoteVideo.controls = true
+		srcObject.addTrack(ev.track)
 	}
 
 	private onIceCandidate = async (ev: RTCPeerConnectionIceEvent) => {

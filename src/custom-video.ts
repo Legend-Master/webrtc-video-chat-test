@@ -9,7 +9,7 @@ import mdiVolumeOff from 'iconify-icon:mdi/volume-off'
 
 import './custom-video.css'
 
-class CustomVideo extends HTMLElement {
+export class CustomVideo extends HTMLElement {
 	private video!: HTMLVideoElement
 	private controlsWrapper!: HTMLDivElement
 	private fullscreenButton!: HTMLButtonElement
@@ -72,6 +72,14 @@ class CustomVideo extends HTMLElement {
 	disconnectedCallback() {
 		window.removeEventListener('pointerdown', this.onPointerDown)
 		window.removeEventListener('keydown', this.onKeyDown)
+	}
+
+	getVideoSrcObject() {
+		return this.video.srcObject instanceof MediaStream ? this.video.srcObject : undefined
+	}
+
+	setVideoSrcObject(mediaStream: MediaStream) {
+		this.video.srcObject = mediaStream
 	}
 
 	//#region fullscreen control
@@ -211,7 +219,6 @@ class CustomVideo extends HTMLElement {
 
 	private onPointerDown = (ev: PointerEvent) => {
 		this.hasKeyboardEvent = false
-
 	}
 	private onKeyDown = (ev: KeyboardEvent) => {
 		if (ev.metaKey || ev.altKey || ev.ctrlKey) {
@@ -257,6 +264,11 @@ class CustomVideo extends HTMLElement {
 	}
 }
 customElements.define('custom-video', CustomVideo)
+declare global {
+	interface HTMLElementTagNameMap {
+		'custom-video': CustomVideo
+	}
+}
 
 declare global {
 	interface ScreenOrientation {
