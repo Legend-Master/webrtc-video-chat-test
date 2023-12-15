@@ -120,6 +120,7 @@ custom-video .audio-slider::-moz-range-track {
 custom-video .audio-slider::-webkit-slider-thumb,
 custom-video .audio-slider::-moz-range-thumb {
 	appearance: none;
+	border: none;
 
 	height: 1em;
 	width: 1em;
