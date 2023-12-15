@@ -13,9 +13,12 @@ export class CustomVideo extends HTMLElement {
 	private video!: HTMLVideoElement
 	private controlsWrapper!: HTMLDivElement
 	private fullscreenButton!: HTMLButtonElement
-	private pipButton: HTMLButtonElement | undefined
+	private pipButton?: HTMLButtonElement
+	private audioControls!: HTMLDivElement
+	private audioSlider!: HTMLInputElement
+	private audioButton!: HTMLButtonElement
 
-	private hideControlsTimeout: number | undefined
+	private hideControlsTimeout?: number
 	private keyboardFocusedControl = false
 	private controlsHovered = false
 	private videoStarted = false
@@ -39,11 +42,17 @@ export class CustomVideo extends HTMLElement {
 		this.controlsWrapper = document.createElement('div')
 		this.controlsWrapper.classList.add('controls-wrapper')
 
+		const leftControls = document.createElement('div')
+		leftControls.classList.add('left-controls')
+
+		const rightControls = document.createElement('div')
+		rightControls.classList.add('right-controls')
+
 		this.fullscreenButton = createIconButton(mdiFullscreen)
 		this.fullscreenButton.title = 'Full screen'
 		this.fullscreenButton.addEventListener('click', this.toggleFullscreen)
 		this.addEventListener('fullscreenchange', this.updateFullscreenStyle)
-		this.controlsWrapper.append(this.fullscreenButton)
+		rightControls.append(this.fullscreenButton)
 
 		// Firefox and Android Webview (kinda irrelevant) doesn't support PiP API yet
 		if (this.video.requestPictureInPicture) {
@@ -60,8 +69,49 @@ export class CustomVideo extends HTMLElement {
 			this.video.addEventListener('leavepictureinpicture', () => {
 				this.classList.remove('picture-in-picture')
 			})
-			this.controlsWrapper.append(this.pipButton)
+			rightControls.append(this.pipButton)
 		}
+
+		let cachedVolume = this.video.volume
+		const isMuted = () => this.video.volume === 0
+
+		this.audioControls = document.createElement('div')
+		this.audioControls.classList.add('audio-controls')
+
+		this.audioButton = createIconButton(mdiVolumeOn)
+		this.audioButton.classList.add('audio-button')
+		this.audioButton.title = isMuted() ? 'Unmute' : 'Mute'
+		this.audioButton.addEventListener('click', () => {
+			this.video.volume = isMuted() ? cachedVolume : 0
+		})
+
+		this.audioSlider = document.createElement('input')
+		this.audioSlider.type = 'range'
+		this.audioSlider.min = '0'
+		this.audioSlider.max = '100'
+		this.audioSlider.classList.add('audio-slider')
+		this.audioSlider.addEventListener('input', () => {
+			this.video.volume = Number(this.audioSlider.value) / 100
+			this.audioSlider.title = `Volume: ${this.audioSlider.value}`
+		})
+		this.audioSlider.title = `Volume: ${this.audioSlider.value}`
+
+		this.video.addEventListener('volumechange', () => {
+			this.audioSlider.value = String(this.video.volume * 100)
+			this.audioButton.innerHTML = isMuted() ? mdiVolumeOff : mdiVolumeOn
+			this.audioButton.title = isMuted() ? 'Unmute' : 'Mute'
+			if (!isMuted()) {
+				cachedVolume = this.video.volume
+			}
+		})
+
+		this.audioControls.append(this.audioButton)
+		this.audioControls.append(this.audioSlider)
+
+		leftControls.append(this.audioControls)
+
+		this.controlsWrapper.append(leftControls)
+		this.controlsWrapper.append(rightControls)
 
 		this.append(this.controlsWrapper)
 		this.append(this.video)
@@ -83,6 +133,14 @@ export class CustomVideo extends HTMLElement {
 	}
 
 	//#region fullscreen control
+	toggleFullscreen = async () => {
+		if (this.isFullscreen()) {
+			await document.exitFullscreen()
+		} else {
+			await Promise.all([this.fullscreenAutoRotate(), this.requestFullscreen()])
+		}
+	}
+
 	private isFullscreen = () => {
 		return document.fullscreenElement === this
 	}
@@ -116,14 +174,6 @@ export class CustomVideo extends HTMLElement {
 			}
 		} catch {}
 		// Throw expected on Chrome desktop
-	}
-
-	private toggleFullscreen = async () => {
-		if (this.isFullscreen()) {
-			await document.exitFullscreen()
-		} else {
-			await Promise.all([this.fullscreenAutoRotate(), this.requestFullscreen()])
-		}
 	}
 	//#endregion
 
@@ -220,6 +270,7 @@ export class CustomVideo extends HTMLElement {
 	private onPointerDown = (ev: PointerEvent) => {
 		this.hasKeyboardEvent = false
 	}
+
 	private onKeyDown = (ev: KeyboardEvent) => {
 		if (ev.metaKey || ev.altKey || ev.ctrlKey) {
 			return

@@ -1,5 +1,5 @@
 custom-video {
-    position: relative;
+	position: relative;
 
 	display: flex;
 	align-items: stretch;
@@ -18,11 +18,11 @@ custom-video .controls-wrapper {
 	bottom: 0;
 	left: 0;
 	right: 0;
+	z-index: 1;
 
 	display: flex;
-	flex-direction: row-reverse;
-
-	z-index: 1;
+	justify-content: space-between;
+    align-items: center;
 
 	transition: display 200ms, opacity 200ms;
 	/* Chrome only, progressive enhancement */
@@ -45,10 +45,14 @@ custom-video.hide-controls {
 	cursor: none;
 }
 
-custom-video.hide-controls .controls-wrapper,
-custom-video.dragging .controls-wrapper {
+custom-video.hide-controls .controls-wrapper {
 	pointer-events: none;
 	opacity: 0;
+}
+
+custom-video .controls-wrapper .right-controls {
+	display: flex;
+	flex-direction: row-reverse;
 }
 
 custom-video .controls-wrapper .icon-button {
@@ -72,6 +76,16 @@ custom-video .controls-wrapper .icon-button.ontouch::after {
 	}
 }
 
-custom-video.fullscreen .controls-wrapper {
+/* custom-video.fullscreen .controls-wrapper {
 	font-size: 1.5em;
+} */
+
+custom-video .audio-controls {
+    display: flex;
+}
+
+custom-video .audio-button {
+}
+
+custom-video .audio-slider {
 }

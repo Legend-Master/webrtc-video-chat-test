@@ -115,6 +115,11 @@ input[type='checkbox'] {
 	margin: 0;
 	accent-color: var(--button-normal-color);
 }
+input[type='range'] {
+	outline: revert;
+	cursor: pointer;
+	padding: 0;
+}
 
 code {
 	font-family: Consolas, monospace;
