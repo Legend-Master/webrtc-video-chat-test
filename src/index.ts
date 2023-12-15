@@ -4,11 +4,12 @@ import './styleHelper/touchResponse'
 import './styleHelper/dialog'
 import './styleHelper/video'
 
+import './custom-video'
+
 import './iceServerData'
 import './selectDevice'
 import './peerConnection'
 import './keyBoardControls'
-import './custom-video'
 
 import { createRoom } from './util/room'
 import { startPeerConnection } from './peerConnectionsManager'

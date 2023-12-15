@@ -1,6 +1,12 @@
-const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
+import { CustomVideo } from './custom-video'
+import { getNoneHiddenVideo, isVideoHidden } from './remoteVideoManager'
 
-window.addEventListener('keydown', (ev) => {
+let lastFocusVideo: CustomVideo | undefined
+export function setLastFocusVideo(video: CustomVideo) {
+	lastFocusVideo = video
+}
+
+window.addEventListener('keydown', async (ev) => {
 	if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey || ev.repeat) {
 		return
 	}
@@ -10,24 +16,15 @@ window.addEventListener('keydown', (ev) => {
 	) {
 		return
 	}
-	if (!remoteVideo.srcObject) {
+	if (!lastFocusVideo || isVideoHidden(lastFocusVideo)) {
+		lastFocusVideo = getNoneHiddenVideo()
+	}
+	if (!lastFocusVideo?.getVideoSrcObject()) {
 		return
 	}
 	if (ev.key === 'f') {
-		if (document.fullscreenElement === remoteVideo) {
-			document.exitFullscreen()
-		} else {
-			remoteVideo.requestFullscreen()
-		}
+		await lastFocusVideo.toggleFullscreen()
 	} else if (ev.key === 'i') {
-		// Firefox and Android Webview (kinda irrelevant) doesn't have these
-		if (typeof remoteVideo.requestFullscreen !== 'function') {
-			return
-		}
-		if (document.pictureInPictureElement === remoteVideo) {
-			document.exitPictureInPicture()
-		} else {
-			remoteVideo.requestPictureInPicture()
-		}
+		await lastFocusVideo.togglePictureInPicture()
 	}
 })

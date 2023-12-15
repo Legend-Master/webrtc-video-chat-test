@@ -1,5 +1,6 @@
 import { createIconButton } from './styleHelper/iconButton'
 import { bindVideo } from './styleHelper/video'
+import { setLastFocusVideo } from './keyBoardControls'
 
 import mdiFullscreen from 'iconify-icon:mdi/fullscreen'
 import mdiFullscreenExit from 'iconify-icon:mdi/fullscreen-exit'
@@ -29,6 +30,9 @@ export class CustomVideo extends HTMLElement {
 	}
 
 	connectedCallback() {
+		this.tabIndex = 0
+		this.addEventListener('keydown', () => setLastFocusVideo(this))
+
 		this.video = bindVideo()
 
 		this.video.autoplay = true
@@ -37,10 +41,9 @@ export class CustomVideo extends HTMLElement {
 		this.video.addEventListener('loadeddata', () => this.setVideoStarted(true))
 		this.video.addEventListener('dblclick', this.toggleFullscreen)
 
-		this.classList.add('hide-controls')
-
 		this.controlsWrapper = document.createElement('div')
 		this.controlsWrapper.classList.add('controls-wrapper')
+		this.classList.add('hide-controls')
 
 		const leftControls = document.createElement('div')
 		leftControls.classList.add('left-controls')
@@ -55,14 +58,10 @@ export class CustomVideo extends HTMLElement {
 		rightControls.append(this.fullscreenButton)
 
 		// Firefox and Android Webview (kinda irrelevant) doesn't support PiP API yet
-		if (this.video.requestPictureInPicture) {
+		if (typeof this.video.requestPictureInPicture === 'function') {
 			this.pipButton = createIconButton(mdiPip)
 			this.pipButton.title = 'Enter picture-in-picture'
-			this.pipButton.addEventListener('click', async () => {
-				try {
-					await this.video.requestPictureInPicture()
-				} catch {}
-			})
+			this.pipButton.addEventListener('click', this.togglePictureInPicture)
 			this.video.addEventListener('enterpictureinpicture', () => {
 				this.classList.add('picture-in-picture')
 			})
@@ -130,6 +129,20 @@ export class CustomVideo extends HTMLElement {
 
 	setVideoSrcObject(mediaStream: MediaStream) {
 		this.video.srcObject = mediaStream
+	}
+
+	private isPictureInPicture = () => {
+		return document.pictureInPictureElement === this.video
+	}
+
+	togglePictureInPicture = async () => {
+		try {
+			if (this.isPictureInPicture()) {
+				await document.exitPictureInPicture()
+			} else {
+				await this.video.requestPictureInPicture()
+			}
+		} catch {}
 	}
 
 	//#region fullscreen control

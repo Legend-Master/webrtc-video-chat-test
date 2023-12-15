@@ -45,6 +45,18 @@ export function hideVideo(video: CustomVideo) {
 	updateVideoLayout()
 }
 
+export function isVideoHidden(video: CustomVideo) {
+    return videos.get(video)?.wrapper.hidden
+}
+
+export function getNoneHiddenVideo() {
+	for (const [video, { wrapper }] of videos) {
+		if (!wrapper.hidden) {
+			return video
+		}
+	}
+}
+
 function hasOnlyOneVisibleChild() {
 	let onlyChild
 	let firstWrapper
