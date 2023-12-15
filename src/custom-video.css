@@ -22,7 +22,7 @@ custom-video .controls-wrapper {
 
 	display: flex;
 	justify-content: space-between;
-    align-items: center;
+	align-items: center;
 
 	transition: display 200ms, opacity 200ms;
 	/* Chrome only, progressive enhancement */
@@ -42,7 +42,7 @@ custom-video .controls-wrapper::after {
 }
 
 custom-video:not(.started) .controls-wrapper {
-    opacity: 0.5;
+	opacity: 0.5;
 }
 
 custom-video.started.hide-controls {
@@ -85,11 +85,12 @@ custom-video .controls-wrapper .icon-button.ontouch::after {
 } */
 
 custom-video .audio-controls {
-    display: flex;
+	display: flex;
 }
 
 /* custom-video .audio-button {
 } */
 
-/* custom-video .audio-slider {
-} */
+custom-video .audio-slider {
+	accent-color: white;
+}
