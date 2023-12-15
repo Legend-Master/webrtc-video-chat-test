@@ -76,13 +76,24 @@ export class CustomVideo extends HTMLElement {
 
 		let cachedVolume = this.video.volume
 		const isMuted = () => this.video.volume === 0
+		const onVolumeChange = () => {
+			this.audioSlider.value = String(this.video.volume * 100)
+			this.audioSlider.title = `Volume: ${this.audioSlider.value}`
+			this.audioSlider.style.setProperty('--progress', `${this.audioSlider.value}%`)
+
+			this.audioButton.innerHTML = isMuted() ? mdiVolumeOff : mdiVolumeOn
+			this.audioButton.title = isMuted() ? 'Unmute' : 'Mute'
+
+			if (!isMuted()) {
+				cachedVolume = this.video.volume
+			}
+		}
 
 		this.audioControls = document.createElement('div')
 		this.audioControls.classList.add('audio-controls')
 
 		this.audioButton = createIconButton(mdiVolumeOn)
 		this.audioButton.classList.add('audio-button')
-		this.audioButton.title = isMuted() ? 'Unmute' : 'Mute'
 		this.audioButton.addEventListener('click', () => {
 			this.video.volume = isMuted() ? cachedVolume : 0
 		})
@@ -94,18 +105,10 @@ export class CustomVideo extends HTMLElement {
 		this.audioSlider.classList.add('audio-slider')
 		this.audioSlider.addEventListener('input', () => {
 			this.video.volume = Number(this.audioSlider.value) / 100
-			this.audioSlider.title = `Volume: ${this.audioSlider.value}`
 		})
-		this.audioSlider.title = `Volume: ${this.audioSlider.value}`
 
-		this.video.addEventListener('volumechange', () => {
-			this.audioSlider.value = String(this.video.volume * 100)
-			this.audioButton.innerHTML = isMuted() ? mdiVolumeOff : mdiVolumeOn
-			this.audioButton.title = isMuted() ? 'Unmute' : 'Mute'
-			if (!isMuted()) {
-				cachedVolume = this.video.volume
-			}
-		})
+		this.video.addEventListener('volumechange', onVolumeChange)
+		onVolumeChange()
 
 		this.audioControls.append(this.audioButton)
 		this.audioControls.append(this.audioSlider)
