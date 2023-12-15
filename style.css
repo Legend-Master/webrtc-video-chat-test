@@ -285,23 +285,23 @@ because it's impossible to do transition/animation only on switching state away 
 .icon-button.ontouch::after {
 	transition: none;
 }
-.icon-button:active::before,
-.icon-button.ontouch::before {
+.icon-button:not(:disabled):active::before,
+.icon-button:not(:disabled).ontouch::before {
 	background-color: rgba(0, 0, 0, 0.1);
 }
-.icon-button:active::after,
-.icon-button.ontouch::after {
+.icon-button:not(:disabled):active::after,
+.icon-button:not(:disabled).ontouch::after {
 	opacity: 0;
 	border-color: rgba(0, 0, 0, 0.2);
 }
 @media (hover: hover) {
-	.icon-button:hover {
+	.icon-button:not(:disabled):hover {
 		color: var(--button-hover-color);
 		background-color: rgba(0, 0, 0, 0.1);
 	}
 }
-.icon-button:active,
-.icon-button.ontouch {
+.icon-button:not(:disabled):active,
+.icon-button:not(:disabled).ontouch {
 	color: var(--button-active-color);
 }
 

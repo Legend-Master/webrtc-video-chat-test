@@ -17,6 +17,7 @@ export class CustomVideo extends HTMLElement {
 	protected audioControls!: HTMLDivElement
 	private audioSlider!: HTMLInputElement
 	private audioButton!: HTMLButtonElement
+	private cachedVolume!: number
 
 	private hideControlsTimeout?: number
 	private keyboardFocusedControl = false
@@ -74,7 +75,7 @@ export class CustomVideo extends HTMLElement {
 			rightControls.append(this.pipButton)
 		}
 
-		let cachedVolume = this.video.volume
+		this.cachedVolume = this.video.volume
 		const isMuted = () => this.video.volume === 0
 		const onVolumeChange = () => {
 			this.audioSlider.value = String(this.video.volume * 100)
@@ -85,7 +86,7 @@ export class CustomVideo extends HTMLElement {
 			this.audioButton.title = isMuted() ? 'Unmute' : 'Mute'
 
 			if (!isMuted()) {
-				cachedVolume = this.video.volume
+				this.cachedVolume = this.video.volume
 			}
 		}
 
@@ -93,12 +94,14 @@ export class CustomVideo extends HTMLElement {
 		this.audioControls.classList.add('audio-controls')
 
 		this.audioButton = createIconButton(mdiVolumeOn)
+		this.audioButton.disabled = true
 		this.audioButton.classList.add('audio-button')
 		this.audioButton.addEventListener('click', () => {
-			this.video.volume = isMuted() ? cachedVolume : 0
+			this.video.volume = isMuted() ? this.cachedVolume : 0
 		})
 
 		this.audioSlider = document.createElement('input')
+		this.audioSlider.disabled = true
 		this.audioSlider.type = 'range'
 		this.audioSlider.min = '0'
 		this.audioSlider.max = '100'
@@ -135,6 +138,23 @@ export class CustomVideo extends HTMLElement {
 
 	setVideoSrcObject(mediaStream: MediaStream) {
 		this.video.srcObject = mediaStream
+	}
+
+	onTrackChange = () => {
+		const srcObject = this.getVideoSrcObject()
+		if (!srcObject) {
+			return
+		}
+		const hasAudio = srcObject.getAudioTracks().length > 0
+		if (hasAudio) {
+			this.audioButton.disabled = false
+			this.audioSlider.disabled = false
+			this.video.volume = this.cachedVolume
+		} else {
+			this.audioButton.disabled = true
+			this.audioSlider.disabled = true
+			this.video.volume = 0
+		}
 	}
 
 	private isPictureInPicture = () => {

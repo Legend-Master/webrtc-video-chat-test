@@ -252,6 +252,7 @@ export class PeerConnection {
 			this.remoteVideo.setVideoSrcObject(srcObject)
 		}
 		srcObject.addTrack(ev.track)
+		this.remoteVideo.onTrackChange()
 	}
 
 	private onIceCandidate = async (ev: RTCPeerConnectionIceEvent) => {
