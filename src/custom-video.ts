@@ -65,9 +65,11 @@ export class CustomVideo extends HTMLElement {
 			this.pipButton.addEventListener('click', this.togglePictureInPicture)
 			this.video.addEventListener('enterpictureinpicture', () => {
 				this.classList.add('picture-in-picture')
+				this.pipButton!.title = 'Exit picture-in-picture'
 			})
 			this.video.addEventListener('leavepictureinpicture', () => {
 				this.classList.remove('picture-in-picture')
+				this.pipButton!.title = 'Enter picture-in-picture'
 			})
 			rightControls.append(this.pipButton)
 		}
