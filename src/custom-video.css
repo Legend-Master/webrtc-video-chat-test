@@ -1,4 +1,4 @@
-custom-video {
+:where(.custom-video) {
 	position: relative;
 
 	display: flex;
@@ -7,15 +7,15 @@ custom-video {
 	--video-control-button-color: hsl(0, 0%, 90%);
 }
 
-custom-video:not(.started) {
+.custom-video:not(.started) {
 	background-color: hsl(0, 0%, 20%);
 }
 
-/* custom-video.picture-in-picture {
+/* .custom-video.picture-in-picture {
 	display: none;
 } */
 
-custom-video .controls-wrapper {
+.custom-video .controls-wrapper {
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -31,7 +31,7 @@ custom-video .controls-wrapper {
 	transition-behavior: allow-discrete !important;
 }
 
-custom-video .controls-wrapper::after {
+.custom-video .controls-wrapper::after {
 	content: '';
 	position: absolute;
 	top: -2.5em;
@@ -43,58 +43,58 @@ custom-video .controls-wrapper::after {
 	z-index: -1;
 }
 
-custom-video:not(.started) .controls-wrapper {
+:where(.custom-video):not(.started) .controls-wrapper {
 	opacity: 0.5;
 }
 
-custom-video.started.hide-controls {
+:where(.custom-video).started.hide-controls {
 	cursor: none;
 }
 
-custom-video.started.hide-controls .controls-wrapper {
+:where(.custom-video).started.hide-controls .controls-wrapper {
 	pointer-events: none;
 	opacity: 0;
 }
 
-custom-video .controls-wrapper .right-controls {
+:where(.custom-video) .controls-wrapper .right-controls {
 	display: flex;
 	flex-direction: row-reverse;
 }
 
-custom-video .controls-wrapper .icon-button {
+.custom-video .controls-wrapper .icon-button {
 	color: var(--video-control-button-color);
 	font-size: 2em;
 	padding: 0.4em;
 }
 
-custom-video .controls-wrapper .icon-button:active::before,
-custom-video .controls-wrapper .icon-button.ontouch::before {
+.custom-video .controls-wrapper .icon-button:active::before,
+.custom-video .controls-wrapper .icon-button.ontouch::before {
 	background-color: rgba(255, 255, 255, 0.1);
 }
-custom-video .controls-wrapper .icon-button:active::after,
-custom-video .controls-wrapper .icon-button.ontouch::after {
+.custom-video .controls-wrapper .icon-button:active::after,
+.custom-video .controls-wrapper .icon-button.ontouch::after {
 	border-color: rgba(255, 255, 255, 0.2);
 }
 
 @media (hover: hover) {
-	custom-video .controls-wrapper .icon-button:hover {
+	.custom-video .controls-wrapper .icon-button:hover {
 		background-color: rgba(255, 255, 255, 0.1);
 	}
 }
 
-/* custom-video.fullscreen .controls-wrapper {
+/* .custom-video.fullscreen .controls-wrapper {
 	font-size: 1.5em;
 } */
 
-custom-video .audio-controls {
+.custom-video .audio-controls {
 	display: flex;
 	align-items: center;
 }
 
-/* custom-video .audio-button {
+/* .custom-video .audio-button {
 } */
 
-custom-video .audio-slider {
+.custom-video .audio-slider {
 	--progress: 0%;
 	--background-color: hsl(0, 0%, 30%);
 
@@ -112,13 +112,13 @@ custom-video .audio-slider {
 	/* border-radius: 1em; */
 }
 
-custom-video .audio-slider::-webkit-slider-runnable-track,
-custom-video .audio-slider::-moz-range-track {
+.custom-video .audio-slider::-webkit-slider-runnable-track,
+.custom-video .audio-slider::-moz-range-track {
 	appearance: none;
 }
 
-custom-video .audio-slider::-webkit-slider-thumb,
-custom-video .audio-slider::-moz-range-thumb {
+.custom-video .audio-slider::-webkit-slider-thumb,
+.custom-video .audio-slider::-moz-range-thumb {
 	appearance: none;
 	border: none;
 

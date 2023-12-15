@@ -13,7 +13,7 @@ import { updateBandwidthRestriction } from './util/sdpInject'
 import { getIceServers } from './iceServerData'
 import { onResolutionChange } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
-import { localVideo } from './floatingVideo'
+import { localVideo } from './floating-video'
 import { closeShareDialog, isShareDialogOpen } from './shareDialog'
 import { stream } from './peerConnectionsManager'
 import { peerConnections } from './peerConnectionsManager'
@@ -23,8 +23,6 @@ import { CustomVideo } from './custom-video'
 import { addVideo, hideVideo, showVideo } from './remoteVideoManager'
 
 type PeerType = 'offer' | 'answer'
-
-let isFirstVideo = true
 
 export class PeerConnection {
 	private static OFFER_PLACEHOLDER = ''

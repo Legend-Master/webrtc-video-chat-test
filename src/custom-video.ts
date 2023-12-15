@@ -1,5 +1,4 @@
 import { createIconButton } from './styleHelper/iconButton'
-import { bindVideo } from './styleHelper/video'
 import { setLastFocusVideo } from './keyBoardControls'
 
 import mdiFullscreen from 'iconify-icon:mdi/fullscreen'
@@ -11,11 +10,11 @@ import mdiVolumeOff from 'iconify-icon:mdi/volume-off'
 import './custom-video.css'
 
 export class CustomVideo extends HTMLElement {
-	private video!: HTMLVideoElement
+	protected video!: HTMLVideoElement
 	private controlsWrapper!: HTMLDivElement
 	private fullscreenButton!: HTMLButtonElement
 	private pipButton?: HTMLButtonElement
-	private audioControls!: HTMLDivElement
+	protected audioControls!: HTMLDivElement
 	private audioSlider!: HTMLInputElement
 	private audioButton!: HTMLButtonElement
 
@@ -30,12 +29,13 @@ export class CustomVideo extends HTMLElement {
 	}
 
 	connectedCallback() {
+		this.classList.add('custom-video')
+
 		this.tabIndex = 0
 		this.addEventListener('keydown', () => setLastFocusVideo(this))
 		this.setVideoStarted(false)
 
-		this.video = bindVideo()
-
+		this.video = document.createElement('video')
 		this.video.autoplay = true
 		// this.video.muted = true
 		this.video.playsInline = true
@@ -160,7 +160,7 @@ export class CustomVideo extends HTMLElement {
 		}
 	}
 
-	private isFullscreen = () => {
+	protected isFullscreen = () => {
 		return document.fullscreenElement === this
 	}
 
@@ -237,6 +237,9 @@ export class CustomVideo extends HTMLElement {
 			if (ev.pointerType === 'mouse') {
 				return
 			}
+			if (this.shouldIgnoreTouchScreenPointerUp()) {
+				return
+			}
 			if (this.isControlsHidden()) {
 				// Delay a bit for touch screen to not instantly click on control buttons (e.g. fullscreen button)
 				this.controlsWrapper.style.pointerEvents = 'none'
@@ -286,6 +289,10 @@ export class CustomVideo extends HTMLElement {
 		window.addEventListener('keydown', this.onKeyDown)
 	}
 
+	protected shouldIgnoreTouchScreenPointerUp() {
+		return false
+	}
+
 	private onPointerDown = (ev: PointerEvent) => {
 		this.hasKeyboardEvent = false
 	}
@@ -301,7 +308,7 @@ export class CustomVideo extends HTMLElement {
 		this.classList.remove('hide-controls')
 	}
 
-	private hideControls = () => {
+	protected hideControls() {
 		if (this.keyboardFocusedControl || this.controlsHovered) {
 			return
 		}
@@ -313,9 +320,9 @@ export class CustomVideo extends HTMLElement {
 		return this.classList.contains('hide-controls')
 	}
 
-	private refreshHideOnIdle = () => {
+	protected refreshHideOnIdle = () => {
 		clearTimeout(this.hideControlsTimeout)
-		this.hideControlsTimeout = setTimeout(this.hideControls, 2000)
+		this.hideControlsTimeout = setTimeout(() => this.hideControls(), 2000)
 	}
 
 	private outOfIdle = () => {
