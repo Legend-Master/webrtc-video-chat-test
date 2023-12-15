@@ -4,5 +4,5 @@ It's just a test for ultra high bitrate WebRTC video sharing and some other UI e
 
 ## Credits Not In The Script Bundle
 
-- Material Icons: https://fonts.google.com/icons
-- Disconnect sound is from: https://m2.material.io/design/sound/sound-choreography.html (alert_error-01)
+- Material Design Icons (Apache 2.0): https://github.com/Templarian/MaterialDesign
+- Disconnect sound is from (CC-BY 4.0): https://m2.material.io/design/sound/sound-choreography.html (alert_error-01)
