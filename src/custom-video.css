@@ -3,8 +3,6 @@ custom-video {
 
 	display: flex;
 	align-items: stretch;
-
-	touch-action: none;
 }
 
 custom-video:not(.started) {
@@ -43,7 +41,7 @@ custom-video .controls-wrapper::after {
 	z-index: -1;
 }
 
-custom-video.hide-controls:not(.stash) {
+custom-video.hide-controls {
 	cursor: none;
 }
 
@@ -51,11 +49,6 @@ custom-video.hide-controls .controls-wrapper,
 custom-video.dragging .controls-wrapper {
 	pointer-events: none;
 	opacity: 0;
-}
-
-custom-video.dragging .controls-wrapper,
-custom-video.stash .controls-wrapper {
-	display: none;
 }
 
 custom-video .controls-wrapper .icon-button {
