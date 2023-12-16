@@ -15,6 +15,9 @@
     - Use radio buttons to select stun/turn(s)?
 - [x] Make dialogs behave like closed when playing closing animation
 - [x] Make Android back button work with dialogs
+- [ ] Make negotiating with Realtime Database more efficient
+    - Swap current order of old and new comer's role
+    - Predetermine offer and answer peer
 
 ## Fix
 
