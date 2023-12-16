@@ -121,3 +121,14 @@ for (const [index, codec] of codecs.entries()) {
     }
 }
 ```
+
+---
+
+Some testing about codecs
+
+Mainly tested in Chrome:
+
+- VP9 produces very low frame rate
+- H264 with packetization-mode=1 produces very low frame rate
+- AV1 actually doesn't consume that much cpu, not like how it works in OBS and ffmpeg by default (speed set to 8 and 1) (yes, 8 is still cpu intensive, and Chrome probably set it to 10 or something like it)
+- AV1 can only be used on desktop Chrome (even Edge doesn't support it) (Firefox doesn't support setCodecPreferences)
