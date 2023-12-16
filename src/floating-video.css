@@ -2,14 +2,19 @@ floating-video {
 	position: fixed;
 	top: 0;
 	right: 0;
+	z-index: var(--local-video-z-index);
+
+	translate: var(--translate);
 
 	box-shadow: 0 0 8px var(--half-transparent);
-
-	z-index: var(--local-video-z-index);
 
 	touch-action: none;
 
 	transition: scale 200ms;
+}
+
+floating-video.fullscreen {
+	translate: unset;
 }
 
 floating-video:not(.fullscreen) video {

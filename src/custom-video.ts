@@ -167,6 +167,9 @@ export class CustomVideo extends HTMLElement {
 				await document.exitPictureInPicture()
 			} else {
 				await this.video.requestPictureInPicture()
+				if (this.isFullscreen()) {
+					await document.exitFullscreen()
+				}
 			}
 		} catch {}
 	}
@@ -176,6 +179,17 @@ export class CustomVideo extends HTMLElement {
 		if (this.isFullscreen()) {
 			await document.exitFullscreen()
 		} else {
+			// Clear picture in picture
+			if (this.isPictureInPicture()) {
+				try {
+					await document.exitPictureInPicture()
+				} catch {}
+			}
+			// Clear other fullscreen elements
+			// There can be stacking fullscreen elements (why???)
+			if (document.fullscreenElement) {
+				await document.exitFullscreen()
+			}
 			await this.requestFullscreen()
 			await this.fullscreenAutoRotate()
 		}

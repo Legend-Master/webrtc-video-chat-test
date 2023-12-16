@@ -142,7 +142,6 @@ export class FloatingVideo extends CustomVideo {
 	// 0, 0 is top right
 	private updatePosition(userMove = false): void {
 		if (this.isFullscreen()) {
-			this.style.translate = ''
 			return
 		}
 		if (!this.hidden) {
@@ -175,7 +174,7 @@ export class FloatingVideo extends CustomVideo {
 			this.videoX = clamp(this.videoX, leftSnapLimit, rightSnapLimit)
 			this.videoY = clamp(this.videoY, -height + this.edgeHeight, innerHeight - this.edgeHeight)
 		}
-		this.style.translate = `${this.videoX}px ${this.videoY}px`
+		this.style.setProperty('--translate', `${this.videoX}px ${this.videoY}px`)
 	}
 
 	private stash(side: StashSide) {
