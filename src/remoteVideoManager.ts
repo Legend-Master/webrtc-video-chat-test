@@ -45,6 +45,10 @@ export function hideVideo(video: CustomVideo) {
 	updateVideoLayout()
 }
 
+export function isRemoteVideo(video: CustomVideo) {
+	return videos.get(video) !== undefined
+}
+
 export function isVideoHidden(video: CustomVideo) {
     return videos.get(video)?.wrapper.hidden
 }
