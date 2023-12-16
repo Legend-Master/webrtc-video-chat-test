@@ -26,6 +26,7 @@
     - `click` event will breaks on mouse down inside then moving out and release (selecting text)
 - [ ] Don't allow duplicated ICE servers
 - [ ] Fix switching camera on Firefox mobile fails most of the time
+- [ ] Timeout disconnected peers
 
 ## Build
 
