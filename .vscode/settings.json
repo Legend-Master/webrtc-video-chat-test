@@ -18,7 +18,6 @@
             ],
             "schema": {
                 "$ref": "https://github.com/firebase/firebase-tools/raw/master/schema/firebase-config.json",
-                "allowTrailingCommas": true,
             }
         }
     ],
