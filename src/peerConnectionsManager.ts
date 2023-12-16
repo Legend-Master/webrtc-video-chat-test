@@ -6,6 +6,7 @@ import {
 	endBefore,
 	onDisconnect,
 	push,
+	set,
 } from 'firebase/database'
 import {
 	getUserMedia,
@@ -55,8 +56,9 @@ export async function startPeerConnection() {
 }
 
 async function createUserOnRealtimeDatabase() {
-	const userIdRef = push(ref(db, room), { online: true })
-	await Promise.all([userIdRef, onDisconnect(userIdRef).remove()])
+	const userIdRef = push(ref(db, room))
+	await onDisconnect(userIdRef).remove()
+	await set(userIdRef, { online: true })
 	return userIdRef.key!
 }
 
