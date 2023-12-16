@@ -245,10 +245,6 @@ export class CustomVideo extends HTMLElement {
 			if (ev.pointerType !== 'mouse') {
 				return
 			}
-			// How???
-			if (ev.movementX === 0 && ev.movementY === 0) {
-				return
-			}
 			this.outOfIdle()
 		})
 
