@@ -2,7 +2,9 @@ import './styleHelper/icon'
 import './styleHelper/iconButton'
 import './styleHelper/touchResponse'
 import './styleHelper/dialog'
-import './styleHelper/video'
+
+import './custom-video'
+import './floating-video'
 
 import './iceServerData'
 import './selectDevice'

@@ -16,7 +16,7 @@ import {
 } from './selectDevice'
 import { PeerConnection } from './peerConnection'
 import { openShareDialog } from './shareDialog'
-import { localVideo, showLocalVideo } from './floatingVideo'
+import { localVideo, showLocalVideo } from './floating-video'
 import { db } from './util/firebaseInit'
 import { room } from './util/room'
 
@@ -78,7 +78,7 @@ async function startUserMedia() {
 	// console.log(videoTrack.getSettings())
 	// console.log(videoTrack.getCapabilities())
 	// console.log(videoTrack.getConstraints())
-	localVideo.srcObject = stream
+	localVideo.setVideoSrcObject(stream)
 	showLocalVideo()
 
 	const firstTrack = stream.getTracks()[0]

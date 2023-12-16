@@ -13,39 +13,16 @@ import { updateBandwidthRestriction } from './util/sdpInject'
 import { getIceServers } from './iceServerData'
 import { onResolutionChange } from './selectDevice'
 import { updateAllParameters, updateParameters, updateResolution } from './senderParameters'
-import { localVideo } from './floatingVideo'
+import { localVideo } from './floating-video'
 import { closeShareDialog, isShareDialogOpen } from './shareDialog'
-import { bindVideo } from './styleHelper/video'
 import { stream } from './peerConnectionsManager'
 import { peerConnections } from './peerConnectionsManager'
 import { getActivePeerConnections } from './peerConnectionsManager'
 import { stateIndicator } from './peerConnectionsManager'
-
-const remoteVideoContainer = document.getElementById('remote-video-container') as HTMLDivElement
-const remoteVideo = document.getElementById('remote-video') as HTMLVideoElement
+import { CustomVideo } from './custom-video'
+import { addVideo, hideVideo, showVideo } from './remoteVideoManager'
 
 type PeerType = 'offer' | 'answer'
-
-let isFirstVideo = true
-const visibleVideoWrappers = new Set<HTMLElement>()
-function updateVideoLayout(el: HTMLElement) {
-	if (el.hidden) {
-		visibleVideoWrappers.delete(el)
-		if (visibleVideoWrappers.size === 1) {
-			for (const wrapper of visibleVideoWrappers) {
-				wrapper.classList.add('only-child')
-			}
-		}
-	} else {
-		visibleVideoWrappers.add(el)
-		if (visibleVideoWrappers.size === 2) {
-			for (const wrapper of visibleVideoWrappers) {
-				wrapper.classList.remove('only-child')
-			}
-		}
-	}
-}
-updateVideoLayout(remoteVideo.parentElement as HTMLDivElement)
 
 export class PeerConnection {
 	private static OFFER_PLACEHOLDER = ''
@@ -71,8 +48,7 @@ export class PeerConnection {
 	private firstConnected = false
 	private isFirstNegotiation = true
 	private isFirstVideo = true
-	private remoteVideo: HTMLVideoElement
-	private remoteVideoWrapper: HTMLDivElement
+	private remoteVideo: CustomVideo
 
 	constructor(private userPath: string) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
@@ -95,27 +71,8 @@ export class PeerConnection {
 		})
 		this.videoStateDataChannel.addEventListener('message', this.onRemoteVideoStateChange)
 
-		this.isFirstVideo = isFirstVideo
-		isFirstVideo = false
-		if (this.isFirstVideo) {
-			this.remoteVideo = remoteVideo
-			this.remoteVideoWrapper = this.remoteVideo.parentElement as HTMLDivElement
-		} else {
-			this.remoteVideoWrapper = document.createElement('div')
-			this.updateRemoveVideoVisibility(false)
-			this.remoteVideo = bindVideo()
-			this.remoteVideo.controls = true
-			this.remoteVideo.autoplay = true
-			this.remoteVideo.playsInline = true
-			this.remoteVideoWrapper.append(this.remoteVideo)
-			remoteVideoContainer.append(this.remoteVideoWrapper)
-		}
+		this.remoteVideo = addVideo()
 		this.registerUserMedia()
-	}
-
-	private updateRemoveVideoVisibility(visible: boolean) {
-		this.remoteVideoWrapper.hidden = !visible
-		updateVideoLayout(this.remoteVideoWrapper)
 	}
 
 	// The one who says "you go first"
@@ -155,7 +112,7 @@ export class PeerConnection {
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
 			if (!this.isFirstVideo) {
-				this.updateRemoveVideoVisibility(false)
+				hideVideo(this.remoteVideo)
 			}
 			// Change the indicator to disconnected only when we're the only connection left
 			if (getActivePeerConnections() !== 1) {
@@ -247,23 +204,13 @@ export class PeerConnection {
 		return this.blankVideoTrack.track
 	}
 
-	private getShownRemoteVideoCount() {
-		let count = 0
-		for (const childElement of remoteVideoContainer.children) {
-			if (childElement instanceof HTMLDivElement && !childElement.hidden) {
-				count += 1
-			}
-		}
-		return count
-	}
-
 	private onRemoteVideoStateChange = (ev: MessageEvent) => {
 		if (ev.data === 'true') {
-			this.updateRemoveVideoVisibility(true)
-		} else if (this.getShownRemoteVideoCount() > 1) {
-			this.updateRemoveVideoVisibility(false)
+			showVideo(this.remoteVideo)
+		} else {
+			hideVideo(this.remoteVideo)
 		}
-		const srcObject = this.remoteVideo.srcObject as MediaStream | null
+		const srcObject = this.remoteVideo.getVideoSrcObject()
 		if (!srcObject) {
 			return
 		}
@@ -297,15 +244,15 @@ export class PeerConnection {
 	}
 
 	private onTrack = (ev: RTCTrackEvent) => {
-		if (!this.remoteVideo.srcObject) {
-			this.updateRemoveVideoVisibility(true)
-			this.remoteVideo.srcObject = new MediaStream()
-		}
-		;(this.remoteVideo.srcObject as MediaStream).addTrack(ev.track)
+		let srcObject = this.remoteVideo.getVideoSrcObject()
+		if (!srcObject) {
+			showVideo(this.remoteVideo)
 
-		// Refresh audio control
-		this.remoteVideo.controls = false
-		this.remoteVideo.controls = true
+			srcObject = new MediaStream()
+			this.remoteVideo.setVideoSrcObject(srcObject)
+		}
+		srcObject.addTrack(ev.track)
+		this.remoteVideo.onTrackChange()
 	}
 
 	private onIceCandidate = async (ev: RTCPeerConnectionIceEvent) => {
