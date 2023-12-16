@@ -38,28 +38,26 @@ export async function startPeerConnection() {
 	onDeviceSelectChange(changeUserMedia)
 	onVideoStateChange(changeUserMedia)
 
-	const key = await createUserOnRealtimeDatabase()
+	const userIdRef = push(ref(db, room))
+	await onDisconnect(userIdRef).remove()
+
+	const key = userIdRef.key!
 	const userPath = `${room}/${key}`
-	onChildAdded(query(ref(db, room), startAfter(null, key)), (snapshot) => {
-		peerConnections.add(new PeerConnection(`${userPath}/${snapshot.key}`))
-	})
 	onChildAdded(
 		query(ref(db, room), endBefore(null, key)),
 		(snapshot) => {
-			peerConnections.add(new PeerConnection(`${room}/${snapshot.key}/${key}`))
+			peerConnections.add(new PeerConnection(`${room}/${snapshot.key}/users/${key}`, 'offer'))
 		},
 		{ onlyOnce: true }
 	)
+	await set(userIdRef, { online: true })
+	const incomingUsersPath = `${userPath}/users`
+	onChildAdded(ref(db, incomingUsersPath), (snapshot) => {
+		peerConnections.add(new PeerConnection(`${incomingUsersPath}/${snapshot.key}`, 'answer'))
+	})
 
 	stateIndicator.innerText = '🟡 Waiting for another peer'
 	openShareDialog()
-}
-
-async function createUserOnRealtimeDatabase() {
-	const userIdRef = push(ref(db, room))
-	await onDisconnect(userIdRef).remove()
-	await set(userIdRef, { online: true })
-	return userIdRef.key!
 }
 
 async function changeUserMedia() {

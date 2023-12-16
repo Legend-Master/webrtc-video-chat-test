@@ -42,14 +42,13 @@ export class PeerConnection {
 	} as const
 
 	private pc: RTCPeerConnection
-	private peerType: PeerType | undefined
 	private renegotiateDataChannel: RTCDataChannel
 	private videoStateDataChannel: RTCDataChannel
 	private firstConnected = false
 	private isFirstNegotiation = true
 	private remoteVideo: CustomVideo
 
-	constructor(private userPath: string) {
+	constructor(private userPath: string, private peerType: PeerType) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
 		this.pc.addEventListener('track', this.onTrack)
 		this.pc.addEventListener('icecandidate', this.onIceCandidate)
@@ -255,9 +254,7 @@ export class PeerConnection {
 	private onIceCandidate = async (ev: RTCPeerConnectionIceEvent) => {
 		if (ev.candidate) {
 			const candidateInit = ev.candidate.toJSON()
-			if (this.peerType) {
-				await set(push(ref(db, `${this.userPath}/${this.peerType}/ice`)), candidateInit)
-			}
+			await set(push(ref(db, `${this.userPath}/${this.peerType}/ice`)), candidateInit)
 		}
 	}
 
@@ -384,19 +381,8 @@ export class PeerConnection {
 		// const onDisconnectRef = onDisconnect(ref(db, `${this.userPath}`))
 		// await onDisconnectRef.remove()
 
-		// Get if we're 'offer' or 'answer' side first
 		const offerDescRef = ref(db, `${this.userPath}/offer/desc`)
-		const result = await runTransaction(offerDescRef, (data) => {
-			if (!data && data !== PeerConnection.OFFER_PLACEHOLDER) {
-				// Mark as used, and we're the 'offer' side
-				return PeerConnection.OFFER_PLACEHOLDER
-			}
-		})
-		function getPeerType(isOffer: boolean): PeerType {
-			return isOffer ? 'offer' : 'answer'
-		}
-		this.peerType = getPeerType(result.committed)
-		const remotePeerType = getPeerType(!result.committed)
+		const anwserDescRef = ref(db, `${this.userPath}/answer/desc`)
 
 		if (this.peerType === 'offer') {
 			const offer = await this.pc.createOffer()
@@ -404,7 +390,9 @@ export class PeerConnection {
 			await set(offerDescRef, this.processDescription(offer))
 		}
 
+		const remotePeerType = this.peerType === 'offer' ? 'answer' : 'offer'
 		const remoteDescRef = ref(db, `${this.userPath}/${remotePeerType}/desc`)
+
 		this.registerUnsub(
 			onValue(remoteDescRef, async (snapshot) => {
 				if (!snapshot.exists()) {
@@ -442,7 +430,7 @@ export class PeerConnection {
 				if (this.peerType === 'answer') {
 					const answer = await this.pc.createAnswer()
 					await this.pc.setLocalDescription(answer)
-					await set(ref(db, `${this.userPath}/answer/desc`), this.processDescription(answer))
+					await set(anwserDescRef, this.processDescription(answer))
 				}
 
 				this.registerUnsub(
