@@ -3,16 +3,6 @@
 		"public": "dist",
 		"headers": [
 			{
-				"source": "index.html",
-				"headers": [
-					{
-						"key": "Cache-Control",
-						// 10 minutes
-						"value": "max-age=600"
-					}
-				]
-			},
-			{
 				// Everything in the root (dist) folder exclude sub folders (e.g. public)
 				"source": "*",
 				"headers": [
@@ -22,7 +12,17 @@
 						"value": "max-age=2592000"
 					}
 				]
-			}
+			},
+			{
+				"source": "index.html",
+				"headers": [
+					{
+						"key": "Cache-Control",
+						// 10 minutes
+						"value": "max-age=600"
+					}
+				]
+			},
 		]
 	}
 }
