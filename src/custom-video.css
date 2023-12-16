@@ -12,6 +12,11 @@
 	background-color: hsl(0, 0%, 20%);
 }
 
+.custom-video video {
+	width: 100%;
+	height: 100%;
+}
+
 /* .custom-video.picture-in-picture {
 	display: none;
 } */

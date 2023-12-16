@@ -337,29 +337,16 @@ because it's impossible to do transition/animation only on switching state away 
 #remote-video-container > div.only-child {
 	aspect-ratio: 16 / 9;
 }
-#remote-video-container video,
+
 #remote-video-container custom-video {
 	width: 100%;
 	height: 100%;
 }
 
 /* Safari hack, aspect ratio doesn't work with flex align-items stretch */
-#remote-video-container:has(video:not(.started)),
-#remote-video-container:has(custom-video:not(.started)){
+#remote-video-container:has(custom-video:not(.started)) {
 	align-items: center;
 }
-
-/* #remote-video-container video:not(.started) { */
-/* width: 100%; */
-/* height: 100%; */
-/* max-width: 100%; */
-/* max-width: 1200px; */
-/* max-height: 100%; */
-/* aspect-ratio: 16 / 9; */
-/* min-width: 0; */
-/* min-height: 0; */
-/* margin: auto; */
-/* } */
 
 #welcome-dialog > form {
 	padding: 2em 1em;
