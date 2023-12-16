@@ -47,7 +47,6 @@ export class PeerConnection {
 	private videoStateDataChannel: RTCDataChannel
 	private firstConnected = false
 	private isFirstNegotiation = true
-	private isFirstVideo = true
 	private remoteVideo: CustomVideo
 
 	constructor(private userPath: string) {
@@ -111,9 +110,7 @@ export class PeerConnection {
 		}
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
-			if (!this.isFirstVideo) {
-				hideVideo(this.remoteVideo)
-			}
+			hideVideo(this.remoteVideo)
 			// Change the indicator to disconnected only when we're the only connection left
 			if (getActivePeerConnections() !== 1) {
 				return
