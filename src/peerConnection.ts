@@ -319,6 +319,30 @@ export class PeerConnection {
 		this.sendIfDataChannelOpen(this.videoStateDataChannel, 'false')
 	}
 
+	setCodecsPreference() {
+		const senderCodecs = RTCRtpSender.getCapabilities('video')?.codecs ?? []
+		// const codecPriority = (capability: RTCRtpCodecCapability) =>
+		// 	capability.mimeType === 'video/H264' &&
+		// 	capability.sdpFmtpLine ===
+		// 		'level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=42001f'
+		// 		? 1
+		// 		: 0
+		const codecPriority = (capability: RTCRtpCodecCapability) =>
+			capability.mimeType === 'video/AV1' ? 1 : 0
+		senderCodecs.sort((a, b) => {
+			const priorityA = codecPriority(a)
+			const priorityB = codecPriority(b)
+			if (priorityA === priorityB) {
+				return 0
+			}
+			return priorityA > priorityB ? -1 : 1
+		})
+		for (const transceiver of this.pc.getTransceivers()) {
+			// Not supported by Firefox
+			transceiver.setCodecPreferences?.(senderCodecs)
+		}
+	}
+
 	async onNewStream() {
 		if (!stream) {
 			return
@@ -333,6 +357,7 @@ export class PeerConnection {
 				this.senders.set(track.kind, this.pc.addTrack(track))
 			}
 		}
+		this.setCodecsPreference()
 		this.sendIfDataChannelOpen(this.videoStateDataChannel, 'true')
 		await Promise.all(promises)
 		await updateAllParameters(this.pc)
