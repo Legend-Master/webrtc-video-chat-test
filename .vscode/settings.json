@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        ".parcelrc": "jsonc"
+        ".parcelrc": "jsonc",
+        "firebase.json": "jsonc",
     },
     "json.schemas": [
         {
@@ -9,6 +10,14 @@
             ],
             "schema": {
                 "allowTrailingCommas": true
+            }
+        },
+        {
+            "fileMatch": [
+                "firebase.json"
+            ],
+            "schema": {
+                "$ref": "https://github.com/firebase/firebase-tools/raw/master/schema/firebase-config.json"
             }
         }
     ],
