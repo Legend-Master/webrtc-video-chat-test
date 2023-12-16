@@ -1,8 +1,13 @@
 import { CustomVideo } from './custom-video'
+import { FloatingVideo } from './floating-video'
 import { getNoneHiddenVideo, isVideoHidden } from './remoteVideoManager'
 
 let lastFocusVideo: CustomVideo | undefined
 export function setLastFocusVideo(video: CustomVideo) {
+	// Ignore floating video
+	if (video instanceof FloatingVideo) {
+		return
+	}
 	lastFocusVideo = video
 }
 
