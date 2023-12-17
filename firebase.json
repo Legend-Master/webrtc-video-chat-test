@@ -1,6 +1,12 @@
 {
 	"hosting": {
 		"public": "dist",
+		"rewrites": [
+			{
+				"source": "**",
+				"destination": "/index.html"
+			}
+		],
 		"headers": [
 			{
 				// Everything in the root (dist) folder exclude sub folders (e.g. public)
