@@ -1,4 +1,4 @@
-import { onVideoStateChange } from './selectDevice'
+import { onVideoStateChange } from '../selectDevice'
 import { CustomVideo } from './custom-video'
 
 import './floating-video.css'

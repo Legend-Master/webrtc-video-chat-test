@@ -1,4 +1,4 @@
-import { start } from './startHandler'
+import { start } from '../startHandler'
 import mdiPin from 'iconify-icon:mdi/pin'
 
 import './recent-room.css'

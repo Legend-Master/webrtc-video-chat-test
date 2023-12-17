@@ -16,7 +16,7 @@ import {
 } from './selectDevice'
 import { PeerConnection } from './peerConnection'
 import { openShareDialog } from './shareDialog'
-import { localVideo, showLocalVideo } from './floating-video'
+import { localVideo, showLocalVideo } from './custom-elements/floating-video'
 import { db } from './util/firebaseInit'
 import { room } from './room'
 

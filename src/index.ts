@@ -3,9 +3,9 @@ import './styleHelper/iconButton'
 import './styleHelper/touchResponse'
 import './styleHelper/dialog'
 
-import './custom-video'
-import './floating-video'
-import './recent-room'
+import './custom-elements/custom-video'
+import './custom-elements/floating-video'
+import './custom-elements/recent-room'
 
 import './iceServerData'
 import './selectDevice'
