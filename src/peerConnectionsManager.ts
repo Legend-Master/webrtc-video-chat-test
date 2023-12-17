@@ -1,12 +1,4 @@
-import {
-	onChildAdded,
-	query,
-	ref,
-	endBefore,
-	onDisconnect,
-	push,
-	set,
-} from 'firebase/database'
+import { onChildAdded, query, ref, endBefore, onDisconnect, push, set } from 'firebase/database'
 import {
 	getUserMedia,
 	onDeviceSelectChange,
@@ -16,7 +8,7 @@ import {
 } from './selectDevice'
 import { PeerConnection } from './peerConnection'
 import { openShareDialog } from './shareDialog'
-import { localVideo, showLocalVideo } from './custom-elements/floating-video'
+import { localVideo, showLocalVideo } from './localVideo'
 import { db } from './util/firebaseInit'
 import { room } from './room'
 
