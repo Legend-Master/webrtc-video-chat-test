@@ -2,7 +2,6 @@ import {
 	onChildAdded,
 	query,
 	ref,
-	startAfter,
 	endBefore,
 	onDisconnect,
 	push,
@@ -19,7 +18,7 @@ import { PeerConnection } from './peerConnection'
 import { openShareDialog } from './shareDialog'
 import { localVideo, showLocalVideo } from './floating-video'
 import { db } from './util/firebaseInit'
-import { room } from './util/room'
+import { room } from './room'
 
 export const stateIndicator = document.getElementById(
 	'connection-state-indicator'

@@ -1,5 +1,5 @@
 import { push, ref } from 'firebase/database'
-import { db } from './firebaseInit'
+import { db } from './util/firebaseInit'
 
 const DB_PATH = 'multi-room'
 const RECENTLY_USED_ROOMS_SAVE_KEY = 'recently-used-rooms'

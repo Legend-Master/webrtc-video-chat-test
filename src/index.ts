@@ -11,7 +11,7 @@ import './selectDevice'
 import './peerConnection'
 import './keyBoardControls'
 
-import { createRoom } from './util/room'
+import { createRoom } from './room'
 import { startPeerConnection } from './peerConnectionsManager'
 import { setVideoState, welcomeDone } from './selectDevice'
 
