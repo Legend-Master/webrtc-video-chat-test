@@ -5,7 +5,6 @@ import './styleHelper/dialog'
 
 import './custom-elements/custom-video'
 import './custom-elements/floating-video'
-import './custom-elements/recent-room'
 
 import './iceServerData'
 import './selectDevice'

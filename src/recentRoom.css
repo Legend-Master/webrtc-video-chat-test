@@ -1,15 +1,15 @@
-recent-room {
+.recent-room {
 	display: flex;
     height: 2em;
 }
 
-recent-room .separator {
+.recent-room .separator {
 	background-color: white;
 	height: 100%;
     width: 1px;
 }
 
-recent-room .pin-button  {
+.recent-room .pin-button  {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,11 +19,11 @@ recent-room .pin-button  {
     height: 2em;
 }
 
-recent-room .pin-button svg {
+.recent-room .pin-button svg {
 	rotate: 45deg;
     opacity: 0.5;
 }
 
-recent-room.pinned .pin-button svg {
+.recent-room.pinned .pin-button svg {
     opacity: 1;
 }

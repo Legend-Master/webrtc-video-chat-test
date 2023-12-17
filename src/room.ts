@@ -1,16 +1,31 @@
 import { push, ref } from 'firebase/database'
 import { db } from './util/firebaseInit'
+import { RecentRoom } from './recentRoom'
+
+type RecentRoomData = {
+	id: string
+	pinned: boolean
+}
 
 const DB_PATH = 'multi-room'
-const RECENTLY_USED_ROOMS_SAVE_KEY = 'recently-used-rooms'
+const RECENT_ROOMS_SAVE_KEY = 'recently-used-rooms'
 
-const MAX_RECENTLY_USED_ROOMS = 6
+const MAX_RECENT_ROOMS = 6
 
 export let roomId: string
 export let room: string
 
-const saved = localStorage.getItem(RECENTLY_USED_ROOMS_SAVE_KEY)
-export const recentlyUsedRooms: string[] = saved ? JSON.parse(saved) : []
+const saved = localStorage.getItem(RECENT_ROOMS_SAVE_KEY)
+export const recentRooms: RecentRoomData[] = saved ? JSON.parse(saved) : []
+
+const container = document.createElement('div')
+for (const data of recentRooms) {
+	const recentRoom = new RecentRoom()
+	recentRoom.setRoomId(data.id)
+	recentRoom.setPinned(data.pinned)
+	container.append(recentRoom.rootElement)
+}
+document.body.append(container)
 
 const searchParams = new URLSearchParams(location.search)
 const roomParam = searchParams.get('room')
@@ -34,25 +49,29 @@ export function createRoom() {
 function setRoom(id: string) {
 	roomId = id
 	room = `${DB_PATH}/${roomId}`
-	addRecentlyUsedRoom()
+	addRecentRoom()
 }
 
-function addRecentlyUsedRoom() {
-	for (const [i, id] of recentlyUsedRooms.entries()) {
-		if (id === roomId) {
-			recentlyUsedRooms.splice(i, 1)
-			recentlyUsedRooms.unshift(id)
-			saveRecentlyUsedRooms()
+function addRecentRoom() {
+	for (const [i, data] of recentRooms.entries()) {
+		if (data.id === roomId) {
+			recentRooms.splice(i, 1)
+			recentRooms.unshift({ id: roomId, pinned: false })
+			saveRecentRooms()
 			return
 		}
 	}
-	recentlyUsedRooms.unshift(roomId)
-	if (recentlyUsedRooms.length > MAX_RECENTLY_USED_ROOMS) {
-		recentlyUsedRooms.pop()
+	recentRooms.unshift({ id: roomId, pinned: false })
+	if (recentRooms.length > MAX_RECENT_ROOMS) {
+		recentRooms.pop()
 	}
-	saveRecentlyUsedRooms()
+	saveRecentRooms()
 }
 
-function saveRecentlyUsedRooms() {
-	localStorage.setItem(RECENTLY_USED_ROOMS_SAVE_KEY, JSON.stringify(recentlyUsedRooms))
+function saveRecentRooms() {
+	localStorage.setItem(RECENT_ROOMS_SAVE_KEY, JSON.stringify(recentRooms))
 }
+
+function pinRoom() {}
+
+function unpinRoom() {}

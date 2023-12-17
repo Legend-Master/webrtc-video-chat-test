@@ -1,19 +1,20 @@
-import { start } from '../startHandler'
+import { start } from './startHandler'
 import mdiPin from 'iconify-icon:mdi/pin'
 
-import './recent-room.css'
+import './recentRoom.css'
 
-class RecentRoom extends HTMLElement {
-	private startButton!: HTMLButtonElement
-	private pinButton!: HTMLButtonElement
-	private separator!: HTMLDivElement
+export class RecentRoom {
+	rootElement: HTMLDivElement
+
+	private startButton: HTMLButtonElement
+	private pinButton: HTMLButtonElement
+	private separator: HTMLDivElement
 	private pinned = false
 
 	constructor() {
-		super()
-	}
+		this.rootElement = document.createElement('div')
+		this.rootElement.classList.add('recent-room')
 
-	connectedCallback() {
 		this.startButton = document.createElement('button')
 		this.startButton.classList.add('start-button')
 		this.startButton.addEventListener('click', () => start())
@@ -26,16 +27,14 @@ class RecentRoom extends HTMLElement {
 		this.separator = document.createElement('div')
 		this.separator.classList.add('separator')
 
-		this.append(this.startButton, this.separator, this.pinButton)
+		this.rootElement.append(this.startButton, this.separator, this.pinButton)
 	}
 
-	disconnectedCallback() {}
-
-	setRoomId(roomId: string) {
+	setRoomId = (roomId: string) => {
 		this.startButton.innerText = roomId
 	}
 
-	setPinned(pinned: boolean) {
+	setPinned = (pinned: boolean) => {
 		this.pinned = pinned
 		this.updatePinnedStyle()
 	}
@@ -47,15 +46,9 @@ class RecentRoom extends HTMLElement {
 
 	private updatePinnedStyle() {
 		if (this.pinned) {
-			this.classList.add('pinned')
+			this.rootElement.classList.add('pinned')
 		} else {
-			this.classList.remove('pinned')
+			this.rootElement.classList.remove('pinned')
 		}
-	}
-}
-customElements.define('recent-room', RecentRoom)
-declare global {
-	interface HTMLElementTagNameMap {
-		'recent-room': RecentRoom
 	}
 }
