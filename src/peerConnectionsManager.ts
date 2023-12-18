@@ -1,13 +1,4 @@
-import {
-	onChildAdded,
-	query,
-	ref,
-	startAfter,
-	endBefore,
-	onDisconnect,
-	push,
-	set,
-} from 'firebase/database'
+import { onChildAdded, query, ref, endBefore, onDisconnect, push, set } from 'firebase/database'
 import {
 	getUserMedia,
 	onDeviceSelectChange,
@@ -17,9 +8,9 @@ import {
 } from './selectDevice'
 import { PeerConnection } from './peerConnection'
 import { openShareDialog } from './shareDialog'
-import { localVideo, showLocalVideo } from './floating-video'
+import { localVideo, showLocalVideo } from './localVideo'
 import { db } from './util/firebaseInit'
-import { room } from './util/room'
+import { room } from './room'
 
 export const stateIndicator = document.getElementById(
 	'connection-state-indicator'

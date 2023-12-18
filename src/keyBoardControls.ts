@@ -1,4 +1,4 @@
-import { CustomVideo } from './custom-video'
+import { CustomVideo } from './custom-elements/custom-video'
 import { getNoneHiddenVideo, isRemoteVideo, isVideoHidden } from './remoteVideoManager'
 
 let lastFocusVideo: CustomVideo | undefined

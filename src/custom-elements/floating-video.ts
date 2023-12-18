@@ -1,4 +1,3 @@
-import { onVideoStateChange } from './selectDevice'
 import { CustomVideo } from './custom-video'
 
 import './floating-video.css'
@@ -208,9 +207,9 @@ export class FloatingVideo extends CustomVideo {
 		return super.hideControls()
 	}
 
-    protected shouldIgnoreTouchScreenPointerUp() {
-        return this.dragging
-    }
+	protected shouldIgnoreTouchScreenPointerUp() {
+		return this.dragging
+	}
 }
 customElements.define('floating-video', FloatingVideo)
 declare global {
@@ -218,18 +217,3 @@ declare global {
 		'floating-video': FloatingVideo
 	}
 }
-
-export const localVideo = document.createElement('floating-video')
-localVideo.id = 'local-video'
-localVideo.hidden = true
-document.body.append(localVideo)
-
-export function showLocalVideo() {
-	localVideo.hidden = false
-}
-
-onVideoStateChange((state) => {
-	if (!state) {
-		localVideo.hidden = true
-	}
-})

@@ -132,3 +132,12 @@ Mainly tested in Chrome:
 - H264 with packetization-mode=1 produces very low frame rate
 - AV1 actually doesn't consume that much cpu, not like how it works in OBS and ffmpeg by default (speed set to 8 and 1) (yes, 8 is still cpu intensive, and Chrome probably set it to 10 or something like it)
 - AV1 can only be used on desktop Chrome (even Edge doesn't support it) (Firefox doesn't support setCodecPreferences)
+
+---
+
+WebComponents/Custom Elements are so bad
+
+- Not many IDE tools/supports
+- No initial style before javascript fully loaded
+- Hard to use APIs
+- So why don't I just use a regular class?

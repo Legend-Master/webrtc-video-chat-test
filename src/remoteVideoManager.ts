@@ -1,4 +1,4 @@
-import { CustomVideo } from './custom-video'
+import { CustomVideo } from './custom-elements/custom-video'
 
 const remoteVideo = document.getElementById('remote-video') as CustomVideo
 const remoteVideoContainer = document.getElementById('remote-video-container') as HTMLDivElement

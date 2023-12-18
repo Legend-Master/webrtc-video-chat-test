@@ -1,5 +1,5 @@
-import { createIconButton } from './styleHelper/iconButton'
-import { setLastFocusVideo } from './keyBoardControls'
+import { createIconButton } from '../styleHelper/iconButton'
+import { setLastFocusVideo } from '../keyBoardControls'
 
 import mdiFullscreen from 'iconify-icon:mdi/fullscreen'
 import mdiFullscreenExit from 'iconify-icon:mdi/fullscreen-exit'
