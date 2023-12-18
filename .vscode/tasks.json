@@ -23,7 +23,10 @@
 			// "dependsOn": [
 			// 	"tsc: watch - tsconfig.json"
 			// ],
-			"isBackground": true
+			"isBackground": true,
+			"presentation": {
+				"reveal": "silent",
+			}
 		},
 		// {
 		// 	"type": "typescript",
