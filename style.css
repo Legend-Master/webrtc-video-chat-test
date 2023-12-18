@@ -391,6 +391,8 @@ because it's impossible to do transition/animation only on switching state away 
 }
 
 #remote-video-container {
+	margin-bottom: 1em;
+
 	/* display: grid; */
 	/* grid-auto-flow: column; */
 	display: flex;
