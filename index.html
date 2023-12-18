@@ -119,12 +119,43 @@
 			</div>
 		</dialog>
 		<main>
-			<div id="pc-control-div" class="hidden-after-call">
-				<button id="start-button">Start</button>
+			<header class="hidden-after-call">
 				<button id="config-ice" class="icon-button" title="Config ICE servers">
 					<iconify-icon icon="mdi:cog"></iconify-icon>
 				</button>
+				<a
+					href="https://github.com/Legend-Master/webrtc-video-chat-test"
+					title="View source on Github"
+					class="icon-button"
+				>
+					<iconify-icon icon="mdi:github"></iconify-icon>
+				</a>
+			</header>
+			<div id="room-input-div" class="hidden-after-call">
+				<h2>start with a room id or random one</h2>
+				<div>
+					<input
+						type="text"
+						id="room-input"
+						title="room"
+						pattern="[\-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz]+"
+						placeholder="Leave blank for random"
+					/>
+					<button id="start-button">Start</button>
+				</div>
 			</div>
+			<div id="recent-rooms" class="hidden-after-call">
+				<h2>or start with a recently used room</h2>
+				<div id="recent-room-container">
+					<div class="place-holder"></div>
+					<div class="place-holder"></div>
+					<div class="place-holder"></div>
+					<div class="place-holder"></div>
+					<div class="place-holder"></div>
+					<div class="place-holder"></div>
+				</div>
+			</div>
+
 			<div id="connection-state-indicator" class="shown-after-call" hidden>
 				🟡 Connecting to server
 			</div>
@@ -155,15 +186,12 @@
 				<!-- <select id="audio-select"></select> -->
 				<!-- </div> -->
 			</div>
-			<div id="remote-video-container">
+			<div id="remote-video-container" class="shown-after-call" hidden>
 				<div class="only-child">
 					<!-- <video id="remote-video" playsinline controls autoplay></video> -->
 					<custom-video id="remote-video" class="custom-video"></custom-video>
 				</div>
 			</div>
 		</main>
-		<footer>
-			<a href="https://github.com/Legend-Master/webrtc-video-chat-test">View source on Github</a>
-		</footer>
 	</body>
 </html>

@@ -9,6 +9,8 @@
 	--button-normal-color-light: hsl(204, 85%, 96%);
 	--button-hover-color-light: hsl(204, 85%, 93%);
 
+	/* Color from Github --color-canvas-subtle */
+	--subtle-background: hsl(210, 29%, 97%);
 	--half-transparent: rgba(0, 0, 0, 0.5);
 
 	--popup-z-index: 100;
@@ -126,18 +128,53 @@ code {
 	text-align: start;
 }
 
-main {
+:root:not(.started) body {
 	height: 100vh;
 	height: 100svh;
-
 	display: grid;
-	grid-template-rows: min-content min-content auto;
+}
+
+main {
+	display: grid;
 	gap: 1em;
 }
 
-footer {
-	margin: 1em 0;
-	text-align: center;
+:root:not(.started) main {
+	padding: 2em;
+}
+
+@media (width > 800px) {
+	:root:not(.started) body {
+		/* From material design 3 website */
+		background-color: hsl(216, 56%, 98%);
+	}
+
+	:root:not(.started) main {
+		background-color: white;
+		margin: auto;
+		box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.2);
+		align-content: center;
+	}
+}
+
+:root.started main {
+	/* display: grid; */
+	grid-template-rows: min-content min-content auto;
+	/* gap: 1em; */
+	height: 100vh;
+	height: 100svh;
+}
+
+header {
+	font-size: 1.5em;
+
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+header a {
+	display: flex;
 }
 
 .flex-container {
@@ -147,28 +184,68 @@ footer {
 	gap: 1em;
 }
 
-.flex-center {
-	place-content: center;
-	place-items: center;
-}
-
-#pc-control-div {
+#room-input-div {
 	display: grid;
-	grid-template-columns: 1fr auto 1fr;
+	justify-content: center;
 	align-items: center;
 	gap: 1em;
+	grid-template-rows: min-content min-content;
+}
 
-	margin-top: 1.75em;
-	margin-bottom: 0.75em;
+#room-input-div > div {
+	display: grid;
+	grid-template-columns: auto min-content;
+	justify-content: center;
+	align-items: center;
+	gap: 1em;
+	font-size: 1.2em;
 }
-#pc-control-div > button {
-	font-size: 1.5em;
+
+#room-input-div > h2 {
+	font-weight: normal;
+	text-align: center;
 }
-#start-button {
-	grid-column-start: 2;
+
+#room-input-div input {
+	padding: 0.5em 1em;
+	min-width: 0;
 }
-#config-ice {
-	justify-self: left;
+
+#room-input-div button {
+	padding: 0.5em 1em;
+}
+
+#recent-rooms {
+	display: grid;
+	grid-template-rows: min-content min-content;
+	gap: 0.5em;
+	text-align: center;
+}
+
+#recent-rooms > h2 {
+	font-weight: normal;
+}
+
+#recent-room-container {
+	margin: 1em;
+
+	/* display: flex; */
+	/* flex-wrap: wrap; */
+	display: grid;
+	grid-template-columns: repeat(2, 18em);
+	grid-template-rows: repeat(3, 2.5em);
+	justify-content: center;
+	/* align-items: center; */
+	gap: 1.5em;
+}
+@media (width < 600px) {
+	#recent-room-container {
+		grid-template-columns: repeat(1, 18em);
+		grid-template-rows: repeat(6, 2.5em);
+	}
+}
+#recent-room-container .place-holder {
+	background-color: var(--subtle-background);
 }
 
 #connection-state-indicator {
@@ -306,8 +383,6 @@ because it's impossible to do transition/animation only on switching state away 
 }
 
 #remote-video-container {
-	margin-bottom: 1em;
-
 	/* display: grid; */
 	/* grid-auto-flow: column; */
 	display: flex;
@@ -465,7 +540,7 @@ because it's impossible to do transition/animation only on switching state away 
 	justify-content: space-between;
 	align-items: center;
 	gap: 1em;
-	background-color: #f6f8fa; /* Color from Github --color-canvas-subtle */
+	background-color: var(--subtle-background); /* Color from Github --color-canvas-subtle */
 	padding: 1em;
 }
 
@@ -484,21 +559,19 @@ because it's impossible to do transition/animation only on switching state away 
 ::view-transition-old(root),
 ::view-transition-new(root),
 ::view-transition-old(device-select),
-::view-transition-new(device-select),
-::view-transition-old(video-container),
-::view-transition-new(video-container) {
+::view-transition-new(device-select) {
 	animation: none;
 }
 
-#pc-control-div,
+/* #room-input-div,
 #connection-state-indicator {
 	view-transition-name: title;
-}
+} */
 
 #device-select-div {
 	view-transition-name: device-select;
 }
 
-#remote-video {
+/* #remote-video {
 	view-transition-name: video-container;
-}
+} */

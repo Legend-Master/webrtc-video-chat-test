@@ -12,6 +12,7 @@ const shownAfterCall = document.getElementsByClassName(
 ) as HTMLCollectionOf<HTMLElement>
 
 async function updateHideStyle() {
+    document.documentElement.classList.add('started')
 	for (const el of hiddenAfterCall) {
 		el.hidden = true
 	}

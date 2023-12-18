@@ -1,6 +1,11 @@
 .recent-room {
-	display: flex;
-    height: 2em;
+	display: grid;
+    grid-template-columns: auto min-content min-content;
+}
+
+.recent-room button {
+    justify-content: center;
+    align-items: center;
 }
 
 .recent-room .separator {
@@ -16,14 +21,12 @@
 
     padding: 0;
     width: 2em;
-    height: 2em;
-}
-
-.recent-room .pin-button svg {
-	rotate: 45deg;
-    opacity: 0.5;
 }
 
 .recent-room.pinned .pin-button svg {
-    opacity: 1;
+	rotate: 45deg;
+}
+
+.recent-room:not(.pinned) .pin-button svg {
+    opacity: 0.7;
 }
