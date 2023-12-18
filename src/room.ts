@@ -86,9 +86,12 @@ export function setRoom(id: string, changeHistory = false, noSave = false) {
 }
 
 function addRecentRoom() {
-	const unpinnedSameIdIndex = recentRooms.findIndex((data) => !data.pinned && data.id === roomId)
-	if (unpinnedSameIdIndex !== -1) {
-		recentRooms.splice(unpinnedSameIdIndex, 1)
+	const sameIdIndex = recentRooms.findIndex((data) => data.id === roomId)
+	if (sameIdIndex !== -1) {
+		if (recentRooms[sameIdIndex]!.pinned) {
+			return
+		}
+		recentRooms.splice(sameIdIndex, 1)
 	}
 
 	const wasFull = recentRooms.length === MAX_RECENT_ROOMS
