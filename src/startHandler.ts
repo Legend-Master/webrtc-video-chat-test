@@ -1,8 +1,5 @@
-import { createRoom } from './room'
 import { startPeerConnection } from './peerConnectionsManager'
 import { setVideoState, welcomeDone } from './selectDevice'
-
-const startBtn = document.getElementById('start-button') as HTMLButtonElement
 
 const hiddenAfterCall = document.getElementsByClassName(
 	'hidden-after-call'
@@ -28,10 +25,8 @@ export function start() {
 		updateHideStyle()
 	}
 
-	createRoom()
 	startPeerConnection()
 }
-startBtn.addEventListener('click', start)
 
 async function handleAutoStart() {
 	const searchParams = new URLSearchParams(location.search)

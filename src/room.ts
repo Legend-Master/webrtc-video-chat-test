@@ -1,6 +1,7 @@
 import { push, ref } from 'firebase/database'
 import { db } from './util/firebaseInit'
 import { RecentRoom } from './recentRoom'
+import { start } from './startHandler'
 
 export type RecentRoomData = {
 	id: string
@@ -12,8 +13,8 @@ const RECENT_ROOMS_SAVE_KEY = 'recently-used-rooms'
 
 const MAX_RECENT_ROOMS = 6
 
-export let roomId: string
-export let room: string
+export let roomId = ''
+export let room = ''
 
 const saved = localStorage.getItem(RECENT_ROOMS_SAVE_KEY)
 export const recentRooms: RecentRoomData[] = saved ? JSON.parse(saved) : []
@@ -30,23 +31,54 @@ for (const [i, data] of recentRooms.entries()) {
 	container.children[i]?.replaceWith(recentRoom.rootElement)
 }
 
-export function createRoom() {
-	if (!roomId) {
-		const id = push(ref(db, DB_PATH)).key
-		if (id) {
-			setRoom(id, true)
-		} else {
-			throw new Error("Can't get a new unique room id")
-		}
+const roomInput = document.getElementById('room-input') as HTMLInputElement
+const startButton = document.getElementById('start-button') as HTMLButtonElement
+
+startButton.addEventListener('click', () => {
+	if (!roomInput.reportValidity()) {
+		roomInput.setCustomValidity(`Only letter, number, '-', '_' are allowed`)
+		return
 	}
-	return roomId
+	if (roomInput.value === '') {
+		createRoom()
+	} else {
+		setRoom(roomInput.value, true)
+	}
+	start()
+})
+
+roomInput.value = roomId ?? ''
+
+roomInput.addEventListener('change', () => {
+	if (!roomInput.reportValidity()) {
+		roomInput.setCustomValidity(`Only letter, number, '-', '_' are allowed`)
+	}
+})
+
+roomInput.addEventListener('input', () => {
+	roomInput.setCustomValidity('')
+})
+
+roomInput.addEventListener('keydown', (ev) => {
+	if (ev.key === 'Enter') {
+		startButton.click()
+	}
+})
+
+function createRoom() {
+	const id = push(ref(db, DB_PATH)).key
+	if (id) {
+		setRoom(id, true)
+	} else {
+		throw new Error("Can't get a new unique room id")
+	}
 }
 
-export function setRoom(id: string, pushHistory = false) {
+export function setRoom(id: string, changeHistory = false) {
 	roomId = id
 	room = `${DB_PATH}/${roomId}`
-	if (pushHistory) {
-		history.pushState(null, '', `?room=${roomId}`)
+	if (changeHistory) {
+		history.replaceState(null, '', `?room=${roomId}`)
 	}
 	addRecentRoom()
 }
