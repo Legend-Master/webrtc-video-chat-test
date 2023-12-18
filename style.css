@@ -165,7 +165,6 @@ main {
 :root.started main {
 	/* display: grid; */
 	grid-template-rows: min-content min-content auto;
-	justify-items: center;
 	/* gap: 1em; */
 	height: 100vh;
 	height: 100svh;
