@@ -6,6 +6,19 @@ import mdiPinOff from 'iconify-icon:mdi/pin-off'
 
 import './recentRoom.css'
 
+// Temp fix for Chrome 117-121 to prevent crashing on reload
+// https://crbug.com/1508254
+const styleTag = document.createElement('style')
+styleTag.innerText = `
+/* Chrome only, progressive enhancement */
+@starting-style {
+	.recent-room {
+		opacity: 0.5;
+	}
+}
+`
+document.head.append(styleTag)
+
 export class RecentRoom {
 	rootElement: HTMLDivElement
 
