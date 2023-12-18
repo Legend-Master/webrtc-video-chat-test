@@ -1,15 +1,15 @@
 {
-	"start_url": ".",
+	"start_url": "../",
 	"name": "WebRTC Chat",
 	"display": "standalone",
 	"icons": [
 		{
-			"src": "./public/favicon.svg",
+			"src": "favicon.svg",
 			"sizes": "any"
 		},
 		{
 			"purpose": "maskable",
-			"src": "./public/maskable-icon.svg",
+			"src": "maskable-icon.svg",
 			"sizes": "any"
 		}
 	]
