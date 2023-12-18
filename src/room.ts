@@ -22,7 +22,7 @@ export const recentRooms: RecentRoomData[] = saved ? JSON.parse(saved) : []
 const searchParams = new URLSearchParams(location.search)
 const roomParam = searchParams.get('room')
 if (roomParam) {
-	setRoom(roomParam)
+	setRoom(roomParam, false, true)
 }
 
 const container = document.getElementById('recent-room-container') as HTMLDivElement
@@ -74,46 +74,36 @@ function createRoom() {
 	}
 }
 
-export function setRoom(id: string, changeHistory = false) {
+export function setRoom(id: string, changeHistory = false, noSave = false) {
 	roomId = id
 	room = `${DB_PATH}/${roomId}`
 	if (changeHistory) {
 		history.replaceState(null, '', `?room=${roomId}`)
 	}
-	addRecentRoom()
+	if (!noSave) {
+		addRecentRoom()
+	}
 }
 
 function addRecentRoom() {
-	const wasFull = recentRooms.length === MAX_RECENT_ROOMS
 	const unpinnedSameIdIndex = recentRooms.findIndex((data) => !data.pinned && data.id === roomId)
 	if (unpinnedSameIdIndex !== -1) {
 		recentRooms.splice(unpinnedSameIdIndex, 1)
 	}
 
-	if (recentRooms.length === 0) {
-		recentRooms.push({ id: roomId, pinned: false })
-		saveRecentRooms()
-		return
-	}
+	const wasFull = recentRooms.length === MAX_RECENT_ROOMS
 
-	const firstUnpinnedIndex = recentRooms.findIndex((data) => !data.pinned)
-	if (firstUnpinnedIndex !== -1) {
-		let lastData = recentRooms[firstUnpinnedIndex]!
-		function fn(startingIndex: number) {
-			for (let index = startingIndex + 1; index < recentRooms.length; index++) {
-				const data = recentRooms[index]!
-				if (!data.pinned) {
-					recentRooms[index] = lastData
-					lastData = data
-					fn(index)
-				}
-			}
+	let lastData: RecentRoomData = { id: roomId, pinned: false }
+	for (let index = 0; index < recentRooms.length; index++) {
+		const data = recentRooms[index]!
+		if (data.pinned) {
+			continue
 		}
-		fn(firstUnpinnedIndex)
-		recentRooms[firstUnpinnedIndex] = { id: roomId, pinned: false }
-		if (!wasFull) {
-			recentRooms.push(lastData)
-		}
+		recentRooms[index] = lastData
+		lastData = data
+	}
+	if (!wasFull) {
+		recentRooms.push(lastData)
 	}
 	saveRecentRooms()
 }
