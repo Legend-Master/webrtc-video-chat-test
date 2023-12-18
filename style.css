@@ -160,6 +160,7 @@ main {
 :root.started main {
 	/* display: grid; */
 	grid-template-rows: min-content min-content auto;
+	justify-items: center;
 	/* gap: 1em; */
 	height: 100vh;
 	height: 100svh;
@@ -556,22 +557,47 @@ because it's impossible to do transition/animation only on switching state away 
 	font-size: 1.3em;
 }
 
-::view-transition-old(root),
-::view-transition-new(root),
-::view-transition-old(device-select),
-::view-transition-new(device-select) {
-	animation: none;
+@media (prefers-reduced-motion: reduce) {
+	::view-transition-old(root),
+	::view-transition-new(root) {
+		animation: none;
+	}
+	/* ::view-transition-old(device-select),
+	::view-transition-new(device-select) {
+		animation: none;
+	}
+	::view-transition-group(device-select) {
+		animation: none;
+	} */
 }
 
-/* #room-input-div,
-#connection-state-indicator {
-	view-transition-name: title;
-} */
+::view-transition-old(root) {
+	animation: root-transition-old 0.3s;
+}
+::view-transition-new(root) {
+	animation: root-transition-new 0.3s;
+}
 
-#device-select-div {
+@keyframes root-transition-old {
+	50% {
+		opacity: 0;
+	}
+	to {
+		scale: 1.2;
+	}
+}
+
+@keyframes root-transition-new {
+	from {
+		scale: 0.95;
+		opacity: 0;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+/* #device-select-div {
 	view-transition-name: device-select;
-}
-
-/* #remote-video {
-	view-transition-name: video-container;
+	contain: layout;
 } */
