@@ -97,8 +97,7 @@ function addRecentRoom() {
 	const wasFull = recentRooms.length === MAX_RECENT_ROOMS
 
 	let lastData: RecentRoomData = { id: roomId, pinned: false }
-	for (let index = 0; index < recentRooms.length; index++) {
-		const data = recentRooms[index]!
+	for (const [index, data] of recentRooms.entries()) {
 		if (data.pinned) {
 			continue
 		}
@@ -108,6 +107,7 @@ function addRecentRoom() {
 	if (!wasFull) {
 		recentRooms.push(lastData)
 	}
+
 	saveRecentRooms()
 }
 
