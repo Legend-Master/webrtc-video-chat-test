@@ -204,8 +204,8 @@ header a {
 	gap: 1em;
 }
 
-#room-input-div > h2 {
-	font-size: 1.4em;
+#room-input-div > h3 {
+	font-size: 1.2em;
 	font-weight: normal;
 	text-align: center;
 }
@@ -227,8 +227,8 @@ header a {
 	text-align: center;
 }
 
-#recent-rooms > h2 {
-	font-size: 1.4em;
+#recent-rooms > h3 {
+	font-size: 1.2em;
 	font-weight: normal;
 }
 
