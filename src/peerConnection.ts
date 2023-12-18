@@ -335,8 +335,10 @@ export class PeerConnection {
 			return priorityA > priorityB ? -1 : 1
 		})
 		for (const transceiver of this.pc.getTransceivers()) {
-			// Not supported by Firefox
-			transceiver.setCodecPreferences?.(senderCodecs)
+			if (transceiver.sender.track?.kind === 'video') {
+				// Not supported by Firefox
+				transceiver.setCodecPreferences?.(senderCodecs)
+			}
 		}
 	}
 
