@@ -140,7 +140,7 @@ main {
 }
 
 :root:not(.started) main {
-	padding: 1em;
+	padding: 1.5em;
 	max-height: 100%;
 	overflow: hidden;
 
@@ -206,6 +206,7 @@ header a {
 }
 
 #room-input-div > h2 {
+	font-size: 1.4em;
 	font-weight: normal;
 	text-align: center;
 }
@@ -228,6 +229,7 @@ header a {
 }
 
 #recent-rooms > h2 {
+	font-size: 1.4em;
 	font-weight: normal;
 }
 
