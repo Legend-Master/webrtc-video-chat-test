@@ -11,7 +11,7 @@ export type RecentRoomData = {
 const DB_PATH = 'multi-room'
 const RECENT_ROOMS_SAVE_KEY = 'recently-used-rooms'
 
-const MAX_RECENT_ROOMS = 6
+const MAX_RECENT_ROOMS = 4
 
 export let roomId = ''
 export let room = ''
@@ -94,7 +94,7 @@ function addRecentRoom() {
 		recentRooms.splice(sameIdIndex, 1)
 	}
 
-	const wasFull = recentRooms.length === MAX_RECENT_ROOMS
+	const wasFull = recentRooms.length >= MAX_RECENT_ROOMS
 
 	let lastData: RecentRoomData = { id: roomId, pinned: false }
 	for (const [index, data] of recentRooms.entries()) {
@@ -106,6 +106,9 @@ function addRecentRoom() {
 	}
 	if (!wasFull) {
 		recentRooms.push(lastData)
+	}
+	if (recentRooms.length >= MAX_RECENT_ROOMS) {
+		recentRooms.length = MAX_RECENT_ROOMS
 	}
 
 	saveRecentRooms()
