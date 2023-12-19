@@ -11,8 +11,8 @@
 		"@parcel/transformer-webmanifest": "^2.10.3",
 		"@types/dom-view-transitions": "^1.0.4",
 		"parcel": "^2.10.3",
-		"parcel-resolver-iconify": "^1.0.3",
-		"parcel-transformer-iconify": "^1.0.3",
+		"parcel-resolver-iconify": "^1.0.4",
+		"parcel-transformer-iconify": "^1.0.4",
 		"process": "^0.11.10",
 		"typescript": "^5.3.3",
 		"user-agent-data-types": "^0.4.2"
