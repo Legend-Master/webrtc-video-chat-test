@@ -151,8 +151,7 @@ main {
 
 @media (width > 800px) {
 	:root:not(.started) body {
-		/* From material design 3 website */
-		background-color: hsl(216, 56%, 98%);
+		background-color: hsl(0, 0%, 95%);
 	}
 
 	:root:not(.started) main {
