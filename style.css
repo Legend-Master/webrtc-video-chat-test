@@ -235,12 +235,14 @@ header a {
 }
 
 #recent-room-container {
+	--recent-room-height: 2.5em;
+
 	overflow: auto;
 	margin: 1em;
 
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 18em));
-	grid-template-rows: repeat(2, 2.5em);
+	grid-template-rows: repeat(2, var(--recent-room-height));
 	justify-content: center;
 	/* align-items: center; */
 	gap: 1.5em;
@@ -248,7 +250,7 @@ header a {
 @media (width < 600px) {
 	#recent-room-container {
 		grid-template-columns: repeat(1, minmax(0, 18em));
-		grid-template-rows: repeat(4, 2.5em);
+		grid-template-rows: repeat(4, var(--recent-room-height));
 	}
 }
 #recent-room-container .place-holder {
