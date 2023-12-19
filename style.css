@@ -145,7 +145,7 @@ main {
 	max-height: 100%;
 	overflow: hidden;
 
-	align-content: center;
+	align-content: space-between;
 	grid-template-rows: min-content min-content minmax(0, min-content) min-content;
 }
 
@@ -209,6 +209,7 @@ header a {
 	font-size: 1.2em;
 	font-weight: normal;
 	text-align: center;
+	margin-top: 0;
 }
 
 #room-input-div input {
