@@ -21,7 +21,13 @@ export let stream: MediaStream | undefined
 export const peerConnections = new Set<PeerConnection>()
 
 export function getActivePeerConnections() {
-	return peerConnections.size
+	let activeConnections = 0
+	for (const connection of peerConnections) {
+		if (connection.currentConnectionState !== 'disconnected') {
+			activeConnections += 1
+		}
+	}
+	return activeConnections
 }
 
 export async function startPeerConnection() {

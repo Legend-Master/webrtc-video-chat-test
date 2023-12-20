@@ -44,6 +44,8 @@ export class PeerConnection {
 	private pc: RTCPeerConnection
 	private renegotiateDataChannel: RTCDataChannel
 	private videoStateDataChannel: RTCDataChannel
+	private localVideoState = false
+	private remoteVideoState = false
 	private firstConnected = false
 	private isFirstNegotiation = true
 	private remoteVideo: CustomVideo
@@ -95,7 +97,7 @@ export class PeerConnection {
 		source.start()
 	}
 
-	private currentConnectionState: keyof typeof PeerConnection.STATES | undefined
+	currentConnectionState: keyof typeof PeerConnection.STATES | undefined
 	private indicateConnectionState(state: keyof typeof PeerConnection.STATES) {
 		if (this.currentConnectionState === state) {
 			return
@@ -109,11 +111,13 @@ export class PeerConnection {
 		}
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
-			hideVideo(this.remoteVideo)
+			this.setRemoteVideoState(false)
 			// Change the indicator to disconnected only when we're the only connection left
 			if (getActivePeerConnections() !== 1) {
 				return
 			}
+		} else if (state === 'connected') {
+			this.sendIfDataChannelOpen(this.videoStateDataChannel, String(this.localVideoState))
 		}
 		stateIndicator.innerText = PeerConnection.STATES[state]
 	}
@@ -200,12 +204,7 @@ export class PeerConnection {
 		return this.blankVideoTrack.track
 	}
 
-	private onRemoteVideoStateChange = (ev: MessageEvent) => {
-		if (ev.data === 'true') {
-			showVideo(this.remoteVideo)
-		} else {
-			hideVideo(this.remoteVideo)
-		}
+	private updateBlackOutRemoteVideo() {
 		const srcObject = this.remoteVideo.getVideoSrcObject()
 		if (!srcObject) {
 			return
@@ -214,7 +213,7 @@ export class PeerConnection {
 		if (!track) {
 			return
 		}
-		if (ev.data === 'true') {
+		if (this.remoteVideoState) {
 			if (this.remoteVideoTrack && track !== this.remoteVideoTrack) {
 				if (this.blankVideoTrack) {
 					srcObject.removeTrack(this.blankVideoTrack.track)
@@ -239,11 +238,24 @@ export class PeerConnection {
 		}
 	}
 
+	private setRemoteVideoState(state: boolean) {
+		this.remoteVideoState = state
+		if (state) {
+			showVideo(this.remoteVideo)
+		} else {
+			hideVideo(this.remoteVideo)
+		}
+		this.updateBlackOutRemoteVideo()
+	}
+
+	private onRemoteVideoStateChange = (ev: MessageEvent) => {
+		this.setRemoteVideoState(ev.data === 'true')
+	}
+
 	private onTrack = (ev: RTCTrackEvent) => {
 		let srcObject = this.remoteVideo.getVideoSrcObject()
 		if (!srcObject) {
-			showVideo(this.remoteVideo)
-
+			this.setRemoteVideoState(true)
 			srcObject = new MediaStream()
 			this.remoteVideo.setVideoSrcObject(srcObject)
 		}
@@ -309,11 +321,16 @@ export class PeerConnection {
 
 	private senders = new Map<string, RTCRtpSender>()
 
+	setLocalVideoState(state: boolean) {
+		this.localVideoState = state
+		this.sendIfDataChannelOpen(this.videoStateDataChannel, String(this.localVideoState))
+	}
+
 	onStreamStop() {
 		for (const [_, sender] of this.senders) {
 			sender.track?.stop()
 		}
-		this.sendIfDataChannelOpen(this.videoStateDataChannel, 'false')
+		this.setLocalVideoState(false)
 	}
 
 	setCodecsPreference() {
@@ -357,7 +374,7 @@ export class PeerConnection {
 			}
 		}
 		this.setCodecsPreference()
-		this.sendIfDataChannelOpen(this.videoStateDataChannel, 'true')
+		this.setLocalVideoState(true)
 		await Promise.all(promises)
 		await updateAllParameters(this.pc)
 	}
