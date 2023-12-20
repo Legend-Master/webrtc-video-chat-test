@@ -113,7 +113,7 @@ export class PeerConnection {
 			this.playDisconnectSound()
 			this.setRemoteVideoState(false)
 			// Change the indicator to disconnected only when we're the only connection left
-			if (getActivePeerConnections() !== 1) {
+			if (getActivePeerConnections() > 1) {
 				return
 			}
 		} else if (state === 'connected') {
