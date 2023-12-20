@@ -49,9 +49,9 @@ server sends
 ### Client cache
 
 ```yaml
-- hash-src-1.html: actrual html
-- hash-2.css: actrual css
-- hash-3.js: actrual js
+- hash-src-1.html: actual html
+- hash-2.css: actual css
+- hash-3.js: actual js
 ```
 
 ### Second load
@@ -76,9 +76,9 @@ server has
 server sends
 
 ```yaml
-- hash-src-10.html: actrual html
+- hash-src-10.html: actual html
 - hash-2.css: true
-- hash-30.js: actrual js
+- hash-30.js: actual js
 ```
 
 client serve and cache
