@@ -23,8 +23,6 @@ jobs:
 
       - name: Install Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
 
       - name: Build step
         run: "npm install && npm run build" # 📝 Update the build command(s) if necessary
@@ -33,5 +31,5 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "far-dove-70"
-          entrypoint: "index.js" # 📝 Update the entrypoint if necessary
-          root: "." # 📝 Update the root if necessary
+          entrypoint: "https://deno.land/std@0.209.0/http/file_server.ts" # 📝 Update the entrypoint if necessary
+          root: "dist" # 📝 Update the root if necessary
