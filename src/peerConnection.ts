@@ -1,13 +1,5 @@
 import './external/webrtcAdapter'
-import {
-	ref,
-	set,
-	onValue,
-	push,
-	onChildAdded,
-	runTransaction,
-	Unsubscribe,
-} from 'firebase/database'
+import { ref, set, onValue, push, onChildAdded, Unsubscribe } from 'firebase/database'
 import { db } from './util/firebaseInit'
 import { updateBandwidthRestriction } from './util/sdpInject'
 import { getIceServers } from './iceServerData'
@@ -25,11 +17,11 @@ import { addVideo, hideVideo, showVideo } from './remoteVideoManager'
 type PeerType = 'offer' | 'answer'
 
 export class PeerConnection {
-	private static OFFER_PLACEHOLDER = ''
-	private static RENEGOTIATE_CHANNEL_ID = 0
-	private static VIDEO_STATE_CHANNEL_ID = 1
+	private static readonly OFFER_PLACEHOLDER = ''
+	private static readonly RENEGOTIATE_CHANNEL_ID = 0
+	private static readonly VIDEO_STATE_CHANNEL_ID = 1
 
-	private static STATES = {
+	static readonly STATES = {
 		connected: '🟢 Connected',
 		connecting: '🟡 Connecting',
 		disconnected: '🔴 Disconnected',
@@ -41,16 +33,26 @@ export class PeerConnection {
 		connectedRemoteOffer: '🟡 Waiting for connection for new channel',
 	} as const
 
-	private pc: RTCPeerConnection
-	private renegotiateDataChannel: RTCDataChannel
-	private videoStateDataChannel: RTCDataChannel
-	private localVideoState = false
-	private remoteVideoState = false
+	currentConnectionState?: keyof typeof PeerConnection.STATES
+
+	private readonly pc: RTCPeerConnection
+	private readonly renegotiateDataChannel: RTCDataChannel
+	private readonly videoStateDataChannel: RTCDataChannel
+
 	private firstConnected = false
 	private isFirstNegotiation = true
-	private remoteVideo: CustomVideo
 
-	constructor(private userPath: string, private peerType: PeerType) {
+	private readonly remoteVideo: CustomVideo
+	private localVideoState = false
+	private remoteVideoState = false
+	private blankVideoTrack?: {
+		width: number
+		height: number
+		track: MediaStreamTrack
+	}
+	private remoteVideoTrack?: MediaStreamTrack
+
+	constructor(private readonly userPath: string, private readonly peerType: PeerType) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
 		this.pc.addEventListener('track', this.onTrack)
 		this.pc.addEventListener('icecandidate', this.onIceCandidate)
@@ -81,11 +83,10 @@ export class PeerConnection {
 		return this.peerType === 'answer'
 	}
 
-	private sendIfDataChannelOpen(channel: RTCDataChannel | undefined, message: string) {
-		if (!channel || channel.readyState !== 'open') {
-			return
+	private sendIfDataChannelOpen(channel: RTCDataChannel, message: string) {
+		if (channel.readyState === 'open') {
+			channel.send(message)
 		}
-		channel.send(message)
 	}
 
 	private async playDisconnectSound() {
@@ -97,7 +98,6 @@ export class PeerConnection {
 		source.start()
 	}
 
-	currentConnectionState: keyof typeof PeerConnection.STATES | undefined
 	private indicateConnectionState(state: keyof typeof PeerConnection.STATES) {
 		if (this.currentConnectionState === state) {
 			return
@@ -167,16 +167,6 @@ export class PeerConnection {
 				break
 		}
 	}
-
-	private blankVideoTrack:
-		| {
-				width: number
-				height: number
-				track: MediaStreamTrack
-		  }
-		| undefined
-
-	private remoteVideoTrack: MediaStreamTrack | undefined
 
 	private createBlankVideoTrack(width: number, height: number) {
 		if (
@@ -327,7 +317,7 @@ export class PeerConnection {
 	}
 
 	onStreamStop() {
-		for (const [_, sender] of this.senders) {
+		for (const sender of this.senders.values()) {
 			sender.track?.stop()
 		}
 		this.setLocalVideoState(false)
@@ -412,7 +402,7 @@ export class PeerConnection {
 		const remotePeerType = this.peerType === 'offer' ? 'answer' : 'offer'
 		const remoteDescRef = ref(db, `${this.userPath}/${remotePeerType}/desc`)
 
-		this.registerUnsub(
+		this.registerUnsubscribe(
 			onValue(remoteDescRef, async (snapshot) => {
 				if (!snapshot.exists()) {
 					// Another peer disconnected after we tried to connect to them
@@ -452,7 +442,7 @@ export class PeerConnection {
 					await set(anwserDescRef, this.processDescription(answer))
 				}
 
-				this.registerUnsub(
+				this.registerUnsubscribe(
 					onChildAdded(ref(db, `${this.userPath}/${remotePeerType}/ice`), async (snapshot) => {
 						if (snapshot.exists()) {
 							await this.pc.addIceCandidate(snapshot.val())
@@ -469,17 +459,17 @@ export class PeerConnection {
 		this.pc.close()
 	}
 
-	private unsubFunctions = new Set<Unsubscribe>()
+	private unsubscribeFunctions = new Set<Unsubscribe>()
 
-	private registerUnsub(fn: Unsubscribe) {
-		this.unsubFunctions.add(fn)
+	private registerUnsubscribe(fn: Unsubscribe) {
+		this.unsubscribeFunctions.add(fn)
 		return fn
 	}
 
 	private unsubscribeAll() {
-		for (const fn of this.unsubFunctions) {
+		for (const fn of this.unsubscribeFunctions) {
 			fn()
 		}
-		this.unsubFunctions.clear()
+		this.unsubscribeFunctions.clear()
 	}
 }
