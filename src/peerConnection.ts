@@ -109,15 +109,16 @@ export class PeerConnection {
 				closeShareDialog()
 			}
 		}
+		if (state === 'connected' || state === 'disconnected') {
+			this.updateBlackOutRemoteVideo()
+		}
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
-			this.setRemoteVideoState(false)
-			// Change the indicator to disconnected only when we're the only connection left
-			if (getActivePeerConnections() > 1) {
+			// Change the indicator to disconnected only when no active connections left
+			if (getActivePeerConnections() === 0) {
+				stateIndicator.innerText = PeerConnection.STATES[state]
 				return
 			}
-		} else if (state === 'connected') {
-			this.sendIfDataChannelOpen(this.videoStateDataChannel, String(this.localVideoState))
 		}
 		stateIndicator.innerText = PeerConnection.STATES[state]
 	}
@@ -213,7 +214,7 @@ export class PeerConnection {
 		if (!track) {
 			return
 		}
-		if (this.remoteVideoState) {
+		if (this.remoteVideoState && this.currentConnectionState !== 'disconnected') {
 			if (this.remoteVideoTrack && track !== this.remoteVideoTrack) {
 				if (this.blankVideoTrack) {
 					srcObject.removeTrack(this.blankVideoTrack.track)
