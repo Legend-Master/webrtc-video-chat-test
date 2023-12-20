@@ -115,8 +115,7 @@ export class PeerConnection {
 		if (state === 'disconnected') {
 			this.playDisconnectSound()
 			// Change the indicator to disconnected only when no active connections left
-			if (getActivePeerConnections() === 0) {
-				stateIndicator.innerText = PeerConnection.STATES[state]
+			if (getActivePeerConnections() !== 0) {
 				return
 			}
 		}
