@@ -161,42 +161,59 @@ export class CustomVideo extends HTMLElement {
 		return document.pictureInPictureElement === this.video
 	}
 
-	togglePictureInPicture = async () => {
+	async setPictureInPicture(enable: boolean) {
 		try {
-			if (this.isPictureInPicture()) {
-				await document.exitPictureInPicture()
-			} else {
-				await this.video.requestPictureInPicture()
-				if (this.isFullscreen()) {
-					await document.exitFullscreen()
+			if (enable) {
+				if (this.isPictureInPicture()) {
+					return
 				}
+				await this.video.requestPictureInPicture?.()
+				await this.setFullscreen(false)
+			} else {
+				if (!this.isPictureInPicture()) {
+					return
+				}
+				await document.exitPictureInPicture?.()
 			}
 		} catch {}
 	}
 
+	togglePictureInPicture = async () => {
+		await this.setPictureInPicture(!this.isPictureInPicture())
+	}
+
 	//#region fullscreen control
-	toggleFullscreen = async () => {
-		if (this.isFullscreen()) {
-			await document.exitFullscreen()
-		} else {
-			// Clear picture in picture
-			if (this.isPictureInPicture()) {
-				try {
-					await document.exitPictureInPicture()
-				} catch {}
+	protected isFullscreen = () => {
+		return document.fullscreenElement === this
+	}
+
+	async setFullscreen(enable: boolean) {
+		if (enable) {
+			if (this.isFullscreen()) {
+				return
 			}
+
+			// Clear picture in picture
+			await this.setPictureInPicture(false)
+
 			// Clear other fullscreen elements
 			// There can be stacking fullscreen elements (why???)
 			if (document.fullscreenElement) {
 				await document.exitFullscreen()
 			}
+
 			await this.requestFullscreen()
 			await this.fullscreenAutoRotate()
+		} else {
+			if (!this.isFullscreen()) {
+				return
+			}
+			await document.exitFullscreen()
 		}
 	}
 
-	protected isFullscreen = () => {
-		return document.fullscreenElement === this
+	toggleFullscreen = async () => {
+		await this.setFullscreen(!this.isFullscreen())
 	}
 
 	private updateFullscreenStyle = () => {

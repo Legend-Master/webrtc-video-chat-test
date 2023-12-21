@@ -9,8 +9,9 @@ export function showLocalVideo() {
 	localVideo.hidden = false
 }
 
-onVideoStateChange((state) => {
+onVideoStateChange(async (state) => {
 	if (!state) {
 		localVideo.hidden = true
+		await Promise.all([localVideo.setPictureInPicture(false), localVideo.setFullscreen(false)])
 	}
 })
