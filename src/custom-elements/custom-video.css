@@ -75,8 +75,14 @@
 
 .custom-video .controls-wrapper .icon-button svg path {
 	stroke: rgba(0, 0, 0, 0.15);
-    stroke-width: 2px;
-    paint-order: stroke;
+	stroke-width: 2px;
+	paint-order: stroke;
+}
+
+/* Don't know why fullscreen svg icon is a little bit smaller than others */
+.custom-video .controls-wrapper .fullscreen-button svg path {
+	scale: 1.1;
+	transform-origin: center;
 }
 
 .custom-video .controls-wrapper .icon-button:not(:disabled):active::before,

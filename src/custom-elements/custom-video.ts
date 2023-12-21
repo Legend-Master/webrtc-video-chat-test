@@ -54,6 +54,7 @@ export class CustomVideo extends HTMLElement {
 		rightControls.classList.add('right-controls')
 
 		this.fullscreenButton = createIconButton(mdiFullscreen)
+		this.fullscreenButton.classList.add('fullscreen-button')
 		this.fullscreenButton.title = 'Full screen'
 		this.fullscreenButton.addEventListener('click', this.toggleFullscreen)
 		this.addEventListener('fullscreenchange', this.updateFullscreenStyle)
