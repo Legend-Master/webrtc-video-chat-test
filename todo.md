@@ -27,6 +27,7 @@
 - [ ] Don't allow duplicated ICE servers
 - [ ] Fix switching camera on Firefox mobile fails most of the time
 - [ ] Timeout disconnected peers
+- [ ] Flip font facing camera preview
 
 ## Build
 
