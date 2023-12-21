@@ -18,6 +18,14 @@
 - [x] Make negotiating with Realtime Database more efficient
     - Swap current order of old and new comer's role
     - Predetermine offer and answer peer
+- [ ] Make moving cursor to the left edge hides the video controls in fullscreen
+- [ ] Figure out a better calling page layout
+    - A disconnect button?
+    - Do we use filled button or plain icon button for things like camera toggle/select and resolution select
+    - Swiching between multiple people's video instead of displaying all of them in a row?
+    - How to prompt user enter their name so others can see? (or do we want it?)
+    - Play a sound when someone connected to the room
+    - A way to purge disconnected peers (the reason we don't just do it on disconnect is because on mobile, if you switch to another page or go to home screen without viewing/listening/pip the page, connection will stop, but later when you swich back, the RTCPeerConnection can still auto reconnect, the question is do we support this use case or not, or do we make them go through the regular connection process again)
 
 ## Fix
 
