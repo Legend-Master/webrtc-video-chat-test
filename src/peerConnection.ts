@@ -110,10 +110,10 @@ export class PeerConnection {
 			}
 		}
 		if (state === 'connected') {
-			this.updateBlackOutRemoteVideo()
+			this.refreshRemoteVideo()
 		} else if (state === 'disconnected') {
 			this.playDisconnectSound()
-			this.setRemoteVideoState(false)
+			this.refreshRemoteVideo()
 			// Change the indicator to disconnected only when no active connections left
 			if (getActivePeerConnections() !== 0) {
 				return
@@ -230,12 +230,16 @@ export class PeerConnection {
 
 	private setRemoteVideoState(state: boolean) {
 		this.remoteVideoState = state
-		if (state) {
+		if (this.remoteVideoState && this.currentConnectionState !== 'disconnected') {
 			showVideo(this.remoteVideo)
 		} else {
 			hideVideo(this.remoteVideo)
 		}
 		this.updateBlackOutRemoteVideo()
+	}
+
+	private refreshRemoteVideo() {
+		this.setRemoteVideoState(this.remoteVideoState)
 	}
 
 	private onRemoteVideoStateChange = (ev: MessageEvent) => {
