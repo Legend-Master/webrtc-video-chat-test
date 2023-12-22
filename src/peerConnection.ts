@@ -109,11 +109,11 @@ export class PeerConnection {
 				closeShareDialog()
 			}
 		}
-		if (state === 'connected' || state === 'disconnected') {
+		if (state === 'connected') {
 			this.updateBlackOutRemoteVideo()
-		}
-		if (state === 'disconnected') {
+		} else if (state === 'disconnected') {
 			this.playDisconnectSound()
+			this.setRemoteVideoState(false)
 			// Change the indicator to disconnected only when no active connections left
 			if (getActivePeerConnections() !== 0) {
 				return
