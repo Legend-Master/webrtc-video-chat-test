@@ -4,13 +4,16 @@
 	"display": "standalone",
 	"icons": [
 		{
-			"src": "favicon.svg",
-			"sizes": "any"
+			"purpose": "any",
+			"src": "favicon-512.png",
+			"type": "image/png",
+			"sizes": "512x512"
 		},
 		{
 			"purpose": "maskable",
-			"src": "maskable-icon.svg",
-			"sizes": "any"
+			"src": "maskable-icon-512.png",
+			"type": "image/png",
+			"sizes": "512x512"
 		}
 	]
 }
