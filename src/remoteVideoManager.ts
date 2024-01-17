@@ -50,7 +50,7 @@ export function isRemoteVideo(video: CustomVideo) {
 }
 
 export function isVideoHidden(video: CustomVideo) {
-    return videos.get(video)?.wrapper.hidden
+	return videos.get(video)?.wrapper.hidden
 }
 
 export function getNoneHiddenVideo() {
@@ -61,32 +61,31 @@ export function getNoneHiddenVideo() {
 	}
 }
 
-function hasOnlyOneVisibleChild() {
-	let onlyChild
-	let firstWrapper
-	for (const { wrapper, shouldShow } of videos.values()) {
-		if (shouldShow) {
-			if (onlyChild) {
-				return false
-			}
-			onlyChild = wrapper
+function getOnlyVisibleChild() {
+	let visibleChild
+	for (const { wrapper } of videos.values()) {
+		// Skip non visible ones
+		if (wrapper.hidden) {
+			continue
 		}
-		if (!firstWrapper) {
-			firstWrapper = wrapper
+		// Return undefined if there's another visible child
+		if (visibleChild) {
+			return
 		}
+		visibleChild = wrapper
 	}
-	return onlyChild ?? firstWrapper
+	return visibleChild
 }
 
 function updateVideoLayout() {
-	const onlyChild = hasOnlyOneVisibleChild()
+	const onlyChild = getOnlyVisibleChild()
 	for (const { shouldShow, wrapper } of videos.values()) {
 		wrapper.hidden = !shouldShow
 		if (wrapper === onlyChild) {
-			wrapper.classList.add('only-child')
+			wrapper.classList.add('only-visible-child')
 			wrapper.hidden = false
 		} else {
-			wrapper.classList.remove('only-child')
+			wrapper.classList.remove('only-visible-child')
 		}
 	}
 }

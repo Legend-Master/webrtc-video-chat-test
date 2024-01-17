@@ -421,7 +421,7 @@ because it's impossible to do transition/animation only on switching state away 
 }
 
 /* Only non-hidden child */
-#remote-video-container > div.only-child {
+#remote-video-container > div.only-visible-child {
 	aspect-ratio: 16 / 9;
 }
 
