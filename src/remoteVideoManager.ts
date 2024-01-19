@@ -14,6 +14,7 @@ export function addVideo() {
 		return remoteVideo
 	}
 	const wrapper = document.createElement('div')
+	wrapper.hidden = true
 	const video = document.createElement('custom-video')
 	wrapper.append(video)
 	remoteVideoContainer.append(wrapper)
@@ -41,8 +42,12 @@ export function hideVideo(video: CustomVideo) {
 	if (!data) {
 		return
 	}
+	if (data.shouldShow === false) {
+		updateVideoLayout()
+		return
+	}
 	data.shouldShow = false
-	updateVideoLayout()
+	updateVideoLayout(video)
 }
 
 export function isRemoteVideo(video: CustomVideo) {
@@ -77,13 +82,33 @@ function getOnlyVisibleChild() {
 	return visibleChild
 }
 
-function updateVideoLayout() {
-	const onlyChild = getOnlyVisibleChild()
+function hasShouldShowVideo() {
+	for (const { shouldShow } of videos.values()) {
+		if (shouldShow) {
+			return true
+		}
+	}
+	return false
+}
+
+function updateVideoLayout(newlyHiddenVideo?: CustomVideo) {
+	let hasShouldShow = hasShouldShowVideo()
+	let forceShowOne = hasShouldShow
+		? undefined
+		: (newlyHiddenVideo && videos.get(newlyHiddenVideo)?.wrapper) ??
+		  [...videos.values()][0]?.wrapper
 	for (const { shouldShow, wrapper } of videos.values()) {
-		wrapper.hidden = !shouldShow
-		if (wrapper === onlyChild) {
+		if (wrapper === forceShowOne) {
+			forceShowOne.hidden = false
+		} else {
+			wrapper.hidden = !shouldShow
+		}
+	}
+
+	let onlyVisibleChild = getOnlyVisibleChild()
+	for (const { wrapper } of videos.values()) {
+		if (wrapper === onlyVisibleChild) {
 			wrapper.classList.add('only-visible-child')
-			wrapper.hidden = false
 		} else {
 			wrapper.classList.remove('only-visible-child')
 		}
