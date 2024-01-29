@@ -17,7 +17,7 @@
 				"background": {
 					"activeOnStart": true,
 					"beginsPattern": "Server running at .*",
-					"endsPattern": "."
+					"endsPattern": ".* Built in .*"
 				}
 			},
 			// "dependsOn": [
