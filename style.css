@@ -354,6 +354,7 @@ because it's impossible to do transition/animation only on switching state away 
 
 	position: absolute;
 	inset: 0;
+	pointer-events: none;
 
 	background-color: transparent;
 	/* background-clip: padding-box; */
