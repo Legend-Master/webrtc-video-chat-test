@@ -332,6 +332,7 @@ header a {
 
 	cursor: pointer;
 	user-select: none;
+	outline: none;
 
 	/* border: 1px solid transparent; */
 	/* border-radius: 50%; */
@@ -387,6 +388,9 @@ because it's impossible to do transition/animation only on switching state away 
 		color: var(--button-hover-color);
 		background-color: rgba(0, 0, 0, 0.1);
 	}
+}
+.icon-button:not(:disabled):focus-visible {
+	background-color: rgba(0, 0, 0, 0.1);
 }
 .icon-button:not(:disabled):active,
 .icon-button:not(:disabled).ontouch {
