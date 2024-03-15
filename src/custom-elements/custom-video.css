@@ -68,7 +68,10 @@
 }
 
 .custom-video .controls-wrapper .icon-button {
-	color: var(--video-control-button-color);
+	--icon-button-color: var(--video-control-button-color);
+	--icon-button-highlight-color: var(--video-control-button-color);
+	--icon-button-active-color: var(--video-control-button-color);
+
 	font-size: 2em;
 	padding: 0.4em;
 }

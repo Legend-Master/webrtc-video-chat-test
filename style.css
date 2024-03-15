@@ -320,13 +320,17 @@ header a {
 } */
 
 .icon-button {
+	--icon-button-color: var(--button-normal-color);
+	--icon-button-highlight-color: var(--button-hover-color);
+	--icon-button-active-color: var(--button-active-color);
+
 	/* For the icon inside */
 	justify-content: center;
 	align-items: center;
 
 	padding: 0.5em;
 
-	color: var(--button-normal-color);
+	color: var(--icon-button-color);
 	background-color: transparent;
 	/* background-clip: padding-box; */
 
@@ -385,7 +389,7 @@ because it's impossible to do transition/animation only on switching state away 
 }
 @media (hover: hover) {
 	.icon-button:not(:disabled):hover {
-		color: var(--button-hover-color);
+		color: var(--icon-button-highlight-color);
 		background-color: rgba(0, 0, 0, 0.1);
 	}
 }
@@ -394,7 +398,7 @@ because it's impossible to do transition/animation only on switching state away 
 }
 .icon-button:not(:disabled):active,
 .icon-button:not(:disabled).ontouch {
-	color: var(--button-active-color);
+	color: var(--icon-button-active-color);
 }
 
 #remote-video-container {
