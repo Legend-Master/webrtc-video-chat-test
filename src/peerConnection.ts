@@ -328,7 +328,7 @@ export class PeerConnection {
 	}
 
 	setCodecsPreference() {
-		const senderCodecs = RTCRtpSender.getCapabilities('video')?.codecs ?? []
+		const receiverCodecs = RTCRtpReceiver.getCapabilities('video')?.codecs ?? []
 		// const codecPriority = (capability: RTCRtpCodecCapability) =>
 		// 	capability.mimeType === 'video/H264' &&
 		// 	capability.sdpFmtpLine ===
@@ -337,7 +337,7 @@ export class PeerConnection {
 		// 		: 0
 		const codecPriority = (capability: RTCRtpCodecCapability) =>
 			capability.mimeType === 'video/AV1' ? 1 : 0
-		senderCodecs.sort((a, b) => {
+		receiverCodecs.sort((a, b) => {
 			const priorityA = codecPriority(a)
 			const priorityB = codecPriority(b)
 			if (priorityA === priorityB) {
@@ -348,7 +348,7 @@ export class PeerConnection {
 		for (const transceiver of this.pc.getTransceivers()) {
 			if (transceiver.sender.track?.kind === 'video') {
 				// Not supported by Firefox
-				transceiver.setCodecPreferences?.(senderCodecs)
+				transceiver.setCodecPreferences?.(receiverCodecs)
 			}
 		}
 	}
