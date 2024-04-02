@@ -10,17 +10,24 @@ const shownAfterCall = document.getElementsByClassName(
 
 const metaTag = document.createElement('meta')
 metaTag.name = 'theme-color'
-metaTag.content = 'hsl(0, 0%, 95%)'
 document.head.append(metaTag)
 
+const screenWidthWatch = window.matchMedia('(width > 800px)')
+function updateThemeColor() {
+	metaTag.content = screenWidthWatch.matches ? 'hsl(0, 0%, 95%)' : 'white'
+}
+screenWidthWatch.onchange = updateThemeColor
+updateThemeColor()
+
 async function updateHideStyle() {
-    document.documentElement.classList.add('started')
+	document.documentElement.classList.add('started')
 	for (const el of hiddenAfterCall) {
 		el.hidden = true
 	}
 	for (const el of shownAfterCall) {
 		el.hidden = false
 	}
+	screenWidthWatch.onchange = null
 	metaTag.content = 'white'
 }
 
