@@ -577,6 +577,16 @@ because it's impossible to do transition/animation only on switching state away 
 	font-size: 1.3em;
 }
 
+#overlay-title-bar {
+	position: fixed;
+	-webkit-app-region: drag;
+	app-region: drag;
+	left: env(titlebar-area-x, 0);
+	top: env(titlebar-area-y, 0);
+	width: env(titlebar-area-width, 0);
+	height: env(titlebar-area-height, 0);
+}
+
 @media (prefers-reduced-motion: reduce) {
 	::view-transition-old(root),
 	::view-transition-new(root) {

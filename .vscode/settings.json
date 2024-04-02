@@ -24,6 +24,7 @@
     "css.lint.unknownAtRules": "ignore",
     "css.lint.validProperties": [
         "transition-behavior",
+        "app-region",
     ],
     "debug.openDebug": "neverOpen",
     "debug.internalConsoleOptions": "neverOpen",
