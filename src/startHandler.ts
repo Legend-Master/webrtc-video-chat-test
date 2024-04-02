@@ -8,6 +8,11 @@ const shownAfterCall = document.getElementsByClassName(
 	'shown-after-call'
 ) as HTMLCollectionOf<HTMLElement>
 
+const metaTag = document.createElement('meta')
+metaTag.name = 'theme-color'
+metaTag.content = 'hsl(0, 0%, 95%)'
+document.head.append(metaTag)
+
 async function updateHideStyle() {
     document.documentElement.classList.add('started')
 	for (const el of hiddenAfterCall) {
@@ -16,6 +21,7 @@ async function updateHideStyle() {
 	for (const el of shownAfterCall) {
 		el.hidden = false
 	}
+	metaTag.content = 'white'
 }
 
 export function start() {
