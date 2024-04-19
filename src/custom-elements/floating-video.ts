@@ -104,8 +104,8 @@ export class FloatingVideo extends CustomVideo {
 	}
 
 	private onDraggingPointerDown = (ev: PointerEvent) => {
-		// Primary button only
-		if (!ev.isPrimary) {
+		// Left mouse button only (including touch)
+		if (ev.button !== 0) {
 			return
 		}
 
