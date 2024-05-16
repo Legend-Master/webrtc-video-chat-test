@@ -69,9 +69,11 @@ export class RecentRoom {
 	private updatePinnedStyle() {
 		if (this.data.pinned) {
 			this.pinButton.innerHTML = mdiPin
+			this.pinButton.title = 'Unpin'
 			this.rootElement.classList.add('pinned')
 		} else {
 			this.pinButton.innerHTML = mdiPinOff
+			this.pinButton.title = 'Pin'
 			this.rootElement.classList.remove('pinned')
 		}
 	}
