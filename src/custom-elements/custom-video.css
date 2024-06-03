@@ -102,6 +102,9 @@
 		background-color: rgba(255, 255, 255, 0.1);
 	}
 }
+.custom-video .controls-wrapper .icon-button:not(:disabled):focus-visible {
+	background-color: rgba(255, 255, 255, 0.1);
+}
 
 /* .custom-video.fullscreen .controls-wrapper {
 	font-size: 1.5em;
