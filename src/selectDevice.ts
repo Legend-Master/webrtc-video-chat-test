@@ -23,7 +23,7 @@ export const welcomeDone = new Promise<void>(async (resolve) => {
 	let state: PermissionState | undefined
 	try {
 		// Firefox doesn't have camera query
-		// Android WebView and lower version Safari doesn't have navigator.permissions
+		// Android WebView and lower version Safari don't have navigator.permissions
 		const status = await navigator.permissions.query({ name: 'camera' as PermissionName })
 		state = status.state
 	} catch {}
