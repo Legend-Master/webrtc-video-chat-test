@@ -21,10 +21,19 @@ function clamp(num: number, min: number, max: number) {
 	return Math.min(max, Math.max(min, num))
 }
 
+declare global {
+	interface Navigator {
+		windowControlsOverlay?: {
+			getTitlebarAreaRect(): DOMRect
+			visible: boolean
+		}
+	}
+}
+
 export class FloatingVideo extends CustomVideo {
 	private pointerDown = false
 	private videoX = -20
-	private videoY = 20
+	private videoY = 20 + (navigator.windowControlsOverlay?.getTitlebarAreaRect().height ?? 0)
 
 	private dragInitialX = 0
 	private dragInitialY = 0
