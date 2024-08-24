@@ -4,7 +4,7 @@
 		"build": "parcel build index.html"
 	},
 	"dependencies": {
-		"firebase": "^10.12.4"
+		"firebase": "^10.13.0"
 	},
 	"devDependencies": {
 		"@parcel/packager-raw-url": "^2.12.0",
