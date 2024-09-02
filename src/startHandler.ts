@@ -19,6 +19,8 @@ function updateThemeColor() {
 screenWidthWatch.onchange = updateThemeColor
 updateThemeColor()
 
+let started = false
+
 async function updateHideStyle() {
 	document.documentElement.classList.add('started')
 	for (const el of hiddenAfterCall) {
@@ -32,6 +34,11 @@ async function updateHideStyle() {
 }
 
 export function start() {
+	if (started) {
+		return
+	}
+	started = true
+
 	if (document.startViewTransition) {
 		document.startViewTransition(updateHideStyle)
 	} else {
