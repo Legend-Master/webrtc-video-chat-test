@@ -1,6 +1,13 @@
 import './external/webrtcAdapter'
-import { ref, set, onValue, push, onChildAdded, Unsubscribe } from 'firebase/database'
-import { db } from './util/firebaseInit'
+import {
+	set,
+	onValue,
+	push,
+	onChildAdded,
+	Unsubscribe,
+	DatabaseReference,
+	child,
+} from 'firebase/database'
 import { updateBandwidthRestriction } from './util/sdpInject'
 import { getIceServers } from './iceServerData'
 import { onResolutionChange } from './selectDevice'
@@ -52,7 +59,10 @@ export class PeerConnection {
 	}
 	private remoteVideoTrack?: MediaStreamTrack
 
-	constructor(private readonly userPath: string, private readonly peerType: PeerType) {
+	constructor(
+		private readonly userPathRef: DatabaseReference,
+		private readonly peerType: PeerType
+	) {
 		this.pc = new RTCPeerConnection({ iceServers: getIceServers() })
 		this.pc.addEventListener('track', this.onTrack)
 		this.pc.addEventListener('icecandidate', this.onIceCandidate)
@@ -260,7 +270,7 @@ export class PeerConnection {
 	private onIceCandidate = async (ev: RTCPeerConnectionIceEvent) => {
 		if (ev.candidate) {
 			const candidateInit = ev.candidate.toJSON()
-			await set(push(ref(db, `${this.userPath}/${this.peerType}/ice`)), candidateInit)
+			await set(push(child(this.userPathRef, `${this.peerType}/ice`)), candidateInit)
 		}
 	}
 
@@ -391,11 +401,11 @@ export class PeerConnection {
 		}
 		this.isFirstNegotiation = false
 
-		// const onDisconnectRef = onDisconnect(ref(db, `${this.userPath}`))
+		// const onDisconnectRef = onDisconnect(this.userPathRef)
 		// await onDisconnectRef.remove()
 
-		const offerDescRef = ref(db, `${this.userPath}/offer/desc`)
-		const anwserDescRef = ref(db, `${this.userPath}/answer/desc`)
+		const offerDescRef = child(this.userPathRef, 'offer/desc')
+		const anwserDescRef = child(this.userPathRef, 'answer/desc')
 
 		if (this.peerType === 'offer') {
 			const offer = await this.pc.createOffer()
@@ -404,7 +414,7 @@ export class PeerConnection {
 		}
 
 		const remotePeerType = this.peerType === 'offer' ? 'answer' : 'offer'
-		const remoteDescRef = ref(db, `${this.userPath}/${remotePeerType}/desc`)
+		const remoteDescRef = child(this.userPathRef, `${remotePeerType}/desc`)
 
 		this.registerUnsubscribe(
 			onValue(remoteDescRef, async (snapshot) => {
@@ -447,7 +457,7 @@ export class PeerConnection {
 				}
 
 				this.registerUnsubscribe(
-					onChildAdded(ref(db, `${this.userPath}/${remotePeerType}/ice`), async (snapshot) => {
+					onChildAdded(child(this.userPathRef, `${remotePeerType}/ice`), async (snapshot) => {
 						if (snapshot.exists()) {
 							await this.pc.addIceCandidate(snapshot.val())
 						}

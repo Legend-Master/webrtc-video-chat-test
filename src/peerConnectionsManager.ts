@@ -1,4 +1,4 @@
-import { onChildAdded, query, ref, endBefore, onDisconnect, push, set } from 'firebase/database'
+import { onChildAdded, query, endBefore, onDisconnect, push, set, child } from 'firebase/database'
 import {
 	getUserMedia,
 	onDeviceSelectChange,
@@ -9,8 +9,7 @@ import {
 import { PeerConnection } from './peerConnection'
 import { openShareDialog } from './shareDialog'
 import { localVideo, showLocalVideo } from './localVideo'
-import { db } from './util/firebaseInit'
-import { room } from './room'
+import { roomRef } from './room'
 
 export const stateIndicator = document.getElementById(
 	'connection-state-indicator'
@@ -35,22 +34,22 @@ export async function startPeerConnection() {
 	onDeviceSelectChange(changeUserMedia)
 	onVideoStateChange(changeUserMedia)
 
-	const userIdRef = push(ref(db, room))
+	const userIdRef = push(roomRef)
 	await onDisconnect(userIdRef).remove()
 
+	// For every user registered before us, send them an offer in their path
 	const key = userIdRef.key!
-	const userPath = `${room}/${key}`
 	onChildAdded(
-		query(ref(db, room), endBefore(null, key)),
+		query(roomRef, endBefore(null, key)),
 		(snapshot) => {
-			peerConnections.add(new PeerConnection(`${room}/${snapshot.key}/users/${key}`, 'offer'))
+			peerConnections.add(new PeerConnection(child(snapshot.ref, `users/${key}`), 'offer'))
 		},
 		{ onlyOnce: true }
 	)
+	// Watch for the offers under our path
 	await set(userIdRef, { online: true })
-	const incomingUsersPath = `${userPath}/users`
-	onChildAdded(ref(db, incomingUsersPath), (snapshot) => {
-		peerConnections.add(new PeerConnection(`${incomingUsersPath}/${snapshot.key}`, 'answer'))
+	onChildAdded(child(userIdRef, 'users'), (snapshot) => {
+		peerConnections.add(new PeerConnection(snapshot.ref, 'answer'))
 	})
 
 	stateIndicator.innerText = '🟡 Waiting for another peer'

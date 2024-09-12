@@ -1,4 +1,4 @@
-import { push, ref } from 'firebase/database'
+import { DatabaseReference, push, ref } from 'firebase/database'
 import { db } from './util/firebaseInit'
 import { RecentRoom } from './recentRoom'
 import { start } from './startHandler'
@@ -14,7 +14,7 @@ const RECENT_ROOMS_SAVE_KEY = 'recently-used-rooms'
 const MAX_RECENT_ROOMS = 4
 
 export let roomId = ''
-export let room = ''
+export let roomRef: DatabaseReference
 
 const saved = localStorage.getItem(RECENT_ROOMS_SAVE_KEY)
 export const recentRooms: RecentRoomData[] = saved ? JSON.parse(saved) : []
@@ -66,17 +66,13 @@ roomInput.addEventListener('keydown', (ev) => {
 })
 
 function createRoom() {
-	const id = push(ref(db, DB_PATH)).key
-	if (id) {
-		setRoom(id, true)
-	} else {
-		throw new Error("Can't get a new unique room id")
-	}
+	const id = push(ref(db, DB_PATH)).key!
+	setRoom(id, true)
 }
 
 export function setRoom(id: string, changeHistory = false, noSave = false) {
 	roomId = id
-	room = `${DB_PATH}/${roomId}`
+	roomRef = ref(db, `${DB_PATH}/${roomId}`)
 	if (changeHistory) {
 		history.replaceState(null, '', `?room=${roomId}`)
 	}
