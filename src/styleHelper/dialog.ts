@@ -21,15 +21,23 @@ export function openDialogModal(dialog: HTMLDialogElement, nonModal = false) {
 
 const preventClickCloseMap = new Set<HTMLDialogElement>()
 
-function preventCloseOnInside(this: HTMLDialogElement, ev: MouseEvent) {
+function onMouseDown(this: HTMLDialogElement, ev: MouseEvent) {
+	if (ev.target !== this) {
+		preventClickCloseMap.add(this)
+	} else {
+		preventClickCloseMap.delete(this)
+	}
+}
+
+function onMouseUp(this: HTMLDialogElement, ev: MouseEvent) {
 	if (ev.target !== this) {
 		preventClickCloseMap.add(this)
 	}
 }
 
 export function closeDialogOnClickOutside(dialog: HTMLDialogElement) {
-	dialog.addEventListener('mouseup', preventCloseOnInside)
-	dialog.addEventListener('mousedown', preventCloseOnInside)
+	dialog.addEventListener('mousedown', onMouseDown)
+	dialog.addEventListener('mouseup', onMouseUp)
 	// Document level for clicking outside of the window/dialog
 	document.addEventListener('click', (ev) => {
 		if (ev.target === dialog && !preventClickCloseMap.has(dialog)) {
