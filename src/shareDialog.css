@@ -42,7 +42,6 @@
 
 	display: grid;
 	grid-template-columns: minmax(0, auto) min-content;
-	gap: 0.5em;
 }
 
 #share-url-popup .url-and-button input {
