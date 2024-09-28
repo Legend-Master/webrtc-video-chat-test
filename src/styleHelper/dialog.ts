@@ -48,26 +48,20 @@ export function closeDialogOnClickOutside(dialog: HTMLDialogElement) {
 }
 
 function closeProxy(this: HTMLDialogElement, ev: Event) {
-	if (ev.isTrusted && ev.target) {
+	if (!ev.defaultPrevented) {
 		ev.preventDefault()
-		ev.stopImmediatePropagation()
-		// How to do this in typescript?
-		// const fakeEvent = new ev.constructor(ev.type, ev)
-		// const fakeEvent = new (ev.constructor as any)(ev.type, ev)
-		const ctor = ev instanceof SubmitEvent ? SubmitEvent : Event
-		const fakeEvent = new ctor(ev.type, ev)
-		ev.target.dispatchEvent(fakeEvent)
-		if (!fakeEvent.defaultPrevented) {
-			fakeEvent.preventDefault()
-			closeDialog(this)
-		}
+		closeDialog(this)
 	}
+}
+
+function makeCloseProxyLastEventListener(this: HTMLDialogElement, ev: Event) {
+	this.addEventListener(ev.type, closeProxy, { once: true })
 }
 
 const dialogs = document.getElementsByTagName('dialog')
 for (const dialog of dialogs) {
 	dialog.classList.add('closed')
-	dialog.addEventListener('cancel', closeProxy, { capture: true })
-	dialog.addEventListener('submit', closeProxy, { capture: true })
+	dialog.addEventListener('cancel', makeCloseProxyLastEventListener, { capture: true })
+	dialog.addEventListener('submit', makeCloseProxyLastEventListener, { capture: true })
 	dialog.addEventListener('close', () => dialog.classList.add('closed'))
 }
