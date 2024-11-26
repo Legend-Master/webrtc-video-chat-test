@@ -4,17 +4,17 @@
 		"build": "parcel build index.html"
 	},
 	"dependencies": {
-		"firebase": "^11.0.1"
+		"firebase": "^11.0.2"
 	},
 	"devDependencies": {
-		"@parcel/packager-raw-url": "^2.12.0",
-		"@parcel/transformer-webmanifest": "^2.12.0",
+		"@parcel/packager-raw-url": "^2.13.2",
+		"@parcel/transformer-webmanifest": "^2.13.2",
 		"@types/dom-view-transitions": "^1.0.5",
-		"parcel": "^2.12.0",
+		"parcel": "^2.13.2",
 		"parcel-resolver-iconify": "^1.0.5",
 		"parcel-transformer-iconify": "^1.0.5",
 		"process": "^0.11.10",
-		"typescript": "^5.6.3",
+		"typescript": "^5.7.2",
 		"user-agent-data-types": "^0.4.2"
 	}
 }
