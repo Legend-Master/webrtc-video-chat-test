@@ -339,14 +339,13 @@ export class PeerConnection {
 
 	setCodecsPreference() {
 		const receiverCodecs = RTCRtpReceiver.getCapabilities('video')?.codecs ?? []
-		// const codecPriority = (capability: RTCRtpCodecCapability) =>
+		// const codecPriority = (capability: RTCRtpCodec) =>
 		// 	capability.mimeType === 'video/H264' &&
 		// 	capability.sdpFmtpLine ===
 		// 		'level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=42001f'
 		// 		? 1
 		// 		: 0
-		const codecPriority = (capability: RTCRtpCodecCapability) =>
-			capability.mimeType === 'video/AV1' ? 1 : 0
+		const codecPriority = (capability: RTCRtpCodec) => (capability.mimeType === 'video/AV1' ? 1 : 0)
 		receiverCodecs.sort((a, b) => {
 			const priorityA = codecPriority(a)
 			const priorityB = codecPriority(b)
