@@ -22,8 +22,8 @@ const resolutionSelect = document.getElementById('video-resolution-select') as H
 export const welcomeDone = new Promise<void>(async (resolve) => {
 	let state: PermissionState | undefined
 	try {
-		// Firefox doesn't have camera query
-		// Android WebView and lower version Safari don't have navigator.permissions
+		// Old version of Firefox doesn't have camera query
+		// Android WebView and older version of Safari don't have navigator.permissions
 		const status = await navigator.permissions.query({ name: 'camera' as PermissionName })
 		state = status.state
 	} catch {}
