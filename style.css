@@ -445,13 +445,18 @@ because it's impossible to do transition/animation only on switching state away 
 }
 
 #welcome-dialog > form {
-	padding: 2em 1em;
-	max-width: 450px;
+	padding: 3em 2em;
+	max-width: 550px;
 
 	display: grid;
 	justify-items: center;
 	gap: 1em;
 	line-height: 1.5;
+}
+@media (width < 500px) {
+	#welcome-dialog > form {
+		padding: 2em 1em;
+	}
 }
 #welcome-dialog > form > h2 {
 	text-align: center;
