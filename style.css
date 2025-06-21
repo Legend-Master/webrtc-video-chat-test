@@ -490,6 +490,7 @@ because it's impossible to do transition/animation only on switching state away 
 .import-container input {
 	flex-grow: 1;
 	overflow: auto;
+	min-width: 0;
 }
 #ice-server-container {
 	width: 500px;
