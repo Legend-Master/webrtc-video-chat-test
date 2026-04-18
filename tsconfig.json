@@ -20,10 +20,8 @@
 		"lib": [
 			"es2022",
 			"dom",
-			"dom.iterable"
 		],
 		"types": [
-			"dom-view-transitions",
 			"user-agent-data-types",
 		],
 	},
